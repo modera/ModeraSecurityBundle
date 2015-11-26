@@ -13,7 +13,7 @@ use Modera\FoundationBundle\Testing\FunctionalTestCase;
  * @copyright 2015 Modera Foundation
  *
  */
-class UserServiceTest extends FunctionalTestCase
+class GroupTest extends FunctionalTestCase
 {
     /**
      * @var SchemaTool
