@@ -41,7 +41,7 @@ class GroupTest extends FunctionalTestCase
         ));
     }
 
-    public function testGetByRole()
+    public function testDeleteEntitiesWithManyToManyRelation()
     {
         $user1 = new User();
         $user2 = new User();
@@ -91,7 +91,8 @@ class GroupTest extends FunctionalTestCase
 
         self::$em->flush();
 
-        $query = static::$em->createQuery("DELETE FROM Modera\SecurityBundle\Entity\Group" );
+        $query = static::$em->createQuery('DELETE FROM Modera\SecurityBundle\Entity\Group' );
         $query->execute();
     }
 }
+
