@@ -47,6 +47,8 @@ security:
             anonymous: ~
             context: modera_auth
             provider: authenticator
+            #TODO: uncomment when update to Symfony 2.8
+            #user_checker: modera_security.chain_user_checker
             access_denied_handler: modera_security.security.access_denied_handler
             form_login:
                 provider:      modera_provider

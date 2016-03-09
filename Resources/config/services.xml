@@ -47,5 +47,16 @@
 
             <tag name="doctrine.event_listener" event="postLoad" />
         </service>
+
+        <service id="modera_security.chain_user_checker" class="Modera\SecurityBundle\Security\ChainUserChecker">
+            <argument type="service" id="modera_security.user_checkers_provider" />
+        </service>
+
+        <service id="modera_security.native_user_checker_provider" class="Modera\SecurityBundle\Contributions\UserCheckerProvider">
+            <argument /> <!-- native user checker -->
+            <argument>255</argument>
+            <tag name="modera_security.user_checkers_provider" />
+        </service>
+
     </services>
 </container>
