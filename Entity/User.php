@@ -123,6 +123,7 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
 
         $this->groups = new ArrayCollection();
         $this->permissions = new ArrayCollection();
+        $this->meta = array();
     }
 
     /**
@@ -460,10 +461,6 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
      */
     public function setState($state)
     {
-        if (self::STATE_ACTIVE !== $state) {
-            $state = self::STATE_NEW;
-        }
-
         $this->state = $state;
     }
 
@@ -505,6 +502,16 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
     public function setMeta(array $meta)
     {
         $this->meta = $meta;
+    }
+
+    public function addMeta($key, $value)
+    {
+        $this->meta[$key] = $value;
+    }
+
+    public function removeMeta($key)
+    {
+        unset($this->meta[$key]);
     }
 
     /**
