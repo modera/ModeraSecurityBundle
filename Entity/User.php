@@ -504,11 +504,18 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
         $this->meta = $meta;
     }
 
+    /**
+     * @param string $key
+     * @param mixed $value
+     */
     public function addMeta($key, $value)
     {
         $this->meta[$key] = $value;
     }
 
+    /**
+     * @param string $key
+     */
     public function removeMeta($key)
     {
         unset($this->meta[$key]);

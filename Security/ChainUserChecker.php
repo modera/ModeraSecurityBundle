@@ -6,6 +6,10 @@ use Sli\ExpanderBundle\Ext\ContributorInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @author    Konstantin Myakshin <koc-dp@yandex.ru>
+ * @copyright 2016 Modera Foundation
+ */
 class ChainUserChecker implements UserCheckerInterface
 {
     /**
@@ -26,8 +30,8 @@ class ChainUserChecker implements UserCheckerInterface
      */
     public function checkPreAuth(UserInterface $user)
     {
+        /* @var $userChecker UserCheckerInterface */
         foreach ($this->resourcesProvider->getItems() as $userChecker) {
-            /* @var $userChecker UserCheckerInterface */
             $userChecker->checkPreAuth($user);
         }
     }
@@ -37,8 +41,8 @@ class ChainUserChecker implements UserCheckerInterface
      */
     public function checkPostAuth(UserInterface $user)
     {
+        /* @var $userChecker UserCheckerInterface */
         foreach ($this->resourcesProvider->getItems() as $userChecker) {
-            /* @var $userChecker UserCheckerInterface */
             $userChecker->checkPostAuth($user);
         }
     }
