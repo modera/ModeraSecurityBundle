@@ -506,7 +506,7 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function addMeta($key, $value)
     {

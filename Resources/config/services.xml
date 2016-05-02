@@ -53,7 +53,7 @@
         </service>
 
         <service id="modera_security.native_user_checker_provider" class="Modera\SecurityBundle\Contributions\UserCheckerProvider">
-            <argument /> <!-- native user checker -->
+            <argument type="service" id="security.user_checker" />
             <argument>255</argument>
             <tag name="modera_security.user_checkers_provider" />
         </service>

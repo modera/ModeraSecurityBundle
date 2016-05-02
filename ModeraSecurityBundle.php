@@ -2,7 +2,6 @@
 
 namespace Modera\SecurityBundle;
 
-use Modera\SecurityBundle\DependencyInjection\Compiler\ReplaceUserCheckerCompilerPass;
 use Sli\ExpanderBundle\Ext\ExtensionPoint;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -28,7 +27,5 @@ class ModeraSecurityBundle extends Bundle
         $userCheckers = new ExtensionPoint('modera_security.user_checkers');
         $userCheckers->setDescription('Allows to contribute additional user checkers.');
         $container->addCompilerPass($userCheckers->createCompilerPass());
-
-        $container->addCompilerPass(new ReplaceUserCheckerCompilerPass());
     }
 }
