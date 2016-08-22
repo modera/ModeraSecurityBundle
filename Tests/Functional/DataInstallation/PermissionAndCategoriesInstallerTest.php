@@ -54,8 +54,8 @@ class PermissionAndCategoriesInstallerTest extends FunctionalTestCase
      */
     public function doSetUp()
     {
-        $this->permissionCategoriesProvider = $this->getMock(ContributorInterface::CLAZZ);
-        $this->permissionsProvider = $this->getMock(ContributorInterface::CLAZZ);
+        $this->permissionCategoriesProvider = $this->createMock(ContributorInterface::CLAZZ);
+        $this->permissionsProvider = $this->createMock(ContributorInterface::CLAZZ);
 
         $this->installer = new PermissionAndCategoriesInstaller(
             self::$em,
