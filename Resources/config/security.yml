@@ -5,7 +5,7 @@ services:
     modera_security.security.logout_success_handler:
         class: Modera\SecurityBundle\Security\LogoutSuccessHandler
         arguments:
-            - @security.http_utils
+            - "@security.http_utils"
             - /
 
     # TODO Left for BC reasons, use "modera.user_provider" instead. Will be removed in MF 3.0 (modera/foundation)
