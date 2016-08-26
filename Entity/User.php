@@ -195,7 +195,7 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
     /**
      * This method also takes into account possibility that a user might be "root".
      *
-     * @see #init() method.
+     * @see #init() method
      * @see \Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface
      *
      * {@inheritdoc}
