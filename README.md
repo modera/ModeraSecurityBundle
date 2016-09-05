@@ -1,6 +1,6 @@
 # ModeraSecurityBundle
 
-[![Build Status](https://travis-ci.org/modera/foundation.svg?branch=master)](https://travis-ci.org/modera/foundation)
+[![Build Status](https://travis-ci.org/modera/foundation.svg?branch=2.x)](https://travis-ci.org/modera/foundation)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/modera/ModeraSecurityBundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/modera/ModeraSecurityBundle/?branch=master)
 [![StyleCI](https://styleci.io/repos/29133119/shield)](https://styleci.io/repos/29133119)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/6612e08b-1f76-47a9-ad29-af085f9a62ac/mini.png)](https://insight.sensiolabs.com/projects/6612e08b-1f76-47a9-ad29-af085f9a62ac)
