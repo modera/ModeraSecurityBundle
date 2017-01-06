@@ -9,7 +9,7 @@ use Modera\SecurityBundle\Model\PermissionCategoryInterface;
 use Sli\ExpanderBundle\Ext\ContributorInterface;
 
 /**
- * Service responsible for installing permissions and permission categories so later they can be used to manager
+ * Service responsible for installing permissions and permission categories so later they can be used to manage
  * user permissions.
  *
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
@@ -17,11 +17,29 @@ use Sli\ExpanderBundle\Ext\ContributorInterface;
  */
 class PermissionAndCategoriesInstaller
 {
+    /**
+     * @var EntityManager
+     */
     private $em;
+
+    /**
+     * @var ContributorInterface
+     */
     private $permissionCategoriesProvider;
+
+    /**
+     * @var ContributorInterface
+     */
     private $permissionsProvider;
 
     /**
+     * @var BCLayer
+     */
+    private $bcLayer;
+
+    /**
+     * @internal Since 2.54.0
+     *
      * @param EntityManager        $em
      * @param ContributorInterface $permissionCategoriesProvider
      * @param ContributorInterface $permissionsProvider
@@ -29,11 +47,13 @@ class PermissionAndCategoriesInstaller
     public function __construct(
         EntityManager $em,
         ContributorInterface $permissionCategoriesProvider,
-        ContributorInterface $permissionsProvider
+        ContributorInterface $permissionsProvider,
+        BCLayer $bcLayer = null
     ) {
         $this->em = $em;
         $this->permissionCategoriesProvider = $permissionCategoriesProvider;
         $this->permissionsProvider = $permissionsProvider;
+        $this->bcLayer = $bcLayer;
     }
 
     /**
@@ -49,8 +69,9 @@ class PermissionAndCategoriesInstaller
             foreach ($permissionCategories as $permissionCategory) {
                 /* @var PermissionCategory $entityPermissionCategory */
                 $entityPermissionCategory = $this->em->getRepository(PermissionCategory::clazz())->findOneBy(array(
-                        'technicalName' => $permissionCategory->getTechnicalName(),
-                    ));
+                    'technicalName' => $permissionCategory->getTechnicalName(),
+                ));
+
                 if (!$entityPermissionCategory) {
                     $entityPermissionCategory = new PermissionCategory();
                     $entityPermissionCategory->setTechnicalName($permissionCategory->getTechnicalName());
@@ -83,8 +104,8 @@ class PermissionAndCategoriesInstaller
         foreach ($permissions as $permission) {
             /* @var \Modera\SecurityBundle\Model\PermissionInterface $permission */
             $entityPermission = $this->em->getRepository(Permission::clazz())->findOneBy(array(
-                    'roleName' => $permission->getRole(),
-                ));
+                'roleName' => $permission->getRole(),
+            ));
 
             if (!$entityPermission) {
                 $entityPermission = new Permission();
@@ -98,8 +119,18 @@ class PermissionAndCategoriesInstaller
             $entityPermission->setDescription($permission->getDescription());
             $entityPermission->setName($permission->getName());
 
+            $categoryTechnicalName = $permission->getCategory();
+            if ($this->bcLayer) {
+                // MPFE-964, see \Modera\BackendSecurityBundle\Contributions\PermissionCategoriesProvider
+                $newCategoryName = $this->bcLayer->resolveNewPermissionCategoryTechnicalName($categoryTechnicalName);
+                if (false !== $newCategoryName) {
+                    $categoryTechnicalName = $newCategoryName;
+                }
+            }
+
+            /* @var PermissionCategory $category */
             $category = $this->em->getRepository(PermissionCategory::clazz())->findOneBy(array(
-                'technicalName' => $permission->getCategory(),
+                'technicalName' => $categoryTechnicalName,
             ));
             if ($category) {
                 $entityPermission->setCategory($category);

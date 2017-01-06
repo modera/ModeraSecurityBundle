@@ -11,6 +11,10 @@ namespace Modera\SecurityBundle\Model;
 interface PermissionInterface
 {
     /**
+     * Returns a Symfony security role that this permission represents. You can use this role with
+     * implementations of \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface to check
+     * if user has access to perform certain operation.
+     *
      * @return string|\Symfony\Component\Security\Core\Role\RoleInterface
      */
     public function getRole();
@@ -27,7 +31,9 @@ interface PermissionInterface
     public function getDescription();
 
     /**
-     * @return string
+     * @see PermissionCategoryInterface::getTechnicalName()
+     *
+     * @return string A "technical name" of a PermissionCategory
      */
     public function getCategory();
 }

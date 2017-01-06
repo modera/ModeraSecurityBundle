@@ -9,21 +9,29 @@ namespace Modera\SecurityBundle\Model;
 class Permission implements PermissionInterface
 {
     /**
+     * @see PermissionInterface::getRole()
+     *
      * @var string
      */
     private $role;
 
     /**
+     * @see PermissionInterface::getName()
+     *
      * @var string
      */
     private $name;
 
     /**
+     * @see PermissionInterface::getCategory()
+     *
      * @var string
      */
     private $category;
 
     /**
+     * @see PermissionInterface::getDescription()
+     *
      * @var string
      */
     private $description;

@@ -4,6 +4,7 @@ namespace Modera\SecurityBundle\Tests\Functional\DataInstallation;
 
 use Doctrine\ORM\Tools\SchemaTool;
 use Modera\FoundationBundle\Testing\FunctionalTestCase;
+use Modera\SecurityBundle\DataInstallation\BCLayer;
 use Modera\SecurityBundle\DataInstallation\PermissionAndCategoriesInstaller;
 use Modera\SecurityBundle\Model\Permission;
 use Modera\SecurityBundle\Model\PermissionCategory;
@@ -60,7 +61,8 @@ class PermissionAndCategoriesInstallerTest extends FunctionalTestCase
         $this->installer = new PermissionAndCategoriesInstaller(
             self::$em,
             $this->permissionCategoriesProvider,
-            $this->permissionsProvider
+            $this->permissionsProvider,
+            new BCLayer()
         );
     }
 
@@ -149,5 +151,43 @@ class PermissionAndCategoriesInstallerTest extends FunctionalTestCase
         $this->assertValidResultStructure($result);
         $this->assertEquals(0, $result['installed']);
         $this->assertEquals(0, $result['removed']);
+    }
+
+    /**
+     * @group MPFE-964
+     */
+    public function testInstallPermissionWithBCLayer()
+    {
+        // emulating BCLayer class from ModeraBackendSecurityBundle
+        $category1 = new PermissionCategoryEntity();
+        $category1->setName('Administration');
+        $category1->setTechnicalName('user-management');
+
+        $category2 = new PermissionCategoryEntity();
+        $category2->setName('Administration');
+        $category2->setTechnicalName('administration');
+
+        self::$em->persist($category1);
+        self::$em->persist($category2);
+        self::$em->flush();
+
+        // refer to "old" technical name
+        $permission = new Permission('foo name', 'FOO_ROLE', $category1->getTechnicalName(), 'foo description');
+
+        $pp = $this->permissionsProvider;
+        $pp->expects($this->atLeastOnce())
+            ->method('getItems')
+            ->will($this->returnValue(array($permission)));
+
+        $result = $this->installer->installPermissions();
+
+        self::$em->clear();
+
+        /* @var PermissionEntity $permission */
+        $permission = self::$em->getRepository(PermissionEntity::class)->findOneBy(array('roleName' => 'FOO_ROLE'));
+
+        $this->assertNotNull($permission);
+        $this->assertNotNull($permission->getCategory());
+        $this->assertEquals('administration', $permission->getCategory()->getTechnicalName());
     }
 }

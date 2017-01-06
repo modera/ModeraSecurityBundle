@@ -17,12 +17,18 @@
             <tag name="modera_routing.routing_resources_provider" />
         </service>
 
+        <!-- internal -->
+        <service id="modera_security.data_installation.bc_layer"
+                 class="Modera\SecurityBundle\DataInstallation\BCLayer" public="false"
+        />
+
         <service id="modera_security.data_installation.permission_and_categories_installer"
                  class="Modera\SecurityBundle\DataInstallation\PermissionAndCategoriesInstaller">
 
             <argument type="service" id="doctrine.orm.entity_manager" />
             <argument type="service" id="modera_security.permission_categories_provider" />
             <argument type="service" id="modera_security.permissions_provider" />
+            <argument type="service" id="modera_security.data_installation.bc_layer" />
         </service>
 
         <service id="modera_security.root_user_handler.semantic_config_root_user_handler"

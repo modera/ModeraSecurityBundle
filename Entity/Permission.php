@@ -199,7 +199,7 @@ class Permission implements RoleInterface
     }
 
     /**
-     * @param mixed $category
+     * @param PermissionCategory $category
      */
     public function setCategory($category)
     {
@@ -207,7 +207,7 @@ class Permission implements RoleInterface
     }
 
     /**
-     * @return mixed
+     * @return PermissionCategory
      */
     public function getCategory()
     {
