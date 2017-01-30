@@ -16,12 +16,16 @@ class AuthenticatorTest extends \PHPUnit_Framework_TestCase
         $om = \Phake::mock('Doctrine\Common\Persistence\ObjectManager');
         $user = \Phake::mock(User::clazz());
         $doctrine = \Phake::mock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $httpUtils = \Phake::mock('Symfony\Component\Security\Http\HttpUtils');
+        $httpKernel = \Phake::mock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $response = \Phake::mock('Symfony\Component\HttpFoundation\Response');
 
         \Phake::when($om)->persist($user)->thenReturn(null);
         \Phake::when($om)->flush()->thenReturn(null);
         \Phake::when($doctrine)->getManager()->thenReturn($om);
+        \Phake::when($httpUtils)->createRedirectResponse->thenReturn($response);
 
-        return new Authenticator($doctrine);
+        return new Authenticator($doctrine, $httpUtils, $httpKernel);
     }
 
     public function testResponseOnAuthenticationFailure()
@@ -29,10 +33,13 @@ class AuthenticatorTest extends \PHPUnit_Framework_TestCase
         $authenticator = $this->createAuthenticator();
 
         $request = \Phake::mock('Symfony\Component\HttpFoundation\Request');
+        $session = \Phake::mock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $exception = \Phake::mock('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
+        \Phake::when($request)->getSession()->thenReturn($session);
+
         $resp = $authenticator->onAuthenticationFailure($request, $exception);
-        $this->assertSame(null, $resp);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $resp);
 
         \Phake::when($request)->isXmlHttpRequest()->thenReturn(true);
 
@@ -45,10 +52,13 @@ class AuthenticatorTest extends \PHPUnit_Framework_TestCase
         $authenticator = $this->createAuthenticator();
 
         $request = \Phake::mock('Symfony\Component\HttpFoundation\Request');
+        $session = \Phake::mock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $token = \Phake::mock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
+        \Phake::when($request)->getSession()->thenReturn($session);
+
         $resp = $authenticator->onAuthenticationSuccess($request, $token);
-        $this->assertSame(null, $resp);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $resp);
 
         \Phake::when($request)->isXmlHttpRequest()->thenReturn(true);
 
