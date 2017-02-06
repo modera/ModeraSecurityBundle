@@ -21,8 +21,6 @@ use Psr\Log\LoggerInterface;
 /**
  * @internal
  *
- * TODO since the class is no longer does any kind of authentication it should be renamed to something more meaningful
- *
  * @author    Sergei Vizel <sergei.vizel@modera.org>
  * @copyright 2014 Modera Foundation
  */
