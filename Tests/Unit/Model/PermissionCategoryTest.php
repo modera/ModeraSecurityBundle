@@ -1,8 +1,8 @@
 <?php
 
-namespace Modera\SecurityBundle\Tests\Unit\Entity;
+namespace Modera\SecurityBundle\Tests\Unit\Model;
 
-use Modera\SecurityBundle\Entity\PermissionCategory;
+use Modera\SecurityBundle\Model\PermissionCategory;
 
 /**
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>

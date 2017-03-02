@@ -3,6 +3,7 @@
 namespace Modera\SecurityBundle\Tests\Unit\DataInstallation;
 
 use Modera\SecurityBundle\DataInstallation\BCLayer;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
@@ -17,12 +18,23 @@ class BCLayerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->bcLayer = new BCLayer();
+        $this->bcLayer = new BCLayer(\Phake::mock(RegistryInterface::class));
     }
 
-    public function testResolveNewPermissionCategoryTechnicalName_match()
+    /**
+     * @dataProvider mappingProvider
+     */
+    public function testResolveNewPermissionCategoryTechnicalName_match($old, $new)
     {
-        $this->assertEquals('administration', $this->bcLayer->resolveNewPermissionCategoryTechnicalName('user-management'));
+        $this->assertEquals($new, $this->bcLayer->resolveNewPermissionCategoryTechnicalName($old));
+    }
+
+    public function mappingProvider()
+    {
+        return [
+            ['user-management', 'administration'],
+            ['site', 'general'],
+        ];
     }
 
     public function testResolveNewPermissionCategoryTechnicalName_noMatch()

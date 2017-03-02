@@ -9,6 +9,7 @@ class ModeraSecurityAppKernel extends \Modera\FoundationBundle\Testing\AbstractF
             new Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
 
+            new Modera\FoundationBundle\ModeraFoundationBundle(),
             new Modera\SecurityBundle\ModeraSecurityBundle(),
         );
     }

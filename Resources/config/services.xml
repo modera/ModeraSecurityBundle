@@ -24,8 +24,10 @@
 
         <!-- internal -->
         <service id="modera_security.data_installation.bc_layer"
-                 class="Modera\SecurityBundle\DataInstallation\BCLayer" public="false"
-        />
+                 class="Modera\SecurityBundle\DataInstallation\BCLayer">
+
+            <argument type="service" id="doctrine" />
+        </service>
 
         <service id="modera_security.data_installation.permission_and_categories_installer"
                  class="Modera\SecurityBundle\DataInstallation\PermissionAndCategoriesInstaller">
@@ -34,6 +36,7 @@
             <argument type="service" id="modera_security.permission_categories_provider" />
             <argument type="service" id="modera_security.permissions_provider" />
             <argument type="service" id="modera_security.data_installation.bc_layer" />
+            <argument type="service" id="modera_foundation.utils.deprecation_notice_emitter" />
         </service>
 
         <service id="modera_security.root_user_handler.semantic_config_root_user_handler"
@@ -53,7 +56,6 @@
         <service id="modera_security.event_listener.root_user_handler_injection_listener"
                  class="Modera\SecurityBundle\EventListener\RootUserHandlerInjectionListener">
 
-            <!-- defined in \Modera\SecurityBundle\DependencyInjection\ModeraSecurityExtension  -->
             <argument type="service" id="service_container" />
 
             <tag name="doctrine.event_listener" event="postLoad" />

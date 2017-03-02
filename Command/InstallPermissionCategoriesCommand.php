@@ -9,9 +9,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @author Sergei Lissovski <sergei.lissovski@modera.org>
+ * @copyright 2014 Modera Foundation
  */
 class InstallPermissionCategoriesCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -20,6 +24,9 @@ class InstallPermissionCategoriesCommand extends ContainerAwareCommand
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /* @var PermissionAndCategoriesInstaller $dataInstaller */

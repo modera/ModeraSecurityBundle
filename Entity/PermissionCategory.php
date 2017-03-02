@@ -36,8 +36,15 @@ class PermissionCategory
      */
     private $permissions;
 
-    public function __construct()
+    /**
+     * @param string $name
+     * @param string $technicalName
+     */
+    public function __construct($name = null, $technicalName = null)
     {
+        $this->name = $name;
+        $this->technicalName = $technicalName;
+
         $this->permissions = new ArrayCollection();
     }
 

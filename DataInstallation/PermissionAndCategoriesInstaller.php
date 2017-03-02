@@ -3,6 +3,7 @@
 namespace Modera\SecurityBundle\DataInstallation;
 
 use Doctrine\ORM\EntityManager;
+use Modera\FoundationBundle\Utils\DeprecationNoticeEmitter;
 use Modera\SecurityBundle\Entity\Permission;
 use Modera\SecurityBundle\Entity\PermissionCategory;
 use Modera\SecurityBundle\Model\PermissionCategoryInterface;
@@ -38,22 +39,31 @@ class PermissionAndCategoriesInstaller
     private $bcLayer;
 
     /**
+     * @var DeprecationNoticeEmitter
+     */
+    private $deprecationNoticeEmitter;
+
+    /**
      * @internal Since 2.54.0
      *
-     * @param EntityManager        $em
-     * @param ContributorInterface $permissionCategoriesProvider
-     * @param ContributorInterface $permissionsProvider
+     * @param EntityManager            $em
+     * @param ContributorInterface     $permissionCategoriesProvider
+     * @param ContributorInterface     $permissionsProvider
+     * @param BCLayer                  $bcLayer
+     * @param DeprecationNoticeEmitter $deprecationNoticeEmitter
      */
     public function __construct(
         EntityManager $em,
         ContributorInterface $permissionCategoriesProvider,
         ContributorInterface $permissionsProvider,
-        BCLayer $bcLayer = null
+        BCLayer $bcLayer = null,
+        DeprecationNoticeEmitter $deprecationNoticeEmitter = null
     ) {
         $this->em = $em;
         $this->permissionCategoriesProvider = $permissionCategoriesProvider;
         $this->permissionsProvider = $permissionsProvider;
         $this->bcLayer = $bcLayer;
+        $this->deprecationNoticeEmitter = $deprecationNoticeEmitter;
     }
 
     /**
@@ -86,6 +96,10 @@ class PermissionAndCategoriesInstaller
         }
 
         $this->em->flush();
+
+        if ($this->bcLayer) {
+            $this->bcLayer->syncPermissionCategoryTechnicalNamesInDatabase();
+        }
 
         return array(
             'installed' => $permissionCategoriesInstalled,
@@ -124,6 +138,11 @@ class PermissionAndCategoriesInstaller
                 // MPFE-964, see \Modera\BackendSecurityBundle\Contributions\PermissionCategoriesProvider
                 $newCategoryName = $this->bcLayer->resolveNewPermissionCategoryTechnicalName($categoryTechnicalName);
                 if (false !== $newCategoryName) {
+                    $this->emitDeprecationNotice(sprintf(
+                        'Permission category "%s" is deprecated, you must use "%s" category instead when contributing new permissions.',
+                        $categoryTechnicalName, $newCategoryName
+                    ));
+
                     $categoryTechnicalName = $newCategoryName;
                 }
             }
@@ -143,5 +162,12 @@ class PermissionAndCategoriesInstaller
             'installed' => $permissionInstalled,
             'removed' => 0,
         );
+    }
+
+    private function emitDeprecationNotice($notice)
+    {
+        if ($this->deprecationNoticeEmitter) {
+            $this->deprecationNoticeEmitter->emit($notice);
+        }
     }
 }

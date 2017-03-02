@@ -16,13 +16,8 @@ use Modera\SecurityBundle\Entity\Permission as PermissionEntity;
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2014 Modera Foundation
  */
-class PermissionAndCategoriesInstallerTest extends FunctionalTestCase
+class PermissionAndCategoriesInstallerTest extends AbstractTestCase
 {
-    /**
-     * @var SchemaTool
-     */
-    private static $st;
-
     /**
      * @var PermissionAndCategoriesInstaller
      */
@@ -30,25 +25,6 @@ class PermissionAndCategoriesInstallerTest extends FunctionalTestCase
 
     private $permissionCategoriesProvider;
     private $permissionsProvider;
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function doSetUpBeforeClass()
-    {
-        self::$st = new SchemaTool(self::$em);
-        self::$st->createSchema(array(self::$em->getClassMetadata(PermissionEntity::clazz())));
-        self::$st->createSchema(array(self::$em->getClassMetadata(PermissionCategoryEntity::clazz())));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function doTearDownAfterClass()
-    {
-        self::$st->dropSchema(array(self::$em->getClassMetadata(PermissionEntity::clazz())));
-        self::$st->dropSchema(array(self::$em->getClassMetadata(PermissionCategoryEntity::clazz())));
-    }
 
     /**
      * {@inheritdoc}
@@ -62,7 +38,7 @@ class PermissionAndCategoriesInstallerTest extends FunctionalTestCase
             self::$em,
             $this->permissionCategoriesProvider,
             $this->permissionsProvider,
-            new BCLayer()
+            self::$container->get('modera_security.data_installation.bc_layer')
         );
     }
 
