@@ -27,6 +27,40 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
         $service->remove($user);
     }
 
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testDisableRootUser()
+    {
+        $em = \Phake::mock('Doctrine\ORM\EntityManager');
+        $rootUserHandler = \Phake::mock('Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface');
+
+        $user = \Phake::mock(User::clazz());
+
+        \Phake::when($rootUserHandler)->isRootUser($user)->thenReturn(true);
+
+        $service = new UserService($em, $rootUserHandler);
+        $service->disable($user);
+    }
+
+    public function testDisableEnableUser()
+    {
+        $em = \Phake::mock('Doctrine\ORM\EntityManager');
+        $rootUserHandler = \Phake::mock('Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface');
+
+        $service = new UserService($em, $rootUserHandler);
+
+        $user = new User();
+        $user->setIsActive(true);
+        \Phake::when($rootUserHandler)->isRootUser($user)->thenReturn(false);
+
+        $service->disable($user);
+        $this->assertFalse($user->getIsActive());
+
+        $service->enable($user);
+        $this->assertTrue($user->getIsActive());
+    }
+
     public function testFind()
     {
         $em = \Phake::mock('Doctrine\ORM\EntityManager');
