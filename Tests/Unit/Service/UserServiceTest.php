@@ -51,14 +51,14 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
         $service = new UserService($em, $rootUserHandler);
 
         $user = new User();
-        $user->setIsActive(true);
+        $user->setActive(true);
         \Phake::when($rootUserHandler)->isRootUser($user)->thenReturn(false);
 
         $service->disable($user);
-        $this->assertFalse($user->getIsActive());
+        $this->assertFalse($user->isActive());
 
         $service->enable($user);
-        $this->assertTrue($user->getIsActive());
+        $this->assertTrue($user->isActive());
     }
 
     public function testFind()

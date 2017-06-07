@@ -55,7 +55,7 @@ class UserService
             throw new \RuntimeException(T::trans('Super admin user never can be disabled.'));
         }
 
-        $user->setIsActive(false);
+        $user->setActive(false);
         $this->em->flush();
     }
 
@@ -64,7 +64,7 @@ class UserService
      */
     public function enable(User $user)
     {
-        $user->setIsActive(true);
+        $user->setActive(true);
         $this->em->flush();
     }
 
