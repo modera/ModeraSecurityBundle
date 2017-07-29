@@ -142,7 +142,8 @@ class UserService
             ->leftJoin('p.users', 'u')
             ->leftJoin('p.groups', 'g')
             ->where($qb->expr()->eq('p.roleName', ':roleName'))
-            ->setParameter('roleName', $roleName);
+            ->setParameter('roleName', $roleName)
+        ;
 
         $query = $qb->getQuery();
         $permission = $query->getOneOrNullResult($query::HYDRATE_ARRAY);
@@ -162,7 +163,8 @@ class UserService
                 $qb->select('g, u')
                     ->from(Group::clazz(), 'g')
                     ->leftJoin('g.users', 'u')
-                    ->where($qb->expr()->in('g.id', $groupIds));
+                    ->where($qb->expr()->in('g.id', $groupIds))
+                ;
 
                 $groups = $qb->getQuery()->getArrayResult();
 

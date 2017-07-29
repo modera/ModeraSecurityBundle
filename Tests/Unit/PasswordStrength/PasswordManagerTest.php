@@ -1,0 +1,265 @@
+<?php
+
+namespace Modera\SecurityBundle\Tests\Unit\PasswordStrength;
+
+use Modera\SecurityBundle\Entity\User;
+use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
+use Modera\SecurityBundle\PasswordStrength\PasswordConfigInterface;
+use Modera\SecurityBundle\PasswordStrength\PasswordManager;
+use Modera\SecurityBundle\PasswordStrength\StrongPassword;
+use Modera\SecurityBundle\PasswordStrength\StrongPasswordValidator;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\ConstraintViolation;
+
+class UserPasswordEncoderDummy implements UserPasswordEncoderInterface
+{
+    public $mapping = array();
+
+    public function encodePassword(UserInterface $user, $plainPassword)
+    {
+        return $this->mapping[$plainPassword];
+    }
+
+    public function isPasswordValid(UserInterface $user, $raw)
+    {
+    }
+}
+
+/**
+ * @author    Sergei Lissovski <sergei.lissovski@modera.org>
+ * @copyright 2017 Modera Foundation
+ */
+class PasswordManagerTest extends \PHPUnit_Framework_TestCase
+{
+    public function testHasPasswordAlreadyBeenUsedWithinLastRotationPeriod()
+    {
+        $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
+        \Phake::when($passwordConfigMock)
+            ->getRotationPeriodInDays()
+            ->thenReturn(90)
+        ;
+
+        $encoderDummy = new UserPasswordEncoderDummy();
+        $encoderDummy->mapping = array(
+            'foo' => 'encoded-foo',
+            'bar' => 'encoded-bar',
+            'baz' => 'encoded-baz',
+            'yoyo' => 'encoded-yoyo',
+        );
+
+        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+
+        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+
+        $user = new User();
+        $this->assertTrue($pm->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, 1234));
+
+        $user = new User();
+        $user->setMeta(array(
+            'modera_security' => array(
+                'used_passwords' => array(
+                    $this->createTimeWithDaysAgo(200) => 'encoded-foo',
+                    $this->createTimeWithDaysAgo(91) => 'encoded-bar',
+                    $this->createTimeWithDaysAgo(50) => 'encoded-baz',
+                    $this->createTimeWithDaysAgo(10) => 'encoded-yoyo',
+                ),
+            ),
+        ));
+
+        $this->assertFalse($pm->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, 'foo'));
+        $this->assertFalse($pm->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, 'bar'));
+        $this->assertTrue($pm->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, 'baz'));
+        $this->assertTrue($pm->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, 'yoyo'));
+    }
+
+    public function testIsTimeToRotatePassword()
+    {
+        $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
+        \Phake::when($passwordConfigMock)
+            ->getRotationPeriodInDays()
+            ->thenReturn(90)
+        ;
+
+        $encoderDummy = new UserPasswordEncoderDummy();
+        $encoderDummy->mapping = array(
+            'foo' => 'encoded-foo',
+            'bar' => 'encoded-bar',
+            'baz' => 'encoded-baz',
+            'yoyo' => 'encoded-yoyo',
+        );
+
+        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+
+        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+
+        $this->assertTrue($pm->isTimeToRotatePassword(new User()));
+
+        $user = new User();
+        $user->setMeta(array(
+            'modera_security' => array(
+                'used_passwords' => array(),
+            ),
+        ));
+
+        $this->assertTrue($pm->isTimeToRotatePassword($user));
+
+        $user = new User();
+        $user->setMeta(array(
+            'modera_security' => array(
+                'used_passwords' => array(
+                    $this->createTimeWithDaysAgo(200) => 'encoded-foo',
+                    $this->createTimeWithDaysAgo(100) => 'encoded-bar',
+                ),
+            ),
+        ));
+
+        $this->assertTrue($pm->isTimeToRotatePassword($user));
+
+        $user = new User();
+        $user->setMeta(array(
+            'modera_security' => array(
+                'used_passwords' => array(
+                    $this->createTimeWithDaysAgo(95) => 'encoded-foo',
+                    $this->createTimeWithDaysAgo(60) => 'encoded-bar',
+                ),
+            ),
+        ));
+
+        $this->assertFalse($pm->isTimeToRotatePassword($user));
+    }
+
+    public function testValidatePassword()
+    {
+        $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
+        $encoderDummy = new UserPasswordEncoderDummy();
+        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+
+        \Phake::when($validatorMock)
+            ->validate('foo123', $this->isInstanceOf(StrongPassword::class))
+            ->thenReturn('validation-result')
+        ;
+
+        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+
+        $this->assertEquals('validation-result', $pm->validatePassword('foo123'));
+    }
+
+    public function testEncodeAndSetPassword_happyPath()
+    {
+        $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
+        \Phake::when($passwordConfigMock)
+            ->getRotationPeriodInDays()
+            ->thenReturn(false)
+        ;
+
+        $encoderDummy = new UserPasswordEncoderDummy();
+        $encoderDummy->mapping = array(
+            'foo' => 'encoded-foo',
+            'bar' => 'encoded-bar',
+            'baz' => 'encoded-baz',
+            'yoyo' => 'encoded-yoyo',
+        );
+
+        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+
+        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+
+        $user = new User();
+        $pm->encodeAndSetPassword($user, 'foo');
+
+        $meta = $user->getMeta();
+        $this->assertArrayHasKey('modera_security', $meta);
+        $this->assertArrayHasKey('used_passwords', $meta['modera_security']);
+        $this->assertEquals(1, count($meta['modera_security']['used_passwords']));
+        $this->assertLessThan(10, array_keys($meta['modera_security']['used_passwords'])[0] - time());
+        $usedPasswords = array_values($meta['modera_security']['used_passwords']);
+        $this->assertEquals('encoded-foo', $usedPasswords[0]);
+    }
+
+    public function testEncodeAndSetPassword_rotationCheckFail()
+    {
+        $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
+        \Phake::when($passwordConfigMock)
+            ->getRotationPeriodInDays()
+            ->thenReturn(99)
+        ;
+
+        $encoderDummy = new UserPasswordEncoderDummy();
+        $encoderDummy->mapping = array(
+            'foo' => 'encoded-foo',
+            'bar' => 'encoded-bar',
+        );
+        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+
+        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+
+        $user = new User();
+        $user->setMeta(array(
+            'modera_security' => array(
+                'used_passwords' => array(
+                    $this->createTimeWithDaysAgo(130) => 'encoded-bar',
+                    $this->createTimeWithDaysAgo(25) => 'encoded-foo',
+                ),
+            ),
+        ));
+
+        $thrownException = null;
+        try {
+            $pm->encodeAndSetPassword($user, 'foo');
+        } catch (BadPasswordException $e) {
+            $thrownException = $e;
+        }
+        $this->assertEquals(
+            'Given password cannot be used because it has been already used in last 99 days.',
+            $thrownException->getMessage()
+        );
+        $this->assertEquals(2, count($user->getMeta()['modera_security']['used_passwords']));
+
+        $pm->encodeAndSetPassword($user, 'bar');
+        $this->assertEquals(3, count($user->getMeta()['modera_security']['used_passwords']));
+    }
+
+    /**
+     * @expectedException Modera\SecurityBundle\PasswordStrength\BadPasswordException
+     * @expectedExceptionMessage Given password failed validation: error-msg1
+     */
+    public function testEncodeAndSetPassword_validationFail()
+    {
+        $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
+        \Phake::when($passwordConfigMock)
+            ->getRotationPeriodInDays()
+            ->thenReturn(false)
+        ;
+
+        $encoderDummy = new UserPasswordEncoderDummy();
+        $encoderDummy->mapping = array(
+            'foo' => 'encoded-foo',
+        );
+
+        $violation = \Phake::mock(ConstraintViolation::class);
+        \Phake::when($violation)
+            ->getMessage()
+            ->thenReturn('error-msg1')
+        ;
+
+        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+        \Phake::when($validatorMock)
+            ->validate('foo', $this->isInstanceOf(StrongPassword::class))
+            ->thenReturn([$violation])
+        ;
+
+        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+
+        $user = new User();
+        $pm->encodeAndSetPassword($user, 'foo');
+    }
+
+    private function createTimeWithDaysAgo($days)
+    {
+        $now = new \DateTime('now');
+        $now->modify("-$days day");
+
+        return $now->getTimestamp();
+    }
+}

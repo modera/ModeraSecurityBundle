@@ -11,6 +11,8 @@ use Symfony\Component\Validator\Constraints\RegexValidator;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
+ * @internal
+ *
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2017 Modera Foundation
  */
