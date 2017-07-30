@@ -256,6 +256,51 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         $pm->encodeAndSetPassword($user, 'foo');
     }
 
+    public function testGeneratePassword()
+    {
+        $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
+        \Phake::when($passwordConfigMock)
+            ->getRotationPeriodInDays()
+            ->thenReturn(false)
+        ;
+
+        $encoderDummy = new UserPasswordEncoderDummy();
+
+        $validatorMock = \Phake::mock(ValidatorInterface::class);
+
+        $pm = new PasswordManager($this->createPasswordConfigMock(8, true, true), $encoderDummy, $validatorMock);
+        $password = $pm->generatePassword();
+        $this->assertNotNull($password);
+        $this->assertTrue(strlen($password) == 8);
+        $this->assertRegExp('/[A-Z]/', $password);
+        $this->assertRegExp('/[0-9]/', $password);
+
+        $pm = new PasswordManager($this->createPasswordConfigMock(12, true, true), $encoderDummy, $validatorMock);
+        $password = $pm->generatePassword();
+        $this->assertTrue(strlen($password) == 12);
+        $this->assertRegExp('/[A-Z]/', $password);
+        $this->assertRegExp('/[0-9]/', $password);
+    }
+
+    private function createPasswordConfigMock($minLength, $isNumberRequired, $isCapitalLetterRequired)
+    {
+        $pc = \Phake::mock(PasswordConfigInterface::class);
+        \Phake::when($pc)
+            ->getMinLength()
+            ->thenReturn($minLength)
+        ;
+        \Phake::when($pc)
+            ->isNumberRequired()
+            ->thenReturn($isNumberRequired)
+        ;
+        \Phake::when($pc)
+            ->isCapitalLetterRequired()
+            ->thenReturn($isCapitalLetterRequired)
+        ;
+
+        return $pc;
+    }
+
     private function createTimeWithDaysAgo($days)
     {
         $now = new \DateTime('now');
