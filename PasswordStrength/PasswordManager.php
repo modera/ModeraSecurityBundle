@@ -63,7 +63,7 @@ class PasswordManager
 
         $meta = $user->getMeta();
         if (!isset($meta['modera_security']['used_passwords'])) {
-            return true;
+            return false; // if here we return TRUE then it won't be possible to create new users
         }
 
         $encodedPassword = $this->passwordEncoder->encodePassword($user, $plainPassword);

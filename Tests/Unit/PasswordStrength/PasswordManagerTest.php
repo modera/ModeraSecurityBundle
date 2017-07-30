@@ -54,7 +54,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
 
         $user = new User();
-        $this->assertTrue($pm->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, 1234));
+        $this->assertFalse($pm->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, 1234));
 
         $user = new User();
         $user->setMeta(array(
