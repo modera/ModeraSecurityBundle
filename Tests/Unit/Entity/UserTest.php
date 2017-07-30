@@ -5,6 +5,7 @@ namespace Modera\SecurityBundle\Tests\Unit\Entity;
 use Modera\SecurityBundle\Entity\Group;
 use Modera\SecurityBundle\Entity\Permission;
 use Modera\SecurityBundle\Entity\User;
+use Modera\SecurityBundle\PasswordStrength\PasswordManager;
 
 /**
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
@@ -68,5 +69,17 @@ class UserTest extends \PHPUnit_Framework_TestCase
         ;
 
         $this->assertEquals(['ROLE_FOO', 'ROLE_BAR'], $user->getRoles());
+    }
+
+    public function testValidateAndSetPassword()
+    {
+        $pm = \Phake::mock(PasswordManager::class);
+
+        $user = new User();
+        $user->validateAndSetPassword($pm, 'foo1234');
+
+        \Phake::verify($pm)
+            ->encodeAndSetPassword($user, 'foo1234')
+        ;
     }
 }

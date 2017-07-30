@@ -11,6 +11,7 @@ use Modera\SecurityBundle\PasswordStrength\StrongPasswordValidator;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserPasswordEncoderDummy implements UserPasswordEncoderInterface
 {
@@ -48,7 +49,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             'yoyo' => 'encoded-yoyo',
         );
 
-        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+        $validatorMock = \Phake::mock(ValidatorInterface::class);
 
         $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
 
@@ -89,7 +90,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             'yoyo' => 'encoded-yoyo',
         );
 
-        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+        $validatorMock = \Phake::mock(ValidatorInterface::class);
 
         $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
 
@@ -133,7 +134,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
     {
         $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
         $encoderDummy = new UserPasswordEncoderDummy();
-        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+        $validatorMock = \Phake::mock(ValidatorInterface::class);
 
         \Phake::when($validatorMock)
             ->validate('foo123', $this->isInstanceOf(StrongPassword::class))
@@ -161,7 +162,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             'yoyo' => 'encoded-yoyo',
         );
 
-        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+        $validatorMock = \Phake::mock(ValidatorInterface::class);
 
         $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
 
@@ -190,7 +191,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             'foo' => 'encoded-foo',
             'bar' => 'encoded-bar',
         );
-        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+        $validatorMock = \Phake::mock(ValidatorInterface::class);
 
         $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
 
@@ -243,7 +244,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             ->thenReturn('error-msg1')
         ;
 
-        $validatorMock = \Phake::mock(StrongPasswordValidator::class);
+        $validatorMock = \Phake::mock(ValidatorInterface::class);
         \Phake::when($validatorMock)
             ->validate('foo', $this->isInstanceOf(StrongPassword::class))
             ->thenReturn([$violation])

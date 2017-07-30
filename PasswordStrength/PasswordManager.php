@@ -5,6 +5,7 @@ namespace Modera\SecurityBundle\PasswordStrength;
 use Modera\SecurityBundle\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @since 2.56.0
@@ -24,20 +25,24 @@ class PasswordManager
      */
     private $passwordEncoder;
 
-    /**
-     * @var StrongPasswordValidator
-     */
-    private $passwordValidator;
+    private $validator;
 
+    /**
+     * @internal Use container service instead
+     *
+     * @param PasswordConfigInterface $passwordConfig
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param ValidatorInterface $validator
+     */
     public function __construct(
         PasswordConfigInterface $passwordConfig,
         UserPasswordEncoderInterface $passwordEncoder,
-        StrongPasswordValidator $passwordValidator
+        ValidatorInterface $validator
     )
     {
         $this->passwordConfig = $passwordConfig;
         $this->passwordEncoder = $passwordEncoder;
-        $this->passwordValidator = $passwordValidator;
+        $this->validator = $validator;
     }
 
     /**
@@ -86,7 +91,7 @@ class PasswordManager
      */
     public function validatePassword($plainPassword)
     {
-        return $this->passwordValidator->validate($plainPassword, new StrongPassword());
+        return $this->validator->validate($plainPassword, new StrongPassword());
     }
 
     /**

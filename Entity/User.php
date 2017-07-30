@@ -4,6 +4,8 @@ namespace Modera\SecurityBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
+use Modera\SecurityBundle\PasswordStrength\PasswordManager;
 use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Modera\SecurityBundle\Model\UserInterface;
@@ -358,11 +360,26 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
     }
 
     /**
-     * @param string $password
+     * @since 2.56.0
+     *
+     * @throws BadPasswordException
+     *
+     * @param PasswordManager $passwordManager
+     * @param string $plainPassword
      */
-    public function setPassword($password)
+    public function validateAndSetPassword(PasswordManager $passwordManager, $plainPassword)
     {
-        $this->password = $password;
+        $passwordManager->encodeAndSetPassword($this, $plainPassword);
+    }
+
+    /**
+     * Most of the time you want to use #validateAndSetPassword() method instead.
+     *
+     * @param string $encodedPassword
+     */
+    public function setPassword($encodedPassword)
+    {
+        $this->password = $encodedPassword;
     }
 
     /**
