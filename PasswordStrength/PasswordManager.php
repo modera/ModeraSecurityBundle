@@ -173,6 +173,8 @@ class PasswordManager
 
     /**
      * @param User|null $user
+     *
+     * @return string
      */
     public function generatePassword(User $user = null)
     {
@@ -187,6 +189,10 @@ class PasswordManager
                 continue;
             }
             if ($this->passwordConfig->isCapitalLetterRequired() && !preg_match('/[A-Z]/', $plainPassword)) {
+                continue;
+            }
+
+            if ($user && $this->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, $plainPassword)) {
                 continue;
             }
 

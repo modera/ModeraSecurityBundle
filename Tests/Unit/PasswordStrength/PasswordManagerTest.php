@@ -258,14 +258,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGeneratePassword()
     {
-        $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
-        \Phake::when($passwordConfigMock)
-            ->getRotationPeriodInDays()
-            ->thenReturn(false)
-        ;
-
         $encoderDummy = new UserPasswordEncoderDummy();
-
         $validatorMock = \Phake::mock(ValidatorInterface::class);
 
         $pm = new PasswordManager($this->createPasswordConfigMock(8, true, true), $encoderDummy, $validatorMock);
@@ -296,6 +289,10 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         \Phake::when($pc)
             ->isCapitalLetterRequired()
             ->thenReturn($isCapitalLetterRequired)
+        ;
+        \Phake::when($pc)
+            ->getRotationPeriodInDays()
+            ->thenReturn(90)
         ;
 
         return $pc;
