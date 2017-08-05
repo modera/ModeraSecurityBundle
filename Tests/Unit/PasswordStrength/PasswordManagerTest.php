@@ -74,7 +74,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($pm->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, 'yoyo'));
     }
 
-    public function testIsTimeToRotatePassword()
+    public function testIsItTimeToRotatePassword()
     {
         $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
         \Phake::when($passwordConfigMock)
@@ -94,7 +94,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
 
         $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
 
-        $this->assertTrue($pm->isTimeToRotatePassword(new User()));
+        $this->assertTrue($pm->isItTimeToRotatePassword(new User()));
 
         $user = new User();
         $user->setMeta(array(
@@ -103,7 +103,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             ),
         ));
 
-        $this->assertTrue($pm->isTimeToRotatePassword($user));
+        $this->assertTrue($pm->isItTimeToRotatePassword($user));
 
         $user = new User();
         $user->setMeta(array(
@@ -115,7 +115,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             ),
         ));
 
-        $this->assertTrue($pm->isTimeToRotatePassword($user));
+        $this->assertTrue($pm->isItTimeToRotatePassword($user));
 
         $user = new User();
         $user->setMeta(array(
@@ -127,7 +127,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             ),
         ));
 
-        $this->assertFalse($pm->isTimeToRotatePassword($user));
+        $this->assertFalse($pm->isItTimeToRotatePassword($user));
     }
 
     public function testValidatePassword()

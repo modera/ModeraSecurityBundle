@@ -147,7 +147,7 @@ class PasswordManager
      *
      * @return bool
      */
-    public function isTimeToRotatePassword(User $user)
+    public function isItTimeToRotatePassword(User $user)
     {
         if ($this->isPasswordRotationTurnedOff()) {
             return false;

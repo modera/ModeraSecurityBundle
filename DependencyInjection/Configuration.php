@@ -54,7 +54,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->cannotBeEmpty()
                     ->children()
-                        ->scalarNode('enabled')
+                        ->scalarNode('enabled') // in 3.0 this flag is going to be removed and feature will be enabled by default
                             ->defaultFalse()
                         ->end()
                         ->scalarNode('min_length')
@@ -67,6 +67,7 @@ class Configuration implements ConfigurationInterface
                             ->defaultFalse()
                         ->end()
                         ->scalarNode('rotation_period')
+                            ->info('If a password has been changed in last X days then it will not be possible to reuse it again the next X days')
                             ->defaultValue(90)
                         ->end()
                     ->end()

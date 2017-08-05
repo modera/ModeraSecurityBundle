@@ -76,6 +76,7 @@
             <tag name="validator.constraint_validator" />
         </service>
 
+        <!-- since 2.56.0 -->
         <service id="modera_security.password_strength.password_manager"
                  class="Modera\SecurityBundle\PasswordStrength\PasswordManager">
 
