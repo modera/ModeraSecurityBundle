@@ -3,6 +3,7 @@
 namespace Modera\SecurityBundle\PasswordStrength;
 
 use Modera\SecurityBundle\Entity\User;
+use Modera\SecurityBundle\PasswordStrength\Mail\MailServiceInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -25,7 +26,15 @@ class PasswordManager
      */
     private $passwordEncoder;
 
+    /**
+     * @var ValidatorInterface
+     */
     private $validator;
+
+    /**
+     * @var MailServiceInterface
+     */
+    private $mailService;
 
     /**
      * @internal Use container service instead
@@ -37,12 +46,14 @@ class PasswordManager
     public function __construct(
         PasswordConfigInterface $passwordConfig,
         UserPasswordEncoderInterface $passwordEncoder,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        MailServiceInterface $mailService
     )
     {
         $this->passwordConfig = $passwordConfig;
         $this->passwordEncoder = $passwordEncoder;
         $this->validator = $validator;
+        $this->mailService = $mailService;
     }
 
     /**
@@ -98,6 +109,8 @@ class PasswordManager
      * Validates $plainPassword, verifies its against possibly configuration rotation if everything's fine then
      * it encodes it and updates $user, if some problems were detected then exception will be thrown.
      *
+     * NB! Changes are not automatically persisted into database, so you need to flush UoW manually.
+     *
      * @throws BadPasswordException
      *
      * @param User $user
@@ -137,6 +150,7 @@ class PasswordManager
         $user->setPassword($encodedPassword);
 
         $meta['modera_security']['used_passwords'][time()] = $encodedPassword;
+        unset($meta['modera_security']['force_password_rotation']);
         $user->setMeta($meta);
     }
 
@@ -154,6 +168,11 @@ class PasswordManager
         }
 
         $meta = $user->getMeta();
+        if (isset($meta['modera_security']['force_password_rotation']) &&
+            true === $meta['modera_security']['force_password_rotation']) {
+
+            return true;
+        }
         if (!isset($meta['modera_security']['used_passwords'])) {
             return true;
         }
@@ -198,6 +217,24 @@ class PasswordManager
 
             return $plainPassword;
         }
+    }
+
+    /**
+     * When a password is sent over email then the first time user logins using it he/she will
+     * be force to change it.
+     *
+     * @param User $user
+     * @param string $plainPassword
+     */
+    public function encodeAndSetPasswordAndThenEmailIt(User $user, $plainPassword)
+    {
+        $this->encodeAndSetPassword($user, $plainPassword);
+
+        $meta = $user->getMeta();
+        $meta['modera_security']['force_password_rotation'] = true;
+        $user->setMeta($meta);
+
+        $this->mailService->sendPassword($user, $plainPassword);
     }
 
     private function isPasswordRotationTurnedOff()

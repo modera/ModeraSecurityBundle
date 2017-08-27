@@ -83,6 +83,17 @@
             <argument type="service" id="modera_security.password_strength.password_config" />
             <argument type="service" id="security.password_encoder" />
             <argument type="service" id="validator" />
+            <argument type="service" id="modera_security.password_strength.mail.mail_service" />
+        </service>
+
+        <!-- since 2.56.0 -->
+        <service id="modera_security.password_strength.mail.default_mail_service"
+                 class="Modera\SecurityBundle\PasswordStrength\Mail\DefaultMailService">
+
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="mailer" />
+            <argument>%locale%</argument>
+            <argument>%modera_security.password_strength.mail.sender%</argument>
         </service>
     </services>
 </container>

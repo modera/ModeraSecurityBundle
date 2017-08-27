@@ -2,6 +2,7 @@
 
 namespace Modera\SecurityBundle;
 
+use Modera\SecurityBundle\DependencyInjection\MailServiceAliasCompilerPass;
 use Sli\ExpanderBundle\Ext\ExtensionPoint;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -23,5 +24,7 @@ class ModeraSecurityBundle extends Bundle
         $permissionCategoriesProviders = new ExtensionPoint('modera_security.permission_categories');
         $permissionCategoriesProviders->setDescription('Allows to contribute new permission categories.');
         $container->addCompilerPass($permissionCategoriesProviders->createCompilerPass());
+
+        $container->addCompilerPass(new MailServiceAliasCompilerPass());
     }
 }

@@ -54,6 +54,21 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->cannotBeEmpty()
                     ->children()
+                        ->arrayNode('mail')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                // Must contain service container ID of an \Modera\SecurityBundle\PasswordStrength\Mail\MailServiceInterface
+                                // implementation.
+                                ->scalarNode('service')
+                                    ->cannotBeEmpty()
+                                    ->defaultValue('modera_security.password_strength.mail.default_mail_service')
+                                ->end()
+                                ->scalarNode('sender')
+                                    ->defaultValue('no-reply@no-reply')
+                                    ->cannotBeEmpty()
+                                ->end()
+                            ->end()
+                        ->end()
                         ->scalarNode('enabled') // in 3.0 this flag is going to be removed and feature will be enabled by default
                             ->defaultFalse()
                         ->end()

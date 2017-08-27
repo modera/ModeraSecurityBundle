@@ -2,6 +2,7 @@
 
 namespace Modera\SecurityBundle\DependencyInjection;
 
+use Modera\BackendSecurityBundle\DependencyInjection\ModeraBackendSecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -28,11 +29,26 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
-        $container->setParameter(self::CONFIG_KEY, $config);
+        $this->injectConfigIntoContainer($config, $container);
 
         $container->setAlias('modera_security.root_user_handling.handler', $config['root_user_handler']);
     }
 
+    private function injectConfigIntoContainer(array $config, ContainerBuilder $container)
+    {
+        $container->setParameter(self::CONFIG_KEY, $config);
+
+        $container->setParameter(
+            'modera_security.password_strength.mail.sender',
+            $config['password_strength']['mail']['sender']
+        );
+
+
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function prepend(ContainerBuilder $container)
     {
         $configs = $container->getExtensionConfig($this->getAlias());

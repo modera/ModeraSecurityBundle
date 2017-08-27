@@ -11,6 +11,8 @@ use Symfony\Component\Validator\Constraints\RegexValidator;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
+ * @see StrongPassword class doc.
+ *
  * @internal
  *
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>

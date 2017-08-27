@@ -4,6 +4,7 @@ namespace Modera\SecurityBundle\Tests\Unit\PasswordStrength;
 
 use Modera\SecurityBundle\Entity\User;
 use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
+use Modera\SecurityBundle\PasswordStrength\Mail\MailServiceInterface;
 use Modera\SecurityBundle\PasswordStrength\PasswordConfigInterface;
 use Modera\SecurityBundle\PasswordStrength\PasswordManager;
 use Modera\SecurityBundle\PasswordStrength\StrongPassword;
@@ -51,7 +52,9 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
 
         $validatorMock = \Phake::mock(ValidatorInterface::class);
 
-        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+        $pm = new PasswordManager(
+            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+        );
 
         $user = new User();
         $this->assertFalse($pm->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, 1234));
@@ -92,7 +95,9 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
 
         $validatorMock = \Phake::mock(ValidatorInterface::class);
 
-        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+        $pm = new PasswordManager(
+            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+        );
 
         $this->assertTrue($pm->isItTimeToRotatePassword(new User()));
 
@@ -141,7 +146,9 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             ->thenReturn('validation-result')
         ;
 
-        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+        $pm = new PasswordManager(
+            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+        );
 
         $this->assertEquals('validation-result', $pm->validatePassword('foo123'));
     }
@@ -164,7 +171,9 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
 
         $validatorMock = \Phake::mock(ValidatorInterface::class);
 
-        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+        $pm = new PasswordManager(
+            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+        );
 
         $user = new User();
         $pm->encodeAndSetPassword($user, 'foo');
@@ -176,6 +185,46 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan(10, array_keys($meta['modera_security']['used_passwords'])[0] - time());
         $usedPasswords = array_values($meta['modera_security']['used_passwords']);
         $this->assertEquals('encoded-foo', $usedPasswords[0]);
+    }
+
+    public function testEncodeAndSetPassword_forcePasswordRotationTracesRemoved()
+    {
+        $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
+        \Phake::when($passwordConfigMock)
+            ->getRotationPeriodInDays()
+            ->thenReturn(false)
+        ;
+
+        $encoderDummy = new UserPasswordEncoderDummy();
+        $encoderDummy->mapping = array(
+            'foo' => 'encoded-foo',
+            'bar' => 'encoded-bar',
+            'baz' => 'encoded-baz',
+            'yoyo' => 'encoded-yoyo',
+        );
+
+        $validatorMock = \Phake::mock(ValidatorInterface::class);
+
+        $pm = new PasswordManager(
+            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+        );
+
+        $user = new User();
+        $user->setMeta(array(
+            'modera_security' => array(
+                'force_password_rotation' => true,
+            )
+        ));
+        $pm->encodeAndSetPassword($user, 'foo');
+
+        $meta = $user->getMeta();
+        $this->assertArrayHasKey('modera_security', $meta);
+        $this->assertArrayHasKey('used_passwords', $meta['modera_security']);
+        $this->assertEquals(1, count($meta['modera_security']['used_passwords']));
+        $this->assertLessThan(10, array_keys($meta['modera_security']['used_passwords'])[0] - time());
+        $usedPasswords = array_values($meta['modera_security']['used_passwords']);
+        $this->assertEquals('encoded-foo', $usedPasswords[0]);
+        $this->assertArrayNotHasKey('force_password_rotation', $meta['modera_security']);
     }
 
     public function testEncodeAndSetPassword_rotationCheckFail()
@@ -193,7 +242,9 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         );
         $validatorMock = \Phake::mock(ValidatorInterface::class);
 
-        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+        $pm = new PasswordManager(
+            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+        );
 
         $user = new User();
         $user->setMeta(array(
@@ -250,7 +301,9 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             ->thenReturn([$violation])
         ;
 
-        $pm = new PasswordManager($passwordConfigMock, $encoderDummy, $validatorMock);
+        $pm = new PasswordManager(
+            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+        );
 
         $user = new User();
         $pm->encodeAndSetPassword($user, 'foo');
@@ -261,18 +314,96 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         $encoderDummy = new UserPasswordEncoderDummy();
         $validatorMock = \Phake::mock(ValidatorInterface::class);
 
-        $pm = new PasswordManager($this->createPasswordConfigMock(8, true, true), $encoderDummy, $validatorMock);
+        $pm = new PasswordManager(
+            $this->createPasswordConfigMock(8, true, true),
+            $encoderDummy,
+            $validatorMock,
+            \Phake::mock(MailServiceInterface::class)
+        );
         $password = $pm->generatePassword();
         $this->assertNotNull($password);
         $this->assertTrue(strlen($password) == 8);
         $this->assertRegExp('/[A-Z]/', $password);
         $this->assertRegExp('/[0-9]/', $password);
 
-        $pm = new PasswordManager($this->createPasswordConfigMock(12, true, true), $encoderDummy, $validatorMock);
+        $pm = new PasswordManager(
+            $this->createPasswordConfigMock(12, true, true),
+            $encoderDummy,
+            $validatorMock,
+            \Phake::mock(MailServiceInterface::class)
+        );
         $password = $pm->generatePassword();
         $this->assertTrue(strlen($password) == 12);
         $this->assertRegExp('/[A-Z]/', $password);
         $this->assertRegExp('/[0-9]/', $password);
+    }
+
+    public function testEncodeAndSetPasswordAndThenEmailIt()
+    {
+        $mailServiceMock = \Phake::mock(MailServiceInterface::class);
+
+        $pm = new PasswordManager(
+            \Phake::mock(PasswordConfigInterface::class),
+            \Phake::mock(UserPasswordEncoderInterface::class),
+            \Phake::mock(ValidatorInterface::class),
+            $mailServiceMock
+        );
+
+        $user = new User();
+
+        $pm->encodeAndSetPasswordAndThenEmailIt($user, 'foobar');
+
+        $this->assertArrayHasKey('modera_security', $user->getMeta());
+        $meta = $user->getMeta()['modera_security'];
+        $this->assertArrayHasKey('used_passwords', $meta);
+        $this->assertEquals(1, count($meta['used_passwords']));
+        $this->assertArrayHasKey('force_password_rotation', $meta);
+
+        \Phake::verify($mailServiceMock)
+            ->sendPassword($user, 'foobar')
+        ;
+    }
+
+    public function testIsItTimeToRotatePassword_aftetItHasBeenEmailed()
+    {
+        $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
+        \Phake::when($passwordConfigMock)
+            ->getRotationPeriodInDays()
+            ->thenReturn(90)
+        ;
+        $encoderDummy = new UserPasswordEncoderDummy();
+        $validatorMock = \Phake::mock(ValidatorInterface::class);
+
+        $pm = new PasswordManager(
+            $passwordConfigMock,
+            $encoderDummy,
+            $validatorMock,
+            \Phake::mock(MailServiceInterface::class)
+        );
+
+        $user = new User();
+        $user->setMeta(
+            array(
+                'modera_security' => array(
+                    'used_passwords' => array(
+                        time() => '1234',
+                    ),
+                    'force_password_rotation' => true,
+                )
+            )
+        );
+
+        $this->assertTrue($pm->isItTimeToRotatePassword($user));
+
+        $user->setMeta(array(
+            'modera_security' => array(
+                'used_passwords' => array(
+                    time() => '1234',
+                ),
+            )
+        ));
+
+        $this->assertFalse($pm->isItTimeToRotatePassword($user));
     }
 
     private function createPasswordConfigMock($minLength, $isNumberRequired, $isCapitalLetterRequired)

@@ -17,6 +17,7 @@
     "require": {
         "php": ">=5.4",
         "symfony/symfony": "~2.6",
+        "symfony/swiftmailer-bundle": "~2.3",
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
         "sergeil/extjsintegration-bundle": "~1.0",

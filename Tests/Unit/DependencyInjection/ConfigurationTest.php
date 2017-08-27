@@ -22,6 +22,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $config = $config['password_strength'];
         $expectedConfig = array(
+            'mail' => array(
+                'service' => 'modera_security.password_strength.mail.default_mail_service',
+                'sender' => 'no-reply@no-reply',
+            ),
             'enabled' => false,
             'min_length' => 6,
             'number_required' => false,
