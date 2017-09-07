@@ -78,7 +78,16 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('number_required')
                             ->defaultFalse()
                         ->end()
-                        ->scalarNode('capital_letter_required')
+                        ->scalarNode('letter_required')
+                            // capital_or_non_capital, capital_and_non_capital, capital, non_capital
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return is_bool($v); })
+                                ->then(function ($v) {
+                                    if (is_bool($v) && $v) {
+                                        return 'capital_or_non_capital';
+                                    }
+                                })
+                            ->end()
                             ->defaultFalse()
                         ->end()
                         ->scalarNode('rotation_period')

@@ -72,7 +72,7 @@ class StrongPasswordValidatorTest extends FunctionalTestCase
         $context = $this->createContext();
         $validator = new StrongPasswordValidator($this->createMockPasswordConfig(array(
             'enabled' => true,
-            'capital_letter_required' => true,
+            'letter_required' => 'capital',
         )));
         $validator->initialize($context);
 
@@ -95,10 +95,98 @@ class StrongPasswordValidatorTest extends FunctionalTestCase
 
         $context = $this->createContext();
         $validator = new StrongPasswordValidator($this->createMockPasswordConfig(array(
+            'enabled' => true,
+            'letter_required' => 'non_capital',
+        )));
+        $validator->initialize($context);
+
+        $validator->validate('FOOBARFOO', new StrongPassword());
+        $this->assertEquals(1, count($context->getViolations()));
+        $this->assertEquals(
+            'Password must contain at least one non-capital letter.',
+            $context->getViolations()[0]->getMessage()
+        );
+
+        // -
+
+        $context = $this->createContext();
+        $validator->initialize($context);
+
+        $validator->validate('FOOBaR1', new StrongPassword());
+        $this->assertEquals(0, count($context->getViolations()));
+
+        // ---
+
+        $context = $this->createContext();
+        $validator = new StrongPasswordValidator($this->createMockPasswordConfig(array(
+            'enabled' => true,
+            'letter_required' => 'capital_and_non_capital',
+        )));
+        $validator->initialize($context);
+
+        $validator->validate('123456', new StrongPassword());
+        $this->assertEquals(1, count($context->getViolations()));
+        $this->assertEquals(
+            'Password must contain at least one capital and one non-capital letter.',
+            $context->getViolations()[0]->getMessage()
+        );
+
+        // -
+
+        $context = $this->createContext();
+        $validator->initialize($context);
+
+        $validator->validate('1234aB', new StrongPassword());
+        $this->assertEquals(0, count($context->getViolations()));
+
+        // ---
+
+        $context = $this->createContext();
+        $validator = new StrongPasswordValidator($this->createMockPasswordConfig(array(
+            'enabled' => true,
+            'letter_required' => 'capital_or_non_capital',
+        )));
+        $validator->initialize($context);
+
+        $validator->validate('123456', new StrongPassword());
+        $this->assertEquals(1, count($context->getViolations()));
+        $this->assertEquals(
+            'Password must contain at least one letter.',
+            $context->getViolations()[0]->getMessage()
+        );
+
+        // -
+
+        $context = $this->createContext();
+        $validator->initialize($context);
+
+        $validator->validate('12345a', new StrongPassword());
+        $this->assertEquals(0, count($context->getViolations()));
+
+        // -
+
+        $context = $this->createContext();
+        $validator->initialize($context);
+
+        $validator->validate('12345A', new StrongPassword());
+        $this->assertEquals(0, count($context->getViolations()));
+
+        // -
+
+        $context = $this->createContext();
+        $validator->initialize($context);
+
+        $validator->validate('1234Ab', new StrongPassword());
+        $this->assertEquals(0, count($context->getViolations()));
+
+        // ---
+
+        $context = $this->createContext();
+        $validator = new StrongPasswordValidator($this->createMockPasswordConfig(array(
             'enabled' => false,
             'min_length' => 6,
             'number_required' => true,
-            'capital_letter_required' => true,
+            'letter_required' => 'capital_or_non_capital',
         )));
         $validator->initialize($context);
 
@@ -112,11 +200,11 @@ class StrongPasswordValidatorTest extends FunctionalTestCase
             'enabled' => true,
             'min_length' => 6,
             'number_required' => true,
-            'capital_letter_required' => true,
+            'letter_required' => 'capital_or_non_capital',
         )));
         $validator->initialize($context);
 
-        $validator->validate('foob', new StrongPassword());
+        $validator->validate(':(', new StrongPassword());
         $this->assertEquals(3, count($context->getViolations()));
     }
 
@@ -127,16 +215,21 @@ class StrongPasswordValidatorTest extends FunctionalTestCase
         $mapping = array(
             'number_required' => 'isNumberRequired',
             'enabled' => 'isEnabled',
-            'capital_letter_required' => 'isCapitalLetterRequired',
+            'letter_required' => array('isLetterRequired', 'getLetterRequiredType'),
             'min_length' => 'getMinLength',
         );
 
-        foreach ($mapping as $keyName=>$methodName) {
+        foreach ($mapping as $keyName => $methods) {
             if (isset($rawConfig[$keyName])) {
-                \Phake::when($config)
-                    ->{$methodName}()
-                    ->thenReturn($rawConfig[$keyName])
-                ;
+                if (!is_array($methods)) {
+                    $methods = array($methods);
+                }
+                foreach ($methods as $methodName) {
+                    \Phake::when($config)
+                        ->{$methodName}()
+                        ->thenReturn($rawConfig[$keyName])
+                    ;
+                }
             }
         }
 

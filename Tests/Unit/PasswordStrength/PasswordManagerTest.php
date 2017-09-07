@@ -274,7 +274,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Modera\SecurityBundle\PasswordStrength\BadPasswordException
-     * @expectedExceptionMessage Given password failed validation: error-msg1
+     * @expectedExceptionMessage error-msg1
      */
     public function testEncodeAndSetPassword_validationFail()
     {
@@ -309,33 +309,47 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         $pm->encodeAndSetPassword($user, 'foo');
     }
 
-    public function testGeneratePassword()
+    private function assertGeneratePassword($minLength, $letterRequired)
     {
         $encoderDummy = new UserPasswordEncoderDummy();
         $validatorMock = \Phake::mock(ValidatorInterface::class);
 
         $pm = new PasswordManager(
-            $this->createPasswordConfigMock(8, true, true),
+            $this->createPasswordConfigMock($minLength, true, $letterRequired),
             $encoderDummy,
             $validatorMock,
             \Phake::mock(MailServiceInterface::class)
         );
-        $password = $pm->generatePassword();
-        $this->assertNotNull($password);
-        $this->assertTrue(strlen($password) == 8);
-        $this->assertRegExp('/[A-Z]/', $password);
-        $this->assertRegExp('/[0-9]/', $password);
 
-        $pm = new PasswordManager(
-            $this->createPasswordConfigMock(12, true, true),
-            $encoderDummy,
-            $validatorMock,
-            \Phake::mock(MailServiceInterface::class)
-        );
         $password = $pm->generatePassword();
-        $this->assertTrue(strlen($password) == 12);
-        $this->assertRegExp('/[A-Z]/', $password);
+
+        switch ($letterRequired) {
+            case 'capital_or_non_capital':
+                $pattern = '/[A-Za-z]/';
+                break;
+            case 'capital_and_non_capital':
+                $pattern = '/(?=.*[A-Z])(?=.*[a-z])/';
+                break;
+            case 'capital':
+                $pattern = '/[A-Z]/';
+                break;
+            case 'non_capital':
+                $pattern = '/[a-z]/';
+                break;
+        }
+
+        $this->assertNotNull($password);
+        $this->assertTrue(strlen($password) == $minLength);
         $this->assertRegExp('/[0-9]/', $password);
+        $this->assertRegExp($pattern, $password);
+    }
+
+    public function testGeneratePassword()
+    {
+        $this->assertGeneratePassword(6, 'capital_or_non_capital');
+        $this->assertGeneratePassword(8, 'capital_and_non_capital');
+        $this->assertGeneratePassword(10, 'capital');
+        $this->assertGeneratePassword(12, 'non_capital');
     }
 
     public function testEncodeAndSetPasswordAndThenEmailIt()
@@ -406,7 +420,7 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($pm->isItTimeToRotatePassword($user));
     }
 
-    private function createPasswordConfigMock($minLength, $isNumberRequired, $isCapitalLetterRequired)
+    private function createPasswordConfigMock($minLength, $isNumberRequired, $letterRequired)
     {
         $pc = \Phake::mock(PasswordConfigInterface::class);
         \Phake::when($pc)
@@ -418,8 +432,12 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             ->thenReturn($isNumberRequired)
         ;
         \Phake::when($pc)
-            ->isCapitalLetterRequired()
-            ->thenReturn($isCapitalLetterRequired)
+            ->isLetterRequired()
+            ->thenReturn(false !== $letterRequired)
+        ;
+        \Phake::when($pc)
+            ->getLetterRequiredType()
+            ->thenReturn($letterRequired)
         ;
         \Phake::when($pc)
             ->getRotationPeriodInDays()

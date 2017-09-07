@@ -114,10 +114,10 @@ class PasswordManager
      * @throws BadPasswordException
      *
      * @param User $user
-     *
-     * @param $plainPassword
+     * @param string $plainPassword
+     * @param bool $onlyFirstError
      */
-    public function encodeAndSetPassword(User $user, $plainPassword)
+    public function encodeAndSetPassword(User $user, $plainPassword, $onlyFirstError = false)
     {
         if (!$this->isPasswordRotationTurnedOff()) {
             if ($this->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, $plainPassword)) {
@@ -135,7 +135,7 @@ class PasswordManager
                 $errors[] = $violation->getMessage();
             }
 
-            throw new BadPasswordException('Given password failed validation: '.implode(', ', $errors));
+            throw new BadPasswordException($onlyFirstError ? $errors[0] : implode(' ', $errors));
         }
 
         $meta = $user->getMeta();
@@ -207,8 +207,26 @@ class PasswordManager
             if ($this->passwordConfig->isNumberRequired() && !preg_match('/[0-9]/', $plainPassword)) {
                 continue;
             }
-            if ($this->passwordConfig->isCapitalLetterRequired() && !preg_match('/[A-Z]/', $plainPassword)) {
-                continue;
+            if ($this->passwordConfig->isLetterRequired()) {
+                $continue = false;
+                switch ($this->passwordConfig->getLetterRequiredType()) {
+                    case 'capital_or_non_capital':
+                        $continue = !preg_match('/[A-Za-z]/', $plainPassword);
+                        break;
+                    case 'capital_and_non_capital':
+                        $continue = !preg_match('/(?=.*[A-Z])(?=.*[a-z])/', $plainPassword);
+                        break;
+                    case 'capital':
+                        $continue = !preg_match('/[A-Z]/', $plainPassword);
+                        break;
+                    case 'non_capital':
+                        $continue = !preg_match('/[a-z]/', $plainPassword);
+                        break;
+                }
+
+                if ($continue) {
+                    continue;
+                }
             }
 
             if ($user && $this->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, $plainPassword)) {
@@ -225,10 +243,11 @@ class PasswordManager
      *
      * @param User $user
      * @param string $plainPassword
+     * @param bool $onlyFirstError
      */
-    public function encodeAndSetPasswordAndThenEmailIt(User $user, $plainPassword)
+    public function encodeAndSetPasswordAndThenEmailIt(User $user, $plainPassword, $onlyFirstError = false)
     {
-        $this->encodeAndSetPassword($user, $plainPassword);
+        $this->encodeAndSetPassword($user, $plainPassword, $onlyFirstError);
 
         $meta = $user->getMeta();
         $meta['modera_security']['force_password_rotation'] = true;

@@ -29,7 +29,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'enabled' => false,
             'min_length' => 6,
             'number_required' => false,
-            'capital_letter_required' => false,
+            'letter_required' => false,
             'rotation_period' => 90,
         );
         $this->assertSame($expectedConfig, $config);

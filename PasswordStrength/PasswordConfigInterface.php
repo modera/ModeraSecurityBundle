@@ -29,7 +29,12 @@ interface PasswordConfigInterface
     /**
      * @return boolean
      */
-    public function isCapitalLetterRequired();
+    public function isLetterRequired();
+
+    /**
+     * @return string
+     */
+    public function getLetterRequiredType();
 
     /**
      * @return integer

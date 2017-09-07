@@ -66,13 +66,39 @@ class StrongPasswordValidator extends ConstraintValidator
             $lengthValidator->validate($value, $regexConstr);
         }
 
-        if ($this->config->isCapitalLetterRequired()) {
-            $errorMsg = 'Password must contain at least one capital letter.';
-            if (class_exists('Modera\FoundationBundle\Translation\T')) {
-                $errorMsg = T::trans($errorMsg);
+        if ($this->config->isLetterRequired()) {
+            switch ($this->config->getLetterRequiredType()) {
+                case 'capital_or_non_capital':
+                    $pattern = '/[A-Za-z]/';
+                    $errorMsg = 'Password must contain at least one letter.';
+                    if (class_exists('Modera\FoundationBundle\Translation\T')) {
+                        $errorMsg = T::trans($errorMsg);
+                    }
+                    break;
+                case 'capital_and_non_capital':
+                    $pattern = '/(?=.*[A-Z])(?=.*[a-z])/';
+                    $errorMsg = 'Password must contain at least one capital and one non-capital letter.';
+                    if (class_exists('Modera\FoundationBundle\Translation\T')) {
+                        $errorMsg = T::trans($errorMsg);
+                    }
+                    break;
+                case 'capital':
+                    $pattern = '/[A-Z]/';
+                    $errorMsg = 'Password must contain at least one capital letter.';
+                    if (class_exists('Modera\FoundationBundle\Translation\T')) {
+                        $errorMsg = T::trans($errorMsg);
+                    }
+                    break;
+                case 'non_capital':
+                    $pattern = '/[a-z]/';
+                    $errorMsg = 'Password must contain at least one non-capital letter.';
+                    if (class_exists('Modera\FoundationBundle\Translation\T')) {
+                        $errorMsg = T::trans($errorMsg);
+                    }
+                    break;
             }
 
-            $regexConstr = new Regex(array('pattern' => '/[A-Z]/'));
+            $regexConstr = new Regex(array('pattern' => $pattern));
             $regexConstr->message = $errorMsg;
 
             $this->context->setConstraint($regexConstr);

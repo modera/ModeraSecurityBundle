@@ -21,7 +21,7 @@ class SemanticPasswordConfigTest extends \PHPUnit_Framework_TestCase
             'password_strength' => array(
                 'enabled' => 'foo1',
                 'number_required' => 'foo2',
-                'capital_letter_required' => 'foo3',
+                'letter_required' => 'foo3',
                 'rotation_period' => 'foo4',
             ),
         ));
@@ -37,9 +37,10 @@ class SemanticPasswordConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo2', $this->config->isNumberRequired());
     }
 
-    public function testCapitalLetterRequired()
+    public function testLetterRequired()
     {
-        $this->assertEquals('foo3', $this->config->isCapitalLetterRequired());
+        $this->assertTrue($this->config->isLetterRequired());
+        $this->assertEquals('capital_or_non_capital', $this->config->getLetterRequiredType());
     }
 
     public function testRotationPeriod()
