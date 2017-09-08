@@ -21,7 +21,8 @@
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
         "sergeil/extjsintegration-bundle": "~1.0",
-        "modera/foundation-bundle": "~1.0|~2.0"
+        "modera/foundation-bundle": "~1.0|~2.0",
+        "modera/translations-bundle": "~1.0|~2.0"
     },
     "require-dev": {
         "modera/foundation-bundle": "~1.0|~2.0",

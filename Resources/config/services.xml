@@ -95,5 +95,13 @@
             <argument>%locale%</argument>
             <argument>%modera_security.password_strength.mail.sender%</argument>
         </service>
+
+        <!-- since 2.56.0 -->
+        <service parent="modera_translations.handling.php_classes_translation_handler">
+
+            <argument>ModeraSecurityBundle</argument>
+
+            <tag name="modera_translations.translation_handler" />
+        </service>
     </services>
 </container>
