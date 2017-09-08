@@ -11,6 +11,7 @@ class ModeraSecurityAppKernel extends \Modera\FoundationBundle\Testing\AbstractF
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
 
             new Modera\FoundationBundle\ModeraFoundationBundle(),
+            new Modera\TranslationsBundle\ModeraTranslationsBundle(),
             new Modera\SecurityBundle\ModeraSecurityBundle(),
         );
     }
