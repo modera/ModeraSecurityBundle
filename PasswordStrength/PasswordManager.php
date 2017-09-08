@@ -7,6 +7,7 @@ use Modera\SecurityBundle\PasswordStrength\Mail\MailServiceInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Modera\SecurityBundle\PasswordStrength\PasswordConfigInterface;
 
 /**
  * @since 2.56.0
@@ -210,16 +211,16 @@ class PasswordManager
             if ($this->passwordConfig->isLetterRequired()) {
                 $continue = false;
                 switch ($this->passwordConfig->getLetterRequiredType()) {
-                    case 'capital_or_non_capital':
+                    case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL:
                         $continue = !preg_match('/[A-Za-z]/', $plainPassword);
                         break;
-                    case 'capital_and_non_capital':
+                    case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_AND_NON_CAPITAL:
                         $continue = !preg_match('/(?=.*[A-Z])(?=.*[a-z])/', $plainPassword);
                         break;
-                    case 'capital':
+                    case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL:
                         $continue = !preg_match('/[A-Z]/', $plainPassword);
                         break;
-                    case 'non_capital':
+                    case PasswordConfigInterface::LETTER_REQUIRED_TYPE_NON_CAPITAL:
                         $continue = !preg_match('/[a-z]/', $plainPassword);
                         break;
                 }

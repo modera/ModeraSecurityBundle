@@ -43,12 +43,11 @@ class StrongPasswordValidator extends ConstraintValidator
         }
 
         if ($this->config->getMinLength() > 0) {
-            $lengthConstr = new Length(array('min' => $this->config->getMinLength()));
-
-            $this->context->setConstraint($lengthConstr);
-            $lengthValidator = new LengthValidator();
-            $lengthValidator->initialize($this->context);
-            $lengthValidator->validate($value, $lengthConstr);
+            $this->subValidate(
+                new LengthValidator(),
+                $value,
+                new Length(array('min' => $this->config->getMinLength()))
+            );
         }
 
         if ($this->config->isNumberRequired()) {
@@ -57,39 +56,40 @@ class StrongPasswordValidator extends ConstraintValidator
                 $errorMsg = T::trans($errorMsg);
             }
 
-            $regexConstr = new Regex(array('pattern' => '/[0-9]/'));
-            $regexConstr->message = $errorMsg;
+            $regexConstraint = new Regex(array('pattern' => '/[0-9]/'));
+            $regexConstraint->message = $errorMsg;
 
-            $this->context->setConstraint($regexConstr);
-            $lengthValidator = new RegexValidator();
-            $lengthValidator->initialize($this->context);
-            $lengthValidator->validate($value, $regexConstr);
+            $this->subValidate(
+                new RegexValidator(),
+                $value,
+                $regexConstraint
+            );
         }
 
         if ($this->config->isLetterRequired()) {
             switch ($this->config->getLetterRequiredType()) {
-                case 'capital_or_non_capital':
+                case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL:
                     $pattern = '/[A-Za-z]/';
                     $errorMsg = 'Password must contain at least one letter.';
                     if (class_exists('Modera\FoundationBundle\Translation\T')) {
                         $errorMsg = T::trans($errorMsg);
                     }
                     break;
-                case 'capital_and_non_capital':
+                case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_AND_NON_CAPITAL:
                     $pattern = '/(?=.*[A-Z])(?=.*[a-z])/';
                     $errorMsg = 'Password must contain at least one capital and one non-capital letter.';
                     if (class_exists('Modera\FoundationBundle\Translation\T')) {
                         $errorMsg = T::trans($errorMsg);
                     }
                     break;
-                case 'capital':
+                case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL:
                     $pattern = '/[A-Z]/';
                     $errorMsg = 'Password must contain at least one capital letter.';
                     if (class_exists('Modera\FoundationBundle\Translation\T')) {
                         $errorMsg = T::trans($errorMsg);
                     }
                     break;
-                case 'non_capital':
+                case PasswordConfigInterface::LETTER_REQUIRED_TYPE_NON_CAPITAL:
                     $pattern = '/[a-z]/';
                     $errorMsg = 'Password must contain at least one non-capital letter.';
                     if (class_exists('Modera\FoundationBundle\Translation\T')) {
@@ -98,13 +98,26 @@ class StrongPasswordValidator extends ConstraintValidator
                     break;
             }
 
-            $regexConstr = new Regex(array('pattern' => $pattern));
-            $regexConstr->message = $errorMsg;
+            $regexConstraint = new Regex(array('pattern' => $pattern));
+            $regexConstraint->message = $errorMsg;
 
-            $this->context->setConstraint($regexConstr);
-            $lengthValidator = new RegexValidator();
-            $lengthValidator->initialize($this->context);
-            $lengthValidator->validate($value, $regexConstr);
+            $this->subValidate(
+                new RegexValidator(),
+                $value,
+                $regexConstraint
+            );
         }
+    }
+
+    /**
+     * @param ConstraintValidator $validator
+     * @param mixed $value
+     * @param Constraint $constraint
+     */
+    private function subValidate(ConstraintValidator $validator, $value, Constraint $constraint)
+    {
+        $this->context->setConstraint($constraint);
+        $validator->initialize($this->context);
+        $validator->validate($value, $constraint);
     }
 }

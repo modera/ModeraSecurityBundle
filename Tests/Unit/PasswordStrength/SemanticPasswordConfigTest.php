@@ -40,7 +40,7 @@ class SemanticPasswordConfigTest extends \PHPUnit_Framework_TestCase
     public function testLetterRequired()
     {
         $this->assertTrue($this->config->isLetterRequired());
-        $this->assertEquals('capital_or_non_capital', $this->config->getLetterRequiredType());
+        $this->assertEquals('foo3', $this->config->getLetterRequiredType());
     }
 
     public function testRotationPeriod()

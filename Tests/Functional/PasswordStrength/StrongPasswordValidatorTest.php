@@ -72,7 +72,7 @@ class StrongPasswordValidatorTest extends FunctionalTestCase
         $context = $this->createContext();
         $validator = new StrongPasswordValidator($this->createMockPasswordConfig(array(
             'enabled' => true,
-            'letter_required' => 'capital',
+            'letter_required' => PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL,
         )));
         $validator->initialize($context);
 
@@ -96,7 +96,7 @@ class StrongPasswordValidatorTest extends FunctionalTestCase
         $context = $this->createContext();
         $validator = new StrongPasswordValidator($this->createMockPasswordConfig(array(
             'enabled' => true,
-            'letter_required' => 'non_capital',
+            'letter_required' => PasswordConfigInterface::LETTER_REQUIRED_TYPE_NON_CAPITAL,
         )));
         $validator->initialize($context);
 
@@ -120,7 +120,7 @@ class StrongPasswordValidatorTest extends FunctionalTestCase
         $context = $this->createContext();
         $validator = new StrongPasswordValidator($this->createMockPasswordConfig(array(
             'enabled' => true,
-            'letter_required' => 'capital_and_non_capital',
+            'letter_required' => PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_AND_NON_CAPITAL,
         )));
         $validator->initialize($context);
 
@@ -144,7 +144,7 @@ class StrongPasswordValidatorTest extends FunctionalTestCase
         $context = $this->createContext();
         $validator = new StrongPasswordValidator($this->createMockPasswordConfig(array(
             'enabled' => true,
-            'letter_required' => 'capital_or_non_capital',
+            'letter_required' => PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL,
         )));
         $validator->initialize($context);
 
@@ -186,7 +186,7 @@ class StrongPasswordValidatorTest extends FunctionalTestCase
             'enabled' => false,
             'min_length' => 6,
             'number_required' => true,
-            'letter_required' => 'capital_or_non_capital',
+            'letter_required' => PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL,
         )));
         $validator->initialize($context);
 
@@ -200,7 +200,7 @@ class StrongPasswordValidatorTest extends FunctionalTestCase
             'enabled' => true,
             'min_length' => 6,
             'number_required' => true,
-            'letter_required' => 'capital_or_non_capital',
+            'letter_required' => PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL,
         )));
         $validator->initialize($context);
 

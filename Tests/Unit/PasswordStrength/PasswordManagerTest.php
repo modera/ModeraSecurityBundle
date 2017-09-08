@@ -324,16 +324,16 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         $password = $pm->generatePassword();
 
         switch ($letterRequired) {
-            case 'capital_or_non_capital':
+            case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL:
                 $pattern = '/[A-Za-z]/';
                 break;
-            case 'capital_and_non_capital':
+            case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_AND_NON_CAPITAL:
                 $pattern = '/(?=.*[A-Z])(?=.*[a-z])/';
                 break;
-            case 'capital':
+            case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL:
                 $pattern = '/[A-Z]/';
                 break;
-            case 'non_capital':
+            case PasswordConfigInterface::LETTER_REQUIRED_TYPE_NON_CAPITAL:
                 $pattern = '/[a-z]/';
                 break;
         }
@@ -346,10 +346,10 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGeneratePassword()
     {
-        $this->assertGeneratePassword(6, 'capital_or_non_capital');
-        $this->assertGeneratePassword(8, 'capital_and_non_capital');
-        $this->assertGeneratePassword(10, 'capital');
-        $this->assertGeneratePassword(12, 'non_capital');
+        $this->assertGeneratePassword(6, PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL);
+        $this->assertGeneratePassword(8, PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_AND_NON_CAPITAL);
+        $this->assertGeneratePassword(10, PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL);
+        $this->assertGeneratePassword(12, PasswordConfigInterface::LETTER_REQUIRED_TYPE_NON_CAPITAL);
     }
 
     public function testEncodeAndSetPasswordAndThenEmailIt()
