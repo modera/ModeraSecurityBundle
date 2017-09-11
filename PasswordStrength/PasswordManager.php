@@ -116,16 +116,18 @@ class PasswordManager
      *
      * @param User $user
      * @param string $plainPassword
-     * @param bool $onlyFirstError
      */
-    public function encodeAndSetPassword(User $user, $plainPassword, $onlyFirstError = false)
+    public function encodeAndSetPassword(User $user, $plainPassword)
     {
         if (!$this->isPasswordRotationTurnedOff()) {
             if ($this->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, $plainPassword)) {
-                throw new BadPasswordException(sprintf(
+                $error = sprintf(
                     'Given password cannot be used because it has been already used in last %d days.',
                     $this->passwordConfig->getRotationPeriodInDays()
-                ));
+                );
+                $e = new BadPasswordException($error);
+                $e->setErrors(array($error));
+                throw $e;
             }
         }
 
@@ -136,7 +138,9 @@ class PasswordManager
                 $errors[] = $violation->getMessage();
             }
 
-            throw new BadPasswordException($onlyFirstError ? $errors[0] : implode(' ', $errors));
+            $e = new BadPasswordException(implode(' ', $errors));
+            $e->setErrors($errors);
+            throw $e;
         }
 
         $meta = $user->getMeta();
@@ -244,11 +248,10 @@ class PasswordManager
      *
      * @param User $user
      * @param string $plainPassword
-     * @param bool $onlyFirstError
      */
-    public function encodeAndSetPasswordAndThenEmailIt(User $user, $plainPassword, $onlyFirstError = false)
+    public function encodeAndSetPasswordAndThenEmailIt(User $user, $plainPassword)
     {
-        $this->encodeAndSetPassword($user, $plainPassword, $onlyFirstError);
+        $this->encodeAndSetPassword($user, $plainPassword);
 
         $meta = $user->getMeta();
         $meta['modera_security']['force_password_rotation'] = true;
