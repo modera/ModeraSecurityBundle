@@ -5,6 +5,8 @@ namespace Modera\SecurityBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Modera\SecurityBundle\Model\UserInterface;
+use Modera\SecurityBundle\Validator\Constraints\Email;
+use Modera\SecurityBundle\Validator\Constraints\Username;
 use Modera\SecurityBundle\PasswordStrength\PasswordManager;
 use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
 use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
@@ -40,6 +42,7 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
     /**
      * @ORM\Column(type="string", length=60, unique=true)
      *
+     * @Email
      * @Assert\NotBlank
      */
     private $email;
@@ -47,6 +50,7 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
     /**
      * @ORM\Column(type="string", length=60, unique=true)
      *
+     * @Username
      * @Assert\NotBlank
      */
     private $username;

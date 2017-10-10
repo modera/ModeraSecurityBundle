@@ -4,6 +4,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
+    <parameters>
+        <parameter key="modera_security.validator.email_validator.class">Modera\SecurityBundle\Validator\Constraints\EmailValidator</parameter>
+        <parameter key="modera_security.validator.username_validator.class">Modera\SecurityBundle\Validator\Constraints\UsernameValidator</parameter>
+    </parameters>
+
     <services>
         <service id="modera_security.security.authenticator"
                  class="Modera\SecurityBundle\Security\Authenticator">
@@ -102,6 +107,18 @@
             <argument>ModeraSecurityBundle</argument>
 
             <tag name="modera_translations.translation_handler" />
+        </service>
+
+        <!-- since 2.57.0 -->
+        <service id="modera_security.validator.constraints.email_validator"
+                 class="%modera_security.validator.email_validator.class%">
+
+            <tag name="validator.constraint_validator" alias="modera_security.validator.email" />
+        </service>
+        <service id="modera_security.validator.constraints.username_validator"
+                 class="%modera_security.validator.username_validator.class%">
+
+            <tag name="validator.constraint_validator" alias="modera_security.validator.username" />
         </service>
     </services>
 </container>
