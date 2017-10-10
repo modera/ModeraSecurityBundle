@@ -13,6 +13,19 @@ use Modera\SecurityBundle\PasswordStrength\PasswordManager;
  */
 class UserTest extends \PHPUnit_Framework_TestCase
 {
+    public function testFirstLastMiddleName()
+    {
+        $user = new User();
+
+        $user->setFirstName('<First Name>');
+        $user->setLastName('*Last@Name*');
+        $user->setMiddleName('"Middle_Name"');
+
+        $this->assertSame('FirstName', $user->getFirstName());
+        $this->assertSame('LastName', $user->getLastName());
+        $this->assertSame('MiddleName', $user->getMiddleName());
+    }
+
     public function testGetRawRoles()
     {
         $user = new User();

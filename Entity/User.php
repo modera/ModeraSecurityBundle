@@ -2,17 +2,17 @@
 
 namespace Modera\SecurityBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
-use Modera\SecurityBundle\PasswordStrength\PasswordManager;
-use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Modera\SecurityBundle\Model\UserInterface;
+use Modera\SecurityBundle\PasswordStrength\PasswordManager;
+use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
+use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
+use Sli\ExtJsIntegrationBundle\DataMapping\PreferencesAwareUserInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Sli\ExtJsIntegrationBundle\DataMapping\PreferencesAwareUserInterface;
 
 /**
  * @ORM\Table(name="modera_security_user")
@@ -411,7 +411,7 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
      */
     public function setFirstName($firstName)
     {
-        $this->firstName = $firstName;
+        $this->firstName = preg_replace('/\PL/u', '', $firstName);
     }
 
     /**
@@ -427,7 +427,7 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
      */
     public function setLastName($lastName)
     {
-        $this->lastName = $lastName;
+        $this->lastName = preg_replace('/\PL/u', '', $lastName);
     }
 
     /**
@@ -443,7 +443,7 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
      */
     public function setMiddleName($middleName)
     {
-        $this->middleName = $middleName;
+        $this->middleName = preg_replace('/\PL/u', '', $middleName);
     }
 
     /**
