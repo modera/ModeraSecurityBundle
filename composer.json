@@ -16,17 +16,17 @@
     ],
     "require": {
         "php": ">=5.4",
-        "symfony/symfony": "~2.6",
-        "symfony/swiftmailer-bundle": "~2.3",
+        "symfony/symfony": "~2.6 || ^3.0",
+        "symfony/swiftmailer-bundle": "~2.3 || ^3.0",
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
         "sergeil/extjsintegration-bundle": "~1.0",
-        "modera/foundation-bundle": "~1.0|~2.0",
-        "modera/translations-bundle": "~1.0|~2.0"
+        "modera/foundation-bundle": "~1.0 || ~2.0",
+        "modera/translations-bundle": "~1.0 || ~2.0"
     },
     "require-dev": {
-        "modera/foundation-bundle": "~1.0|~2.0",
-        "modera/languages-bundle": "~1.0|~2.0",
+        "modera/foundation-bundle": "~1.0 || ~2.0",
+        "modera/languages-bundle": "~1.0 || ~2.0",
         "phake/phake": "~2.0",
         "phpunit/phpunit": "^5.5"
     },
