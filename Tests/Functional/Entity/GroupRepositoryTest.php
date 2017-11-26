@@ -87,14 +87,6 @@ class GroupRepositoryTest extends FunctionalTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Debug\Exception\ContextErrorException
-     */
-    public function testFindByRefName_EmptyArgument()
-    {
-        static::$em->getRepository(Group::clazz())->findByRefName();
-    }
-
-    /**
      * Db Tables used in test.
      *
      * @return array

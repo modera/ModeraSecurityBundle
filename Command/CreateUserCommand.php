@@ -4,11 +4,12 @@ namespace Modera\SecurityBundle\Command;
 
 use Doctrine\ORM\EntityManager;
 use Modera\SecurityBundle\Entity\User;
+use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
@@ -45,18 +46,22 @@ class CreateUserCommand extends ContainerAwareCommand
         $password = $input->getOption('password');
 
         if (false === $input->getOption('no-interactions')) {
-            /* @var DialogHelper $dialog */
-            $dialog = $this->getHelper('dialog');
+            /* @var QuestionHelper $questionHelper */
+            $questionHelper = $this->getHelper('question');
 
             $output->writeln('<info>This command will let you to create a test user that you can user to authenticated to administration interface</info>');
             $output->write(PHP_EOL);
 
-            $username = $dialog->ask($output, '<question>Username:</question> ');
-            $email = $dialog->ask($output, '<question>Email:</question> ');
+            $username = $questionHelper->ask($input, $output, new Question('<question>Username:</question> '));
+            $email = $questionHelper->ask($input, $output, new Question('<question>Email:</question> '));
 
             do {
-                $password = $dialog->askHiddenResponse($output, '<question>Password:</question> ');
-                $passwordConfirm = $dialog->askHiddenResponse($output, '<question>Password again:</question> ');
+                $password = $questionHelper->ask(
+                    $input, $output, $this->createHiddenQuestion('<question>Password:</question> ')
+                );
+                $passwordConfirm = $questionHelper->ask(
+                    $input, $output, $this->createHiddenQuestion('<question>Password again:</question> ')
+                );
 
                 if ($password != $passwordConfirm) {
                     $output->writeln('<error>Entered passwords do not match, please try again</error>');
@@ -80,5 +85,13 @@ class CreateUserCommand extends ContainerAwareCommand
             '<info>Great success! User "%s" has been successfully created!</info>',
             $user->getUsername()
         ));
+    }
+
+    private function createHiddenQuestion($text)
+    {
+        $question = new Question($text);
+        $question->setHidden(true);
+
+        return $question;
     }
 }
