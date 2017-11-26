@@ -20,7 +20,7 @@
         "symfony/swiftmailer-bundle": "~2.3 || ^3.0",
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
-        "sergeil/extjsintegration-bundle": "dev-master",
+        "sergeil/extjsintegration-bundle": "^2.0",
         "modera/foundation-bundle": "~1.0 || ~2.0",
         "modera/translations-bundle": "~1.0 || ~2.0"
     },
