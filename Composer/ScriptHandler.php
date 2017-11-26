@@ -22,7 +22,7 @@ class ScriptHandler extends AbstractScriptHandler
         echo '>>> ModeraSecurityBundle: Install permissions'.PHP_EOL;
 
         if (!is_dir($binDir)) {
-            echo 'The symfony-app-dir ('.$binDir.') specified in composer.json was not found in '.getcwd().', can not install permissions.'.PHP_EOL;
+            echo 'The symfony-bin-dir ('.$binDir.') specified in composer.json was not found in '.getcwd().', can not install permissions.'.PHP_EOL;
 
             return;
         }
