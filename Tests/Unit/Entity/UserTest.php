@@ -17,13 +17,21 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User();
 
-        $user->setFirstName('<First Name>');
+        $user->setFirstName('<First:Name>');
         $user->setLastName('*Last@Name*');
         $user->setMiddleName('"Middle_Name"');
 
         $this->assertSame('FirstName', $user->getFirstName());
         $this->assertSame('LastName', $user->getLastName());
         $this->assertSame('MiddleName', $user->getMiddleName());
+
+        $user->setFirstName('First-Name');
+        $user->setLastName('Last Name');
+        $user->setMiddleName('Middle - Name');
+
+        $this->assertSame('First-Name', $user->getFirstName());
+        $this->assertSame('Last Name', $user->getLastName());
+        $this->assertSame('Middle - Name', $user->getMiddleName());
     }
 
     public function testGetRawRoles()
