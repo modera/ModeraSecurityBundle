@@ -46,7 +46,11 @@ security:
             pattern:    ^/
             anonymous: ~
             context: modera_auth
-            provider: authenticator
+            # In 2.x/3.4.x provider used to contain "authenticator", which doesn't exist and symfony
+            # was simply ignoring it, but in 3.4.x it was fixed and Symfony started throwing
+            # errors when detecting non existing user-provider. For more details see:
+            # https://symfony.com/doc/3.4/security/multiple_user_providers.html
+            provider: modera_provider
             access_denied_handler: modera_security.security.access_denied_handler
             form_login:
                 provider:      modera_provider
