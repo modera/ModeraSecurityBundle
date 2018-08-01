@@ -470,7 +470,13 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
             $values[] = $value;
         }
 
-        return trim(preg_replace($keys, $values, $pattern));
+        $name = trim(preg_replace($keys, $values, $pattern));
+
+        if (!$name) {
+            return $this->getUsername();
+        }
+
+        return $name;
     }
 
     /**
