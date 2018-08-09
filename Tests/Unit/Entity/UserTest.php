@@ -103,4 +103,20 @@ class UserTest extends \PHPUnit_Framework_TestCase
             ->encodeAndSetPassword($user, 'foo1234')
         ;
     }
+
+    public function testGetFullName()
+    {
+        $user = new User();
+        $user->setFirstName('First');
+        $user->setLastName('Last');
+        $user->setMiddleName('Middle');
+        $user->setUsername('johnsnow');
+
+        $this->assertSame('First Last', $user->getFullName());
+
+        $user->setFirstName('');
+        $user->setLastName('');
+        $user->setMiddleName('');
+        $this->assertSame('johnsnow', $user->getFullName());
+    }
 }
