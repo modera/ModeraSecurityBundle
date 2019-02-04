@@ -51,6 +51,10 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         $validatorMock = \Phake::mock(ValidatorInterface::class);
+        \Phake::when($validatorMock)
+            ->validate(\Phake::anyParameters())
+            ->thenReturn([])
+        ;
 
         $pm = new PasswordManager(
             $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
@@ -94,6 +98,10 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         $validatorMock = \Phake::mock(ValidatorInterface::class);
+        \Phake::when($validatorMock)
+            ->validate(\Phake::anyParameters())
+            ->thenReturn([])
+        ;
 
         $pm = new PasswordManager(
             $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
@@ -170,6 +178,10 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         $validatorMock = \Phake::mock(ValidatorInterface::class);
+        \Phake::when($validatorMock)
+            ->validate(\Phake::anyParameters())
+            ->thenReturn([])
+        ;
 
         $pm = new PasswordManager(
             $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
@@ -204,6 +216,10 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         $validatorMock = \Phake::mock(ValidatorInterface::class);
+        \Phake::when($validatorMock)
+            ->validate(\Phake::anyParameters())
+            ->thenReturn([])
+        ;
 
         $pm = new PasswordManager(
             $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
@@ -241,6 +257,10 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
             'bar' => 'encoded-bar',
         );
         $validatorMock = \Phake::mock(ValidatorInterface::class);
+        \Phake::when($validatorMock)
+            ->validate(\Phake::anyParameters())
+            ->thenReturn([])
+        ;
 
         $pm = new PasswordManager(
             $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
@@ -313,6 +333,10 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
     {
         $encoderDummy = new UserPasswordEncoderDummy();
         $validatorMock = \Phake::mock(ValidatorInterface::class);
+        \Phake::when($validatorMock)
+            ->validate(\Phake::anyParameters())
+            ->thenReturn([])
+        ;
 
         $pm = new PasswordManager(
             $this->createPasswordConfigMock($minLength, true, $letterRequired),
@@ -356,10 +380,16 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
     {
         $mailServiceMock = \Phake::mock(MailServiceInterface::class);
 
+        $validatorMock = \Phake::mock(ValidatorInterface::class);
+        \Phake::when($validatorMock)
+            ->validate(\Phake::anyParameters())
+            ->thenReturn([])
+        ;
+
         $pm = new PasswordManager(
             \Phake::mock(PasswordConfigInterface::class),
             \Phake::mock(UserPasswordEncoderInterface::class),
-            \Phake::mock(ValidatorInterface::class),
+            $validatorMock,
             $mailServiceMock
         );
 
@@ -387,6 +417,10 @@ class PasswordManagerTest extends \PHPUnit_Framework_TestCase
         ;
         $encoderDummy = new UserPasswordEncoderDummy();
         $validatorMock = \Phake::mock(ValidatorInterface::class);
+        \Phake::when($validatorMock)
+            ->validate(\Phake::anyParameters())
+            ->thenReturn([])
+        ;
 
         $pm = new PasswordManager(
             $passwordConfigMock,
