@@ -31,9 +31,22 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
 
         $this->injectConfigIntoContainer($config, $container);
 
-        $container->setAlias('modera_security.root_user_handling.handler', $config['root_user_handler']);
+        $container
+            ->setAlias('modera_security.root_user_handling.handler', $config['root_user_handler'])
+            ->setPublic(true)
+        ;
+
+        if (class_exists('Symfony\Component\Console\Application')) {
+            try {
+                $loader->load('console.xml');
+            } catch (\Exception $e) {}
+        }
     }
 
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
     private function injectConfigIntoContainer(array $config, ContainerBuilder $container)
     {
         $container->setParameter(self::CONFIG_KEY, $config);

@@ -29,13 +29,15 @@
 
         <!-- internal -->
         <service id="modera_security.data_installation.bc_layer"
-                 class="Modera\SecurityBundle\DataInstallation\BCLayer">
+                 class="Modera\SecurityBundle\DataInstallation\BCLayer"
+                 public="true">
 
             <argument type="service" id="doctrine" />
         </service>
 
         <service id="modera_security.data_installation.permission_and_categories_installer"
-                 class="Modera\SecurityBundle\DataInstallation\PermissionAndCategoriesInstaller">
+                 class="Modera\SecurityBundle\DataInstallation\PermissionAndCategoriesInstaller"
+                 public="true">
 
             <argument type="service" id="doctrine.orm.entity_manager" />
             <argument type="service" id="modera_security.permission_categories_provider" />
@@ -45,13 +47,15 @@
         </service>
 
         <service id="modera_security.root_user_handler.semantic_config_root_user_handler"
-                 class="Modera\SecurityBundle\RootUserHandling\SemanticConfigRootUserHandler">
+                 class="Modera\SecurityBundle\RootUserHandling\SemanticConfigRootUserHandler"
+                 public="true">
 
             <argument type="service" id="service_container" />
         </service>
 
         <service id="modera_security.service.user_service"
-                 class="Modera\SecurityBundle\Service\UserService">
+                 class="Modera\SecurityBundle\Service\UserService"
+                 public="true">
 
             <argument type="service" id="doctrine.orm.entity_manager" />
             <!-- defined in \Modera\SecurityBundle\DependencyInjection\ModeraSecurityExtension  -->
@@ -83,7 +87,8 @@
 
         <!-- since 2.56.0 -->
         <service id="modera_security.password_strength.password_manager"
-                 class="Modera\SecurityBundle\PasswordStrength\PasswordManager">
+                 class="Modera\SecurityBundle\PasswordStrength\PasswordManager"
+                 public="true">
 
             <argument type="service" id="modera_security.password_strength.password_config" />
             <argument type="service" id="security.password_encoder" />
@@ -93,7 +98,8 @@
 
         <!-- since 2.56.0 -->
         <service id="modera_security.password_strength.mail.default_mail_service"
-                 class="Modera\SecurityBundle\PasswordStrength\Mail\DefaultMailService">
+                 class="Modera\SecurityBundle\PasswordStrength\Mail\DefaultMailService"
+                 public="true">
 
             <argument type="service" id="doctrine.orm.entity_manager" />
             <argument type="service" id="mailer" />
