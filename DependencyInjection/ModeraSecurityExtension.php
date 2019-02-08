@@ -69,6 +69,7 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $container->setParameter(self::CONFIG_KEY.'.switch_user', $config['switch_user']);
         $container->setParameter(self::CONFIG_KEY.'.access_control', $config['access_control']);
     }
 }

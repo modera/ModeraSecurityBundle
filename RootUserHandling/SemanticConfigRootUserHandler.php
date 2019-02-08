@@ -28,8 +28,17 @@ class SemanticConfigRootUserHandler implements RootUserHandlerInterface
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->config = $container->getParameter(ModeraSecurityExtension::CONFIG_KEY);
-        $this->config = $this->config['root_user'];
+        $config = $container->getParameter(ModeraSecurityExtension::CONFIG_KEY);
+
+        $this->config = $config['root_user'];
+
+        $this->config['switch_user_role'] = null;
+        if (isset($config['switch_user']) && $config['switch_user']) {
+            $this->config['switch_user_role'] = 'ROLE_ALLOWED_TO_SWITCH';
+            if (is_array($config['switch_user']) && isset($config['switch_user']['role'])) {
+                $this->config['switch_user_role'] = $config['switch_user']['role'];
+            }
+        }
 
         $this->em = $container->get('doctrine.orm.entity_manager');
     }
@@ -73,11 +82,17 @@ class SemanticConfigRootUserHandler implements RootUserHandlerInterface
                 $roleNames[] = $roleName['roleName'];
             }
 
-            return $roleNames;
-        } elseif (is_array($roles)) {
-            return $roles;
-        } else {
+            $roles = $roleNames;
+        }
+
+        if (!is_array($roles)) {
             throw new \RuntimeException('Neither "*" nor array is used to define root user roles!');
         }
+
+        if ($this->config['switch_user_role']) {
+            $roles[] = $this->config['switch_user_role'];
+        }
+
+        return $roles;
     }
 }
