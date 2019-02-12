@@ -13,6 +13,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class ModeraSecurityBundle extends Bundle
 {
+    const ROLE_ROOT_USER = 'ROLE_ROOT_USER';
+
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container)
     {
         $permissionsProviders = new ExtensionPoint('modera_security.permissions');

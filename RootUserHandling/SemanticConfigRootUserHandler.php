@@ -2,12 +2,13 @@
 
 namespace Modera\SecurityBundle\RootUserHandling;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\EntityManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Modera\SecurityBundle\DependencyInjection\ModeraSecurityExtension;
+use Modera\SecurityBundle\ModeraSecurityBundle;
 use Modera\SecurityBundle\Entity\Permission;
 use Modera\SecurityBundle\Entity\User;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This implementation will use semantic bundle configuration to retrieve information about root user.
@@ -19,8 +20,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SemanticConfigRootUserHandler implements RootUserHandlerInterface
 {
+    /**
+     * @var array
+     */
     private $config;
-    /* @var EntityManager $em */
+
+    /**
+     * @var EntityManager $em
+     */
     private $em;
 
     /**
@@ -34,10 +41,7 @@ class SemanticConfigRootUserHandler implements RootUserHandlerInterface
 
         $this->config['switch_user_role'] = null;
         if (isset($config['switch_user']) && $config['switch_user']) {
-            $this->config['switch_user_role'] = 'ROLE_ALLOWED_TO_SWITCH';
-            if (is_array($config['switch_user']) && isset($config['switch_user']['role'])) {
-                $this->config['switch_user_role'] = $config['switch_user']['role'];
-            }
+            $this->config['switch_user_role'] = $config['switch_user']['role'];
         }
 
         $this->em = $container->get('doctrine.orm.entity_manager');
@@ -92,6 +96,8 @@ class SemanticConfigRootUserHandler implements RootUserHandlerInterface
         if ($this->config['switch_user_role']) {
             $roles[] = $this->config['switch_user_role'];
         }
+
+        $roles[] = ModeraSecurityBundle::ROLE_ROOT_USER;
 
         return $roles;
     }

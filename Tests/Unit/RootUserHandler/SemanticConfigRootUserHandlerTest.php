@@ -3,10 +3,11 @@
 namespace Modera\SecurityBundle\Tests\Unit\RootUserHandler;
 
 use Doctrine\ORM\Query;
+use Modera\SecurityBundle\RootUserHandling\SemanticConfigRootUserHandler;
 use Modera\SecurityBundle\DependencyInjection\ModeraSecurityExtension;
+use Modera\SecurityBundle\ModeraSecurityBundle;
 use Modera\SecurityBundle\Entity\Permission;
 use Modera\SecurityBundle\Entity\User;
-use Modera\SecurityBundle\RootUserHandling\SemanticConfigRootUserHandler;
 
 /**
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
@@ -65,7 +66,7 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit_Framework_TestCase
 
         $handler = new SemanticConfigRootUserHandler($container);
 
-        $this->assertSame(array('FOO_ROLE', 'BAR_ROLE'), $handler->getRoles());
+        $this->assertSame(array('FOO_ROLE', 'BAR_ROLE', ModeraSecurityBundle::ROLE_ROOT_USER), $handler->getRoles());
     }
 
     public function testGetRolesAsArray()
@@ -81,7 +82,8 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit_Framework_TestCase
 
         $handler = new SemanticConfigRootUserHandler($container);
 
-        $this->assertSame($bundleConfig['root_user']['roles'], $handler->getRoles());
+        $expected = array_merge($bundleConfig['root_user']['roles'], array(ModeraSecurityBundle::ROLE_ROOT_USER));
+        $this->assertSame($expected, $handler->getRoles());
     }
 
     /**

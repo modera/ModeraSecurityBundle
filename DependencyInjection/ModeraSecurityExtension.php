@@ -29,6 +29,8 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
+        $config = $this->prependSwitchUserConfig($config);
+
         $this->injectConfigIntoContainer($config, $container);
 
         $container
@@ -55,8 +57,6 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
             'modera_security.password_strength.mail.sender',
             $config['password_strength']['mail']['sender']
         );
-
-
     }
 
     /**
@@ -69,7 +69,37 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $config = $this->prependSwitchUserConfig($config);
+
         $container->setParameter(self::CONFIG_KEY.'.switch_user', $config['switch_user']);
         $container->setParameter(self::CONFIG_KEY.'.access_control', $config['access_control']);
+    }
+
+    /**
+     * @param array $config
+     * @return array
+     */
+    private function prependSwitchUserConfig(array $config)
+    {
+        if ($config['switch_user']) {
+            $switchUserDefaultCfg = array(
+                'role' => 'ROLE_ALLOWED_TO_SWITCH',
+                'parameter' => '_switch_user',
+            );
+
+            if (!is_array($config['switch_user'])) {
+                $config['switch_user'] = $switchUserDefaultCfg;
+            }
+
+            if (!isset($config['switch_user']['role'])) {
+                $config['switch_user']['role'] = $switchUserDefaultCfg['role'];
+            }
+
+            if (!isset($config['switch_user']['parameter'])) {
+                $config['switch_user']['parameter'] = $switchUserDefaultCfg['parameter'];
+            }
+        }
+
+        return $config;
     }
 }
