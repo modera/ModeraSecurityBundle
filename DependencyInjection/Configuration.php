@@ -29,7 +29,6 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('root_user')
                     ->addDefaultsIfNotSet()
-                    ->cannotBeEmpty()
                     ->children()
                         // these configuration properties are only used when
                         // 'modera_security.root_user_handler.semantic_config_root_user_handler' service is used
@@ -56,7 +55,6 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('password_strength') // since 2.56.0
                     ->addDefaultsIfNotSet()
-                    ->cannotBeEmpty()
                     ->children()
                         ->arrayNode('mail')
                             ->addDefaultsIfNotSet()

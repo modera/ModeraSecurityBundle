@@ -95,7 +95,7 @@ class AuthenticatorTest extends \PHPUnit_Framework_TestCase
         $user->setLastName('Doe');
         $user->setEmail('john.doe@test.test');
         $user->setUsername('john.doe');
-        $role = \Phake::mock('Symfony\Component\Security\Core\Role\RoleInterface');
+        $role = \Phake::mock('Symfony\Component\Security\Core\Role\Role');
 
         \Phake::when($role)->getRole()->thenReturn('ROLE_USER');
         \Phake::when($token)->isAuthenticated()->thenReturn(true);

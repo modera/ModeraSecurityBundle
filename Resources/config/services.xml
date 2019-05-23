@@ -109,7 +109,8 @@
         </service>
 
         <!-- since 2.56.0 -->
-        <service parent="modera_translations.handling.php_classes_translation_handler">
+        <service id="modera_security.handling.php_classes_translation_handler"
+                 parent="modera_translations.handling.php_classes_translation_handler">
 
             <argument>ModeraSecurityBundle</argument>
 

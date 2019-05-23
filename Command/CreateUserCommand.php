@@ -4,8 +4,8 @@ namespace Modera\SecurityBundle\Command;
 
 use Doctrine\ORM\EntityManager;
 use Modera\SecurityBundle\Entity\User;
-use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;

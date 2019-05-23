@@ -5,7 +5,7 @@ namespace Modera\SecurityBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * @ORM\Entity
@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Role\RoleInterface;
  *
  * @author Sergei Lissovski <sergei.lissovski@gmail.com>
  */
-class Permission implements RoleInterface
+class Permission extends Role
 {
     /**
      * @ORM\Column(type="integer")
@@ -119,7 +119,7 @@ class Permission implements RoleInterface
     }
 
     /**
-     * @see RoleInterface
+     * @see Role
      */
     public function getRole()
     {

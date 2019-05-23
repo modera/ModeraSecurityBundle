@@ -15,7 +15,7 @@ interface PermissionInterface
      * implementations of \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface to check
      * if user has access to perform certain operation.
      *
-     * @return string|\Symfony\Component\Security\Core\Role\RoleInterface
+     * @return string|\Symfony\Component\Security\Core\Role\Role
      */
     public function getRole();
 
