@@ -30,6 +30,17 @@ class UserService
     }
 
     /**
+     * @param User $user
+     */
+    public function save(User $user)
+    {
+        if (!$user->getId()) {
+            $this->em->persist($user);
+        }
+        $this->em->flush($user);
+    }
+
+    /**
      * @throws \RuntimeException If given used is root user and cannot be deleted
      *
      * @param User $user
