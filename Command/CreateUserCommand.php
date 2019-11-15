@@ -67,6 +67,8 @@ class CreateUserCommand extends ContainerAwareCommand
                     $output->writeln('<error>Entered passwords do not match, please try again</error>');
                 }
             } while ($password != $passwordConfirm);
+
+            $output->write(PHP_EOL);
         }
 
         /* @var UserPasswordEncoderInterface $encoder */
@@ -80,7 +82,6 @@ class CreateUserCommand extends ContainerAwareCommand
         $em->persist($user);
         $em->flush();
 
-        $output->writeln('');
         $output->writeln(sprintf(
             '<info>Great success! User "%s" has been successfully created!</info>',
             $user->getUsername()
