@@ -1,0 +1,42 @@
+parameters:
+    modera_security.user_provider_service: modera.user_provider
+
+services:
+    modera.user_provider:
+        alias: security.user.provider.concrete.entity_provider
+
+    # TODO Left for BC reasons, use "modera.user_provider" instead. Will be removed in MF 3.0 (modera/foundation)
+    security.user_provider:
+        alias: modera.user_provider
+
+    modera_security.security.access_denied_handler:
+        class: Modera\SecurityBundle\Security\AccessDeniedHandler
+
+    modera_security.security.logout_success_handler:
+        class: Modera\SecurityBundle\Security\LogoutSuccessHandler
+        arguments:
+            - "@security.http_utils"
+            - /
+
+security:
+    encoders:
+        Modera\SecurityBundle\Entity\User:
+            algorithm: sha1
+            encode_as_base64: false
+            iterations: 1
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPER_ADMIN: [ ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
+
+    providers:
+        # From MF version 0.3 (or this bundle's version v2.2.1) we no longer rely on our
+        # own implementation of UserProviderInterface
+        entity_provider:
+            entity:
+                class: ModeraSecurityBundle:User
+                property: username
+        modera_provider:
+            id: '%modera_security.user_provider_service%'
+
+    always_authenticate_before_granting: true
