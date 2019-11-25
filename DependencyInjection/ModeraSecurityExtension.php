@@ -71,7 +71,15 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
 
         $config = $this->prependSwitchUserConfig($config);
 
+        if ($container->hasParameter('modera_security.default_firewalls')) {
+            $config['firewalls'] = array_merge(
+                $config['firewalls'],
+                $container->getParameter('modera_security.default_firewalls')
+            );
+        }
+
         $container->setParameter(self::CONFIG_KEY.'.switch_user', $config['switch_user']);
+        $container->setParameter(self::CONFIG_KEY.'.firewalls', $config['firewalls']);
         $container->setParameter(self::CONFIG_KEY.'.access_control', $config['access_control']);
     }
 

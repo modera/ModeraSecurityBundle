@@ -2,8 +2,7 @@ parameters:
     modera_security.firewalls.secured_area.guard: false
     modera_security.firewalls.remember_me.secret: '%secret%'
 
-security:
-    firewalls:
+    modera_security.default_firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
