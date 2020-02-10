@@ -88,8 +88,9 @@ class DefaultMailService implements MailServiceInterface
      */
     private function getLocale(User $user)
     {
+        /* @var UserSettings $settings */
         $settings = $this->em->getRepository(UserSettings::clazz())->findOneBy(array('user' => $user->getId()));
-        if ($settings && $settings->getLanguage() && $settings->getLanguage()->getEnabled()) {
+        if ($settings && $settings->getLanguage() && $settings->getLanguage()->isEnabled()) {
             return $settings->getLanguage()->getLocale();
         }
 
