@@ -57,6 +57,11 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
             'modera_security.password_strength.mail.sender',
             $config['password_strength']['mail']['sender']
         );
+
+        $container->setParameter(
+            'modera_security.mail_sender',
+            $config['password_strength']['mail']['sender']
+        );
     }
 
     /**
