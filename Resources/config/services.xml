@@ -61,6 +61,7 @@
             <argument type="service" id="doctrine.orm.entity_manager" />
             <!-- defined in \Modera\SecurityBundle\DependencyInjection\ModeraSecurityExtension  -->
             <argument type="service" id="modera_security.root_user_handling.handler" />
+            <argument type="service" id="security.role_hierarchy" />
         </service>
 
         <service id="modera_security.event_listener.root_user_handler_injection_listener"
