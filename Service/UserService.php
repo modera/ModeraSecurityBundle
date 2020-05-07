@@ -58,7 +58,7 @@ class UserService
         }
 
         $this->em->remove($user);
-        $this->em->flush();
+        $this->em->flush($user);
     }
 
     /**
@@ -73,7 +73,7 @@ class UserService
         }
 
         $user->setActive(false);
-        $this->em->flush();
+        $this->em->flush($user);
     }
 
     /**
@@ -82,7 +82,7 @@ class UserService
     public function enable(User $user)
     {
         $user->setActive(true);
-        $this->em->flush();
+        $this->em->flush($user);
     }
 
     /**
