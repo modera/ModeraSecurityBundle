@@ -113,6 +113,7 @@ class AuthenticatorTest extends \PHPUnit_Framework_TestCase
             'name' => $user->getFullName(),
             'email' => $user->getEmail(),
             'username' => $user->getUsername(),
+            'meta' => $user->getMeta(),
         ), $resp['profile']);
     }
 
@@ -123,6 +124,7 @@ class AuthenticatorTest extends \PHPUnit_Framework_TestCase
         \Phake::when($user)->getFullName()->thenReturn('John Doe');
         \Phake::when($user)->getEmail()->thenReturn('john.doe@example.org');
         \Phake::when($user)->getUsername()->thenReturn('john.doe');
+        \Phake::when($user)->getMeta()->thenReturn(array());
 
         $result = Authenticator::userToArray($user);
 
@@ -131,9 +133,11 @@ class AuthenticatorTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('name', $result);
         $this->assertArrayHasKey('email', $result);
         $this->assertArrayHasKey('username', $result);
+        $this->assertArrayHasKey('meta', $result);
         $this->assertEquals(777, $result['id']);
         $this->assertEquals('John Doe', $result['name']);
         $this->assertEquals('john.doe@example.org', $result['email']);
         $this->assertEquals('john.doe', $result['username']);
+        $this->assertInternalType('array', $result['meta']);
     }
 }
