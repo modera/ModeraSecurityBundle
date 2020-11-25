@@ -78,7 +78,7 @@ class Permission extends Role
     /**
      * @var PermissionCategory
      *
-     * @Orm\ManyToOne(targetEntity="PermissionCategory", inversedBy="permissions")
+     * @Orm\ManyToOne(targetEntity="PermissionCategory", inversedBy="permissions", cascade={"persist"})
      */
     private $category;
 

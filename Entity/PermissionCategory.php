@@ -32,7 +32,7 @@ class PermissionCategory
     private $technicalName;
 
     /**
-     * @Orm\OneToMany(targetEntity="Permission", mappedBy="category")
+     * @Orm\OneToMany(targetEntity="Permission", mappedBy="category", cascade={"persist"})
      */
     private $permissions;
 
