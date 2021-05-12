@@ -8,13 +8,13 @@
         <parameter key="modera_security.validator.email_validator.class">Modera\SecurityBundle\Validator\Constraints\EmailValidator</parameter>
         <parameter key="modera_security.validator.username_validator.class">Modera\SecurityBundle\Validator\Constraints\UsernameValidator</parameter>
         <parameter key="modera_security.event_listener.switch_user_subscriber.class">Modera\SecurityBundle\EventListener\SwitchUserSubscriber</parameter>
+        <parameter key="modera_security.event_listener.authentication_subscriber.class">Modera\SecurityBundle\EventListener\AuthenticationSubscriber</parameter>
     </parameters>
 
     <services>
         <service id="modera_security.security.authenticator"
                  class="Modera\SecurityBundle\Security\Authenticator">
 
-            <argument type="service" id="doctrine" />
             <argument type="service" id="security.http_utils" />
             <argument type="service" id="http_kernel" />
             <argument type="service" id="logger" on-invalid="null" />
@@ -135,6 +135,14 @@
                  class="%modera_security.event_listener.switch_user_subscriber.class%">
 
             <argument>%modera_security.config%</argument>
+
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="modera_security.event_listener.authentication_subscriber"
+                 class="%modera_security.event_listener.authentication_subscriber.class%">
+
+            <argument type="service" id="doctrine" />
 
             <tag name="kernel.event_subscriber" />
         </service>

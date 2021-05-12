@@ -13,19 +13,13 @@ class AuthenticatorTest extends \PHPUnit_Framework_TestCase
 {
     private function createAuthenticator()
     {
-        $om = \Phake::mock('Doctrine\Common\Persistence\ObjectManager');
-        $user = \Phake::mock(User::clazz());
-        $doctrine = \Phake::mock('Symfony\Bridge\Doctrine\RegistryInterface');
         $httpUtils = \Phake::mock('Symfony\Component\Security\Http\HttpUtils');
         $httpKernel = \Phake::mock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $response = \Phake::mock('Symfony\Component\HttpFoundation\Response');
 
-        \Phake::when($om)->persist($user)->thenReturn(null);
-        \Phake::when($om)->flush()->thenReturn(null);
-        \Phake::when($doctrine)->getManager()->thenReturn($om);
         \Phake::when($httpUtils)->createRedirectResponse->thenReturn($response);
 
-        return new Authenticator($doctrine, $httpUtils, $httpKernel);
+        return new Authenticator($httpUtils, $httpKernel);
     }
 
     public function testResponseOnAuthenticationFailure()
@@ -64,21 +58,6 @@ class AuthenticatorTest extends \PHPUnit_Framework_TestCase
 
         $resp = $authenticator->onAuthenticationSuccess($request, $token);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\JsonResponse', $resp);
-    }
-
-    public function testUserStateChangeOnAuthenticationSuccess()
-    {
-        $user = new User();
-        $authenticator = $this->createAuthenticator();
-
-        $request = \Phake::mock('Symfony\Component\HttpFoundation\Request');
-        $token = \Phake::mock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-
-        \Phake::when($token)->getUser()->thenReturn($user);
-
-        $this->assertSame(User::STATE_NEW, $user->getState());
-        $authenticator->onAuthenticationSuccess($request, $token);
-        $this->assertSame(User::STATE_ACTIVE, $user->getState());
     }
 
     public function testGetAuthenticationResponse()

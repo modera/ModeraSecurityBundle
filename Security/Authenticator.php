@@ -2,21 +2,18 @@
 
 namespace Modera\SecurityBundle\Security;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
-use Modera\SecurityBundle\Entity\User;
-use Modera\SecurityBundle\Model\UserInterface;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Http\HttpUtils;
-use Psr\Log\LoggerInterface;
+use Modera\SecurityBundle\Entity\User;
 
 /**
  * @internal
@@ -26,11 +23,6 @@ use Psr\Log\LoggerInterface;
  */
 class Authenticator implements AuthenticationFailureHandlerInterface, AuthenticationSuccessHandlerInterface
 {
-    /**
-     * @var ObjectManager
-     */
-    private $om;
-
     /**
      * @var DefaultAuthenticationSuccessHandler
      */
@@ -42,20 +34,16 @@ class Authenticator implements AuthenticationFailureHandlerInterface, Authentica
     private $failureHandler;
 
     /**
-     * @param RegistryInterface $doctrine
      * @param HttpUtils $httpUtils
      * @param HttpKernelInterface $httpKernel
      * @param LoggerInterface|null $logger
      */
     public function __construct(
-        RegistryInterface $doctrine,
         HttpUtils $httpUtils,
         HttpKernelInterface $httpKernel,
         LoggerInterface $logger = null
     )
     {
-        $this->om = $doctrine->getManager();
-
         $this->successHandler = new DefaultAuthenticationSuccessHandler($httpUtils);
         $this->failureHandler = new DefaultAuthenticationFailureHandler($httpKernel, $httpUtils, array(), $logger);
     }
@@ -99,14 +87,6 @@ class Authenticator implements AuthenticationFailureHandlerInterface, Authentica
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
-        $user = $token->getUser();
-        if ($user instanceof UserInterface && UserInterface::STATE_NEW == $user->getState()) {
-            /* @var User $user */
-            $user->setState(UserInterface::STATE_ACTIVE);
-            $this->om->persist($user);
-            $this->om->flush();
-        }
-
         if ($request->isXmlHttpRequest()) {
             $result = static::getAuthenticationResponse($token);
 
