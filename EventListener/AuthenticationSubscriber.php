@@ -56,9 +56,13 @@ class AuthenticationSubscriber implements EventSubscriberInterface
     {
         $token = $event->getAuthenticationToken();
         $user = $token->getUser();
-        if ($user instanceof UserInterface && UserInterface::STATE_NEW == $user->getState()) {
-            /* @var User $user */
-            $user->setState(UserInterface::STATE_ACTIVE);
+        if ($user instanceof User) {
+            $user->setLastLogin(new \DateTime());
+
+            if (UserInterface::STATE_NEW == $user->getState()) {
+                $user->setState(UserInterface::STATE_ACTIVE);
+            }
+
             $this->om->persist($user);
             $this->om->flush();
         }

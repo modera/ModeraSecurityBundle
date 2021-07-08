@@ -48,4 +48,9 @@ interface UserInterface
      * @return string
      */
     public function getState();
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getLastLogin();
 }

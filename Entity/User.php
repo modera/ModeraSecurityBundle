@@ -91,6 +91,12 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
     protected $state = self::STATE_NEW;
 
     /**
+     * @var \DateTime
+     * @ORM\Column(name="last_login", type="datetime", nullable=true)
+     */
+    private $lastLogin;
+
+    /**
      * @ORM\ManyToMany(targetEntity="Group", inversedBy="users", cascade={"persist"})
      * @ORM\JoinTable(
      *   name="modera_security_users_groups",
@@ -99,11 +105,6 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
      * )
      */
     private $groups;
-
-    /**
-     * @var RootUserHandlerInterface
-     */
-    private $rootUserHandler;
 
     /**
      * @var Permission[]
@@ -121,6 +122,11 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
      * @ORM\Column(type="json_array")
      */
     private $meta = array();
+
+    /**
+     * @var RootUserHandlerInterface
+     */
+    private $rootUserHandler;
 
     public function __construct()
     {
@@ -518,6 +524,22 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
         }
 
         $this->state = $state;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getLastLogin()
+    {
+        return $this->lastLogin;
+    }
+
+    /**
+     * @param \DateTime $lastLogin
+     */
+    public function setLastLogin($lastLogin)
+    {
+        $this->lastLogin = $lastLogin;
     }
 
     /**

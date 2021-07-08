@@ -36,7 +36,9 @@ class AuthenticationSubscriberTest extends \PHPUnit_Framework_TestCase
         \Phake::when($token)->getUser()->thenReturn($user);
 
         $this->assertSame(User::STATE_NEW, $user->getState());
+        $this->assertNull($user->getLastLogin());
         $subscriber->onAuthenticationSuccess($event);
         $this->assertSame(User::STATE_ACTIVE, $user->getState());
+        $this->assertInstanceOf(\DateTime::class, $user->getLastLogin());
     }
 }
