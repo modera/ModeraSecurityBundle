@@ -64,6 +64,9 @@
             <argument type="service" id="security.role_hierarchy" />
         </service>
 
+        <service id="Modera\SecurityBundle\Service\UserService"
+                 alias="modera_security.service.user_service" />
+
         <service id="modera_security.event_listener.root_user_handler_injection_listener"
                  class="Modera\SecurityBundle\EventListener\RootUserHandlerInjectionListener">
 
