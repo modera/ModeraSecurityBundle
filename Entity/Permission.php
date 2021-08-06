@@ -44,6 +44,12 @@ class Permission extends Role
     private $description;
 
     /**
+     * @var int
+     * @ORM\Column(type="integer")
+     */
+    private $position = 0;
+
+    /**
      * @ORM\ManyToMany(targetEntity="Permission", cascade={"persist"})
      * @ORM\JoinTable(
      *     name="modera_security_rolehierarchy",
@@ -127,6 +133,22 @@ class Permission extends Role
     }
 
     // boilerplate:
+
+    /**
+     * @param int $position
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPosition()
+    {
+        return $this->position;
+    }
 
     public function setDescription($description)
     {

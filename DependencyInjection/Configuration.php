@@ -111,6 +111,45 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('sorting_position')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('categories')
+                            ->defaultValue(array())
+                            ->beforeNormalization()
+                                ->ifArray()
+                                ->then(function ($v) {
+                                    if (array_keys($v) !== range(0, count($v) - 1)) {
+                                        return $v;
+                                    }
+                                    $arr = array_flip(array_reverse($v));
+                                    array_walk($arr, function (&$position) {
+                                        $position++;
+                                    });
+                                    return $arr;
+                                })
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->arrayNode('perrmissions')
+                            ->defaultValue(array())
+                            ->beforeNormalization()
+                                ->ifArray()
+                                ->then(function ($v) {
+                                    if (array_keys($v) !== range(0, count($v) - 1)) {
+                                        return $v;
+                                    }
+                                    $arr = array_flip(array_reverse($v));
+                                    array_walk($arr, function (&$position) {
+                                        $position++;
+                                    });
+                                    return $arr;
+                                })
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

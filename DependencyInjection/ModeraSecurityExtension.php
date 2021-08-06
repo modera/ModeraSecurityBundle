@@ -54,6 +54,11 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
         $container->setParameter(self::CONFIG_KEY, $config);
 
         $container->setParameter(
+            'modera_security.sorting_position',
+            $config['sorting_position']
+        );
+
+        $container->setParameter(
             'modera_security.password_strength.mail.sender',
             $config['password_strength']['mail']['sender']
         );

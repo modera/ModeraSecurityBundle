@@ -45,6 +45,7 @@
             <argument type="service" id="modera_security.permissions_provider" />
             <argument type="service" id="modera_security.data_installation.bc_layer" />
             <argument type="service" id="modera_foundation.utils.deprecation_notice_emitter" />
+            <argument>%modera_security.sorting_position%</argument>
         </service>
 
         <service id="modera_security.root_user_handler.semantic_config_root_user_handler"

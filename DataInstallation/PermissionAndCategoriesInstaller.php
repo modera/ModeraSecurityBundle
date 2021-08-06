@@ -3,11 +3,12 @@
 namespace Modera\SecurityBundle\DataInstallation;
 
 use Doctrine\ORM\EntityManager;
-use Modera\FoundationBundle\Utils\DeprecationNoticeEmitter;
-use Modera\SecurityBundle\Entity\Permission;
-use Modera\SecurityBundle\Entity\PermissionCategory;
-use Modera\SecurityBundle\Model\PermissionCategoryInterface;
 use Sli\ExpanderBundle\Ext\ContributorInterface;
+use Modera\FoundationBundle\Utils\DeprecationNoticeEmitter;
+use Modera\SecurityBundle\Model\PermissionCategoryInterface;
+use Modera\SecurityBundle\Model\PermissionInterface;
+use Modera\SecurityBundle\Entity\PermissionCategory;
+use Modera\SecurityBundle\Entity\Permission;
 
 /**
  * Service responsible for installing permissions and permission categories so later they can be used to manage
@@ -44,6 +45,11 @@ class PermissionAndCategoriesInstaller
     private $deprecationNoticeEmitter;
 
     /**
+     * @var array
+     */
+    private $sortingPosition;
+
+    /**
      * @internal Since 2.54.0
      *
      * @param EntityManager            $em
@@ -57,13 +63,18 @@ class PermissionAndCategoriesInstaller
         ContributorInterface $permissionCategoriesProvider,
         ContributorInterface $permissionsProvider,
         BCLayer $bcLayer = null,
-        DeprecationNoticeEmitter $deprecationNoticeEmitter = null
+        DeprecationNoticeEmitter $deprecationNoticeEmitter = null,
+        array $sortingPosition = array()
     ) {
         $this->em = $em;
         $this->permissionCategoriesProvider = $permissionCategoriesProvider;
         $this->permissionsProvider = $permissionsProvider;
         $this->bcLayer = $bcLayer;
         $this->deprecationNoticeEmitter = $deprecationNoticeEmitter;
+        $this->sortingPosition = array_merge(array(
+            'categories' => array(),
+            'perrmissions' => array(),
+        ), $sortingPosition);
     }
 
     /**
@@ -72,6 +83,7 @@ class PermissionAndCategoriesInstaller
     public function installCategories()
     {
         $permissionCategoriesInstalled = 0;
+        $sortingPosition = $this->sortingPosition['categories'];
 
         /* @var PermissionCategoryInterface[] $permissionCategories */
         $permissionCategories = $this->permissionCategoriesProvider->getItems();
@@ -92,6 +104,12 @@ class PermissionAndCategoriesInstaller
                 }
 
                 $entityPermissionCategory->setName($permissionCategory->getName());
+
+                $position = 0;
+                if (isset($sortingPosition[$entityPermissionCategory->getTechnicalName()])) {
+                    $position = $sortingPosition[$entityPermissionCategory->getTechnicalName()];
+                }
+                $entityPermissionCategory->setPosition($position);
             }
         }
 
@@ -113,10 +131,11 @@ class PermissionAndCategoriesInstaller
     public function installPermissions()
     {
         $permissionInstalled = 0;
+        $sortingPosition = $this->sortingPosition['perrmissions'];
 
+        /* @var PermissionInterface[] $permissions */
         $permissions = $this->permissionsProvider->getItems();
         foreach ($permissions as $permission) {
-            /* @var \Modera\SecurityBundle\Model\PermissionInterface $permission */
             $entityPermission = $this->em->getRepository(Permission::clazz())->findOneBy(array(
                 'roleName' => $permission->getRole(),
             ));
@@ -132,6 +151,12 @@ class PermissionAndCategoriesInstaller
 
             $entityPermission->setDescription($permission->getDescription());
             $entityPermission->setName($permission->getName());
+
+            $position = 0;
+            if (isset($sortingPosition[$entityPermission->getRoleName()])) {
+                $position = $sortingPosition[$entityPermission->getRoleName()];
+            }
+            $entityPermission->setPosition($position);
 
             $categoryTechnicalName = $permission->getCategory();
             if ($this->bcLayer) {

@@ -32,6 +32,12 @@ class PermissionCategory
     private $technicalName;
 
     /**
+     * @var int
+     * @ORM\Column(type="integer")
+     */
+    private $position = 0;
+
+    /**
      * @Orm\OneToMany(targetEntity="Permission", mappedBy="category", cascade={"persist"})
      */
     private $permissions;
@@ -51,6 +57,22 @@ class PermissionCategory
     public static function clazz()
     {
         return get_called_class();
+    }
+
+    /**
+     * @param int $position
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPosition()
+    {
+        return $this->position;
     }
 
     /**
