@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Modera\SecurityBundle\Entity\Permission;
 use Modera\SecurityBundle\Entity\PermissionCategory;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * @internal
@@ -18,7 +18,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 class BCLayer
 {
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrineRegistry;
 
@@ -29,9 +29,9 @@ class BCLayer
     );
 
     /**
-     * @param RegistryInterface $doctrineRegistry
+     * @param ManagerRegistry $doctrineRegistry
      */
-    public function __construct(RegistryInterface $doctrineRegistry)
+    public function __construct(ManagerRegistry $doctrineRegistry)
     {
         $this->doctrineRegistry = $doctrineRegistry;
     }

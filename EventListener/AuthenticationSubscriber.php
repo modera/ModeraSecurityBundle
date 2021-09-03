@@ -3,7 +3,7 @@
 namespace Modera\SecurityBundle\EventListener;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
@@ -23,9 +23,9 @@ class AuthenticationSubscriber implements EventSubscriberInterface
     private $om;
 
     /**
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(RegistryInterface $doctrine)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->om = $doctrine->getManager();
     }

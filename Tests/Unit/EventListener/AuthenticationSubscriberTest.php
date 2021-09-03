@@ -15,7 +15,7 @@ class AuthenticationSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $om = \Phake::mock('Doctrine\Common\Persistence\ObjectManager');
         $user = \Phake::mock(User::clazz());
-        $doctrine = \Phake::mock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $doctrine = \Phake::mock('Doctrine\Common\Persistence\ManagerRegistry');
 
         \Phake::when($om)->persist($user)->thenReturn(null);
         \Phake::when($om)->flush()->thenReturn(null);
