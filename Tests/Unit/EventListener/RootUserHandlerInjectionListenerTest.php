@@ -9,13 +9,13 @@ use Modera\SecurityBundle\EventListener\RootUserHandlerInjectionListener;
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2016 Modera Foundation
  */
-class RootUserHandlerInjectionListenerTest extends \PHPUnit_Framework_TestCase
+class RootUserHandlerInjectionListenerTest extends \PHPUnit\Framework\TestCase
 {
     private $container;
 
     private $rootUserHandler;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->rootUserHandler = \Phake::mock('Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface');
 
@@ -28,7 +28,7 @@ class RootUserHandlerInjectionListenerTest extends \PHPUnit_Framework_TestCase
 
     private function createEvent($object = null)
     {
-        $event = \Phake::mock('Doctrine\Common\Persistence\Event\LifecycleEventArgs');
+        $event = \Phake::mock('Doctrine\Persistence\Event\LifecycleEventArgs');
 
         \Phake::when($event)
             ->getObject()
@@ -50,6 +50,9 @@ class RootUserHandlerInjectionListenerTest extends \PHPUnit_Framework_TestCase
         \Phake::verify($user)->init($this->rootUserHandler);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testPostLoadNoEntityProvided()
     {
         $event = $this->createEvent();
@@ -58,6 +61,9 @@ class RootUserHandlerInjectionListenerTest extends \PHPUnit_Framework_TestCase
         $listener->postLoad($event);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
     public function testPostLoadWithWrongType()
     {
         $userWannaBe = new \stdClass();

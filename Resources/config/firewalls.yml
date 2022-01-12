@@ -1,6 +1,6 @@
 parameters:
     modera_security.firewalls.secured_area.guard: false
-    modera_security.firewalls.remember_me.secret: '%secret%'
+    modera_security.firewalls.remember_me.secret: '%kernel.secret%'
 
     modera_security.default_firewalls:
         dev:
@@ -16,11 +16,8 @@ parameters:
             anonymous: ~
             guard: '%modera_security.firewalls.secured_area.guard%'
             context: modera_auth
-            # In 2.x/3.4.x provider used to contain "authenticator", which doesn't exist and symfony
-            # was simply ignoring it, but in 3.4.x it was fixed and Symfony started throwing
-            # errors when detecting non existing user-provider. For more details see:
-            # https://symfony.com/doc/3.4/security/multiple_user_providers.html
             provider: modera_provider
+            user_checker: modera_security.security.user_checker
             access_denied_handler: modera_security.security.access_denied_handler
             form_login:
                 provider: modera_provider

@@ -5,7 +5,6 @@ namespace Modera\SecurityBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * @ORM\Entity
@@ -13,7 +12,7 @@ use Symfony\Component\Security\Core\Role\Role;
  *
  * @author Sergei Lissovski <sergei.lissovski@gmail.com>
  */
-class Permission extends Role
+class Permission
 {
     /**
      * @ORM\Column(type="integer")
@@ -124,9 +123,6 @@ class Permission extends Role
         return $this->groups->contains($group);
     }
 
-    /**
-     * @see Role
-     */
     public function getRole()
     {
         return $this->getRoleName();

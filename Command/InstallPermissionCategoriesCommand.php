@@ -2,18 +2,30 @@
 
 namespace Modera\SecurityBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Modera\SecurityBundle\DataInstallation\PermissionAndCategoriesInstaller;
 
 /**
  * @author Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2014 Modera Foundation
  */
-class InstallPermissionCategoriesCommand extends ContainerAwareCommand
+class InstallPermissionCategoriesCommand extends Command
 {
+    private TranslatorInterface $translator;
+
+    private PermissionAndCategoriesInstaller $dataInstaller;
+
+    public function __construct(TranslatorInterface $translator, PermissionAndCategoriesInstaller $dataInstaller)
+    {
+        $this->translator = $translator;
+        $this->dataInstaller = $dataInstaller;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -31,18 +43,13 @@ class InstallPermissionCategoriesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // set locale to undefined, then we will receive translations from source code
-        if ($this->getContainer()->has('translator')) {
-            /* @var TranslatorInterface $translator */
-            $translator = $this->getContainer()->get('translator');
-            $translator->setLocale('__');
-        }
+        $this->translator->setLocale('__');
 
-        /* @var PermissionAndCategoriesInstaller $dataInstaller */
-        $dataInstaller = $this->getContainer()->get('modera_security.data_installation.permission_and_categories_installer');
-
-        $stats = $dataInstaller->installCategories();
+        $stats = $this->dataInstaller->installCategories();
 
         $output->writeln(' >> Installed: '.$stats['installed']);
         $output->writeln(' >> Removed: '.$stats['removed']);
+
+        return 0;
     }
 }

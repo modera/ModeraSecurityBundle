@@ -5,7 +5,7 @@ namespace Modera\SecurityBundle\DataInstallation;
 use Doctrine\ORM\EntityManagerInterface;
 use Modera\SecurityBundle\Entity\Permission;
 use Modera\SecurityBundle\Entity\PermissionCategory;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @internal

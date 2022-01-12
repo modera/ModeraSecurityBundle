@@ -10,7 +10,7 @@ use Modera\SecurityBundle\PasswordStrength\PasswordConfigInterface;
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2017 Modera Foundation
  */
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     public function testPasswordStrength()
     {
@@ -25,7 +25,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $expectedConfig = array(
             'mail' => array(
                 'service' => 'modera_security.password_strength.mail.default_mail_service',
-                'sender' => 'no-reply@no-reply',
             ),
             'enabled' => false,
             'min_length' => 6,
@@ -75,7 +74,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $expectedConfig = array(
             'mail' => array(
                 'service' => 'modera_security.password_strength.mail.default_mail_service',
-                'sender' => 'no-reply@no-reply',
             ),
             'enabled' => false,
             'min_length' => 6,

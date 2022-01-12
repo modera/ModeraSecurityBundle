@@ -2,13 +2,13 @@
 
 namespace Modera\SecurityBundle\EventListener;
 
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
-use Symfony\Component\Security\Http\Event\SwitchUserEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
+use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Modera\SecurityBundle\ModeraSecurityBundle;
 
@@ -38,9 +38,9 @@ class SwitchUserSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param FilterResponseEvent $event
+     * @param ResponseEvent $event
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event)
     {
         if ($this->redirectUri) {
             $event->setResponse(new RedirectResponse($this->redirectUri));
@@ -61,11 +61,9 @@ class SwitchUserSubscriber implements EventSubscriberInterface
 
             if (SwitchUserListener::EXIT_VALUE !== $username) {
                 $exit = false;
-                foreach ($event->getToken()->getRoles() as $role) {
-                    if ($role instanceof SwitchUserRole) {
-                        $exit = $role->getSource()->getUser()->getUsername() === $targetUser->getUsername();
-                        break;
-                    }
+                $token = $event->getToken();
+                if ($token instanceof SwitchUserToken) {
+                    $exit = $token->getOriginalToken()->getUser()->getUsername() === $targetUser->getUsername();
                 }
 
                 if ($exit || in_array(ModeraSecurityBundle::ROLE_ROOT_USER, $targetUser->getRoles())) {

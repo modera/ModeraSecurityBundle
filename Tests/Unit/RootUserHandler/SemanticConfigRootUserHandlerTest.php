@@ -13,7 +13,7 @@ use Modera\SecurityBundle\Entity\User;
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2014 Modera Foundation
  */
-class SemanticConfigRootUserHandlerTest extends \PHPUnit_Framework_TestCase
+class SemanticConfigRootUserHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsRootUser()
     {
@@ -36,7 +36,7 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit_Framework_TestCase
         $dbUser = \Phake::mock(User::clazz());
         \Phake::when($dbUser)->isEqualTo($anonymousUser)->thenReturn('dat is true');
 
-        $userRepository = \Phake::mock('Doctrine\Common\Persistence\ObjectRepository');
+        $userRepository = \Phake::mock('Doctrine\Persistence\ObjectRepository');
         \Phake::when($userRepository)->findOneBy($bundleConfig['root_user']['query'])->thenReturn($dbUser);
         \Phake::when($em)->getRepository(User::clazz())->thenReturn($userRepository);
 

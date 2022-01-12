@@ -9,7 +9,7 @@ use Modera\SecurityBundle\Security\Authenticator;
  * @author    Sergei Vizel <sergei.vizel@modera.org>
  * @copyright 2014 Modera Foundation
  */
-class AuthenticatorTest extends \PHPUnit_Framework_TestCase
+class AuthenticatorTest extends \PHPUnit\Framework\TestCase
 {
     private function createAuthenticator()
     {
@@ -74,12 +74,10 @@ class AuthenticatorTest extends \PHPUnit_Framework_TestCase
         $user->setLastName('Doe');
         $user->setEmail('john.doe@test.test');
         $user->setUsername('john.doe');
-        $role = \Phake::mock('Symfony\Component\Security\Core\Role\Role');
 
-        \Phake::when($role)->getRole()->thenReturn('ROLE_USER');
         \Phake::when($token)->isAuthenticated()->thenReturn(true);
         \Phake::when($token)->getUser()->thenReturn($user);
-        \Phake::when($token)->getRoles()->thenReturn(array($role));
+        \Phake::when($token)->getRoleNames()->thenReturn(array('ROLE_USER'));
 
         $resp = Authenticator::getAuthenticationResponse($token);
         $this->assertInternalType('array', $resp);

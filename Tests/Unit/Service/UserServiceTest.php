@@ -9,7 +9,7 @@ use Modera\SecurityBundle\Service\UserService;
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2014 Modera Foundation
  */
-class UserServiceTest extends \PHPUnit_Framework_TestCase
+class UserServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException RuntimeException
@@ -64,7 +64,7 @@ class UserServiceTest extends \PHPUnit_Framework_TestCase
     public function testFind()
     {
         $em = \Phake::mock('Doctrine\ORM\EntityManager');
-        $repo = \Phake::mock('Doctrine\Common\Persistence\ObjectRepository');
+        $repo = \Phake::mock('Doctrine\Persistence\ObjectRepository');
         $rootUserHandler = \Phake::mock('Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface');
         $service = new UserService($em, $rootUserHandler);
 

@@ -12,9 +12,7 @@ interface MailServiceInterface
 {
     /**
      * @param User $user
-     * @param $plainPassword
-     *
-     * @return array|bool
+     * @param string $plainPassword
      */
     public function sendPassword(User $user, $plainPassword);
 }

@@ -11,7 +11,7 @@ use Modera\SecurityBundle\PasswordStrength\PasswordManager;
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2016 Modera Foundation
  */
-class UserTest extends \PHPUnit_Framework_TestCase
+class UserTest extends \PHPUnit\Framework\TestCase
 {
     public function testFirstLastMiddleName()
     {

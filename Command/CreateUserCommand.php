@@ -2,22 +2,34 @@
 
 namespace Modera\SecurityBundle\Command;
 
-use Doctrine\ORM\EntityManager;
-use Modera\SecurityBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Modera\SecurityBundle\Entity\User;
 
 /**
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2014 Modera Foundation
  */
-class CreateUserCommand extends ContainerAwareCommand
+class CreateUserCommand extends Command
 {
+    private EntityManagerInterface $em;
+
+    private UserPasswordEncoderInterface $encoder;
+
+    public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $encoder)
+    {
+        $this->em = $em;
+        $this->encoder = $encoder;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -38,9 +50,6 @@ class CreateUserCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /* @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-
         $username = $input->getOption('username');
         $email = $input->getOption('email');
         $password = $input->getOption('password');
@@ -71,21 +80,20 @@ class CreateUserCommand extends ContainerAwareCommand
             $output->write(PHP_EOL);
         }
 
-        /* @var UserPasswordEncoderInterface $encoder */
-        $encoder = $this->getContainer()->get('security.password_encoder');
-
         $user = new User();
         $user->setEmail($email);
         $user->setUsername($username);
-        $user->setPassword($encoder->encodePassword($user, $password));
+        $user->setPassword($this->encoder->encodePassword($user, $password));
 
-        $em->persist($user);
-        $em->flush();
+        $this->em->persist($user);
+        $this->em->flush();
 
         $output->writeln(sprintf(
             '<info>Great success! User "%s" has been successfully created!</info>',
             $user->getUsername()
         ));
+
+        return 0;
     }
 
     private function createHiddenQuestion($text)

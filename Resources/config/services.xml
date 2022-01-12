@@ -48,6 +48,9 @@
             <argument>%modera_security.sorting_position%</argument>
         </service>
 
+        <service id="Modera\SecurityBundle\DataInstallation\PermissionAndCategoriesInstaller"
+                 alias="modera_security.data_installation.permission_and_categories_installer" />
+
         <service id="modera_security.root_user_handler.semantic_config_root_user_handler"
                  class="Modera\SecurityBundle\RootUserHandling\SemanticConfigRootUserHandler"
                  public="true">
@@ -102,15 +105,10 @@
             <argument type="service" id="modera_security.password_strength.mail.mail_service" />
         </service>
 
-        <!-- since 2.56.0 -->
+        <!-- since 4.0.0 -->
         <service id="modera_security.password_strength.mail.default_mail_service"
                  class="Modera\SecurityBundle\PasswordStrength\Mail\DefaultMailService"
                  public="true">
-
-            <argument type="service" id="doctrine.orm.entity_manager" />
-            <argument type="service" id="mailer" />
-            <argument>%locale%</argument>
-            <argument>%modera_security.password_strength.mail.sender%</argument>
         </service>
 
         <!-- since 2.56.0 -->
@@ -149,6 +147,10 @@
             <argument type="service" id="doctrine" />
 
             <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="modera_security.security.user_checker"
+                 class="Modera\SecurityBundle\Security\UserChecker">
         </service>
     </services>
 </container>

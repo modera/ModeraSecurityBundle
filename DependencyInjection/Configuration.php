@@ -18,8 +18,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('modera_security');
+        $treeBuilder = new TreeBuilder('modera_security');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
@@ -70,10 +70,6 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('service')
                                     ->cannotBeEmpty()
                                     ->defaultValue('modera_security.password_strength.mail.default_mail_service')
-                                ->end()
-                                ->scalarNode('sender')
-                                    ->defaultValue('no-reply@no-reply')
-                                    ->cannotBeEmpty()
                                 ->end()
                             ->end()
                         ->end()

@@ -8,7 +8,7 @@ use Modera\SecurityBundle\Entity\Group;
  * @author    Alex Plaksin <alex.plaksin@modera.net>
  * @copyright 2016 Modera Foundation
  */
-class GroupTest extends \PHPUnit_Framework_TestCase
+class GroupTest extends \PHPUnit\Framework\TestCase
 {
     public function testNormalizeRefNameString()
     {

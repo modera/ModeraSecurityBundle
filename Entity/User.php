@@ -11,7 +11,7 @@ use Modera\SecurityBundle\PasswordStrength\PasswordManager;
 use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
 use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
 use Sli\ExtJsIntegrationBundle\DataMapping\PreferencesAwareUserInterface;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface as CoreUserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author    Sergei Vizel <sergei.vizel@modera.org>
  * @copyright 2014 Modera Foundation
  */
-class User implements UserInterface, AdvancedUserInterface, \Serializable, EquatableInterface, PreferencesAwareUserInterface
+class User implements UserInterface, CoreUserInterface, \Serializable, EquatableInterface, PreferencesAwareUserInterface
 {
     /**
      * @ORM\Column(type="integer")
@@ -119,7 +119,7 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
      * example, if you have a bundle AcmeFooBundle which wants to save some values to this field then store all values
      * under "acme_foo" key.
      *
-     * @ORM\Column(type="json_array")
+     * @ORM\Column(type="json")
      */
     private $meta = array();
 
@@ -233,21 +233,6 @@ class User implements UserInterface, AdvancedUserInterface, \Serializable, Equat
      */
     public function eraseCredentials()
     {
-    }
-
-    public function isAccountNonExpired()
-    {
-        return true;
-    }
-
-    public function isAccountNonLocked()
-    {
-        return true;
-    }
-
-    public function isCredentialsNonExpired()
-    {
-        return true;
     }
 
     public function isEnabled()

@@ -2,7 +2,6 @@
 
 namespace Modera\SecurityBundle\DependencyInjection;
 
-use Modera\BackendSecurityBundle\DependencyInjection\ModeraBackendSecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -27,6 +26,7 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('controller.xml');
         $loader->load('services.xml');
 
         $config = $this->prependSwitchUserConfig($config);
@@ -56,16 +56,6 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
         $container->setParameter(
             'modera_security.sorting_position',
             $config['sorting_position']
-        );
-
-        $container->setParameter(
-            'modera_security.password_strength.mail.sender',
-            $config['password_strength']['mail']['sender']
-        );
-
-        $container->setParameter(
-            'modera_security.mail_sender',
-            $config['password_strength']['mail']['sender']
         );
     }
 

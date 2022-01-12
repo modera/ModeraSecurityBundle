@@ -2,7 +2,7 @@
 
 namespace Modera\SecurityBundle\EventListener;
 
-use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Modera\SecurityBundle\Entity\User;
 use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;

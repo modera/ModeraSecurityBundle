@@ -1,17 +1,18 @@
 parameters:
-    pdo.db_options:
-        db_table:    modera_security_session
-        db_id_col:   session_id
+    modera_security.session_handler.db_username: ~
+    modera_security.session_handler.db_password: ~
+    modera_security.session_handler.dns_or_url: '%env(DATABASE_URL)%'
+    modera_security.session_handler.options:
+        db_table: modera_security_session
+        db_id_col: session_id
         db_data_col: session_value
         db_time_col: session_time
         db_lifetime_col: session_lifetime
-        db_username: '%database_user%'
-        db_password: '%database_password%'
+        db_username: '%modera_security.session_handler.db_username%'
+        db_password: '%modera_security.session_handler.db_password%'
 
 services:
-    session.handler.pdo:
-        class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
-        public:    false
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
         arguments:
-            - 'mysql:host=%database_host%;port=%database_port%;dbname=%database_name%'
-            - "%pdo.db_options%"
+            - '%modera_security.session_handler.dns_or_url%'
+            - "%modera_security.session_handler.options%"

@@ -8,7 +8,6 @@ class ModeraSecurityAppKernel extends \Modera\FoundationBundle\Testing\AbstractF
             new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
             new Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
-            new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
 
             new Modera\FoundationBundle\ModeraFoundationBundle(),
             new Modera\TranslationsBundle\ModeraTranslationsBundle(),

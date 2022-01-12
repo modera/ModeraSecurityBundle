@@ -3,20 +3,20 @@
 namespace Modera\SecurityBundle\Tests\Unit\DataInstallation;
 
 use Modera\SecurityBundle\DataInstallation\BCLayer;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2017 Modera Foundation
  */
-class BCLayerTest extends \PHPUnit_Framework_TestCase
+class BCLayerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var BCLayer
      */
     private $bcLayer;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->bcLayer = new BCLayer(\Phake::mock(ManagerRegistry::class));
     }

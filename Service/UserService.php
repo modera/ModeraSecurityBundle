@@ -3,7 +3,6 @@
 namespace Modera\SecurityBundle\Service;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
 use Modera\SecurityBundle\Entity\Permission;
@@ -141,12 +140,8 @@ class UserService
             return in_array($roleName, $user->getRoles(), true);
         }
 
-        $roles = array_map(function($roleName) {
-            return new Role($roleName);
-        }, $user->getRoles());
-
-        foreach ($this->roleHierarchy->getReachableRoles($roles) as $role) {
-            if ($roleName === $role->getRole()) {
+        foreach ($this->roleHierarchy->getReachableRoles($user->getRoles()) as $role) {
+            if ($roleName === $role) {
                 return true;
             }
         }

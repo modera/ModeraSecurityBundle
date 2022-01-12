@@ -8,14 +8,14 @@ use Modera\SecurityBundle\PasswordStrength\SemanticPasswordConfig;
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2017 Modera Foundation
  */
-class SemanticPasswordConfigTest extends \PHPUnit_Framework_TestCase
+class SemanticPasswordConfigTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SemanticPasswordConfig
      */
     private $config;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->config = new SemanticPasswordConfig(array(
             'password_strength' => array(

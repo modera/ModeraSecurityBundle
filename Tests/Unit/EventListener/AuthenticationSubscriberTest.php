@@ -9,13 +9,13 @@ use Modera\SecurityBundle\Entity\User;
  * @author    Sergei Vizel <sergei.vizel@modera.org>
  * @copyright 2021 Modera Foundation
  */
-class AuthenticationSubscriberTest extends \PHPUnit_Framework_TestCase
+class AuthenticationSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private function createAuthenticationSubscriber()
     {
         $om = \Phake::mock('Doctrine\ORM\EntityManagerInterface');
         $user = \Phake::mock(User::clazz());
-        $doctrine = \Phake::mock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine = \Phake::mock('Doctrine\Persistence\ManagerRegistry');
 
         \Phake::when($om)->persist($user)->thenReturn(null);
         \Phake::when($om)->flush()->thenReturn(null);
