@@ -67,7 +67,7 @@ class SemanticConfigRootUserHandler implements RootUserHandlerInterface
      */
     public function getUser()
     {
-        return $this->em->getRepository(User::clazz())->findOneBy($this->config['query']);
+        return $this->em->getRepository(User::class)->findOneBy($this->config['query']);
     }
 
     /**
@@ -78,7 +78,7 @@ class SemanticConfigRootUserHandler implements RootUserHandlerInterface
         $roles = $this->config['roles'];
 
         if (is_string($roles) && '*' == $roles) {
-            $query = sprintf('SELECT e.roleName FROM %s e', Permission::clazz());
+            $query = sprintf('SELECT e.roleName FROM %s e', Permission::class);
             $query = $this->em->createQuery($query);
 
             $roleNames = array();

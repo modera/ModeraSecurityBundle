@@ -31,14 +31,14 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit\Framework\TestCase
 
         $handler = new SemanticConfigRootUserHandler($container);
 
-        $anonymousUser = \Phake::mock(User::clazz());
+        $anonymousUser = \Phake::mock(User::class);
 
-        $dbUser = \Phake::mock(User::clazz());
+        $dbUser = \Phake::mock(User::class);
         \Phake::when($dbUser)->isEqualTo($anonymousUser)->thenReturn('dat is true');
 
         $userRepository = \Phake::mock('Doctrine\Persistence\ObjectRepository');
         \Phake::when($userRepository)->findOneBy($bundleConfig['root_user']['query'])->thenReturn($dbUser);
-        \Phake::when($em)->getRepository(User::clazz())->thenReturn($userRepository);
+        \Phake::when($em)->getRepository(User::class)->thenReturn($userRepository);
 
         $this->assertEquals('dat is true', $handler->isRootUser($anonymousUser));
     }
@@ -61,7 +61,7 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit\Framework\TestCase
         \Phake::when($container)->get('doctrine.orm.entity_manager')->thenReturn($em);
         \Phake::when($container)->getParameter(ModeraSecurityExtension::CONFIG_KEY)->thenReturn($bundleConfig);
         $query = \Phake::mock('Doctrine\ORM\AbstractQuery');
-        \Phake::when($em)->createQuery(sprintf('SELECT e.roleName FROM %s e', Permission::clazz()))->thenReturn($query);
+        \Phake::when($em)->createQuery(sprintf('SELECT e.roleName FROM %s e', Permission::class))->thenReturn($query);
         \Phake::when($query)->getResult(Query::HYDRATE_SCALAR)->thenReturn($databaseRoles);
 
         $handler = new SemanticConfigRootUserHandler($container);

@@ -90,7 +90,7 @@ class PermissionAndCategoriesInstaller
         if (count($permissionCategories) > 0) {
             foreach ($permissionCategories as $permissionCategory) {
                 /* @var PermissionCategory $entityPermissionCategory */
-                $entityPermissionCategory = $this->em->getRepository(PermissionCategory::clazz())->findOneBy(array(
+                $entityPermissionCategory = $this->em->getRepository(PermissionCategory::class)->findOneBy(array(
                     'technicalName' => $permissionCategory->getTechnicalName(),
                 ));
 
@@ -136,7 +136,7 @@ class PermissionAndCategoriesInstaller
         /* @var PermissionInterface[] $permissions */
         $permissions = $this->permissionsProvider->getItems();
         foreach ($permissions as $permission) {
-            $entityPermission = $this->em->getRepository(Permission::clazz())->findOneBy(array(
+            $entityPermission = $this->em->getRepository(Permission::class)->findOneBy(array(
                 'roleName' => $permission->getRole(),
             ));
 
@@ -173,7 +173,7 @@ class PermissionAndCategoriesInstaller
             }
 
             /* @var PermissionCategory $category */
-            $category = $this->em->getRepository(PermissionCategory::clazz())->findOneBy(array(
+            $category = $this->em->getRepository(PermissionCategory::class)->findOneBy(array(
                 'technicalName' => $categoryTechnicalName,
             ));
             if ($category) {

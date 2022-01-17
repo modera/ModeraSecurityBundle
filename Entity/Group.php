@@ -63,8 +63,18 @@ class Group
         $this->permissions = new ArrayCollection();
     }
 
+    /**
+     * @deprecated Use native ::class property
+     *
+     * @return string
+     */
     public static function clazz()
     {
+        @trigger_error(sprintf(
+            'The "%s()" method is deprecated. Use native ::class property.',
+            __METHOD__
+        ), \E_USER_DEPRECATED);
+
         return get_called_class();
     }
 

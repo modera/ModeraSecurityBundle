@@ -42,10 +42,10 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
         // ---
 
-        $groupPermission = \Phake::mock(Permission::clazz());
-        $userPermission = \Phake::mock(Permission::clazz());
+        $groupPermission = \Phake::mock(Permission::class);
+        $userPermission = \Phake::mock(Permission::class);
 
-        $group = \Phake::mock(Group::clazz());
+        $group = \Phake::mock(Group::class);
         \Phake::when($group)
             ->getPermissions()
             ->thenReturn([$groupPermission])

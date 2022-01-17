@@ -265,10 +265,17 @@ class User implements UserInterface, CoreUserInterface, \Serializable, Equatable
     }
 
     /**
+     * @deprecated Use native ::class property
+     *
      * @return string
      */
     public static function clazz()
     {
+        @trigger_error(sprintf(
+            'The "%s()" method is deprecated. Use native ::class property.',
+            __METHOD__
+        ), \E_USER_DEPRECATED);
+
         return get_called_class();
     }
 
@@ -297,20 +304,30 @@ class User implements UserInterface, CoreUserInterface, \Serializable, Equatable
     }
 
     /**
-     * @deprecated
+     * @deprecated Use User::isActive() method
      * @return bool
      */
     public function getIsActive()
     {
+        @trigger_error(sprintf(
+            'The "%s()" method is deprecated. Use User::isActive() method.',
+            __METHOD__
+        ), \E_USER_DEPRECATED);
+
         return $this->isActive();
     }
 
     /**
-     * @deprecated
+     * @deprecated Use User::setActive() method
      * @param bool $isActive
      */
     public function setIsActive($isActive)
     {
+        @trigger_error(sprintf(
+            'The "%s()" method is deprecated. Use User::setActive() method.',
+            __METHOD__
+        ), \E_USER_DEPRECATED);
+
         $this->setActive($isActive);
     }
 

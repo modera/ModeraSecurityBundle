@@ -24,8 +24,8 @@ class AbstractTestCase extends FunctionalTestCase
     public static function doSetUpBeforeClass()
     {
         self::$st = new SchemaTool(self::$em);
-        self::$st->createSchema(array(self::$em->getClassMetadata(PermissionEntity::clazz())));
-        self::$st->createSchema(array(self::$em->getClassMetadata(PermissionCategoryEntity::clazz())));
+        self::$st->createSchema(array(self::$em->getClassMetadata(PermissionEntity::class)));
+        self::$st->createSchema(array(self::$em->getClassMetadata(PermissionCategoryEntity::class)));
     }
 
     /**
@@ -33,7 +33,7 @@ class AbstractTestCase extends FunctionalTestCase
      */
     public static function doTearDownAfterClass()
     {
-        self::$st->dropSchema(array(self::$em->getClassMetadata(PermissionEntity::clazz())));
-        self::$st->dropSchema(array(self::$em->getClassMetadata(PermissionCategoryEntity::clazz())));
+        self::$st->dropSchema(array(self::$em->getClassMetadata(PermissionEntity::class)));
+        self::$st->dropSchema(array(self::$em->getClassMetadata(PermissionCategoryEntity::class)));
     }
 }

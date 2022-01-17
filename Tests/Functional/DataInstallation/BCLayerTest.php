@@ -35,8 +35,8 @@ class BCLayerTest extends AbstractTestCase
         // Old category should have just been renamed to a new name
 
         /* @var PermissionCategory $oldCategory */
-        $newCategory = self::$em->find(PermissionCategory::clazz(), $oldCategory->getId());
-        $this->assertInstanceOf(PermissionCategory::clazz(), $newCategory);
+        $newCategory = self::$em->find(PermissionCategory::class, $oldCategory->getId());
+        $this->assertInstanceOf(PermissionCategory::class, $newCategory);
         $this->assertEquals('administration', $newCategory->getTechnicalName());
     }
 
@@ -61,15 +61,15 @@ class BCLayerTest extends AbstractTestCase
         self::$em->clear(); // because otherwise $newCategory still is in UoW
 
         /* @var PermissionCategory $oldCategory */
-        $renamedOldCategory = self::$em->find(PermissionCategory::clazz(), $oldCategory->getId());
-        $this->assertInstanceOf(PermissionCategory::clazz(), $renamedOldCategory);
+        $renamedOldCategory = self::$em->find(PermissionCategory::class, $oldCategory->getId());
+        $this->assertInstanceOf(PermissionCategory::class, $renamedOldCategory);
         $this->assertEquals('administration', $renamedOldCategory->getTechnicalName());
 
         /* @var Permission $perm */
-        $perm = self::$em->find(Permission::clazz(), $perm->getId());
+        $perm = self::$em->find(Permission::class, $perm->getId());
         $this->assertEquals($perm->getCategory()->getId(), $oldCategory->getId());
 
-        $deletedNewCategory = self::$em->find(PermissionCategory::clazz(), $newCategory->getId());
+        $deletedNewCategory = self::$em->find(PermissionCategory::class, $newCategory->getId());
         $this->assertTrue(null === $deletedNewCategory);
     }
 }

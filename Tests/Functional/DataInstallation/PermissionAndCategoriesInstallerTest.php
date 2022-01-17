@@ -73,7 +73,7 @@ class PermissionAndCategoriesInstallerTest extends AbstractTestCase
         $this->assertEquals(0, $result['removed']);
 
         /* @var PermissionCategoryEntity $installedCategory */
-        $installedCategory = $this->getLastRecordInDatabase(PermissionCategoryEntity::clazz());
+        $installedCategory = $this->getLastRecordInDatabase(PermissionCategoryEntity::class);
 
         $this->assertNotNull($installedCategory);
         $this->assertEquals($category->getName(), $installedCategory->getName());
@@ -111,7 +111,7 @@ class PermissionAndCategoriesInstallerTest extends AbstractTestCase
         $this->assertEquals(0, $result['removed']);
 
         /* @var PermissionEntity $installedPermission */
-        $installedPermission = $this->getLastRecordInDatabase(PermissionEntity::clazz());
+        $installedPermission = $this->getLastRecordInDatabase(PermissionEntity::class);
 
         $this->assertNotNull($installedPermission);
         $this->assertEquals($permission->getName(), $installedPermission->getName());

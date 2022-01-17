@@ -19,7 +19,7 @@ class UserServiceTest extends \PHPUnit\Framework\TestCase
         $em = \Phake::mock('Doctrine\ORM\EntityManager');
         $rootUserHandler = \Phake::mock('Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface');
 
-        $user = \Phake::mock(User::clazz());
+        $user = \Phake::mock(User::class);
 
         \Phake::when($rootUserHandler)->isRootUser($user)->thenReturn(true);
 
@@ -35,7 +35,7 @@ class UserServiceTest extends \PHPUnit\Framework\TestCase
         $em = \Phake::mock('Doctrine\ORM\EntityManager');
         $rootUserHandler = \Phake::mock('Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface');
 
-        $user = \Phake::mock(User::clazz());
+        $user = \Phake::mock(User::class);
 
         \Phake::when($rootUserHandler)->isRootUser($user)->thenReturn(true);
 
@@ -68,15 +68,15 @@ class UserServiceTest extends \PHPUnit\Framework\TestCase
         $rootUserHandler = \Phake::mock('Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface');
         $service = new UserService($em, $rootUserHandler);
 
-        \Phake::when($em)->getRepository(User::clazz())->thenReturn($repo);
+        \Phake::when($em)->getRepository(User::class)->thenReturn($repo);
 
-        $user1 = \Phake::mock(User::clazz());
+        $user1 = \Phake::mock(User::class);
         \Phake::when($user1)->getId()->thenReturn(1);
         \Phake::when($user1)->getGender()->thenReturn(User::GENDER_MALE);
-        $user2 = \Phake::mock(User::clazz());
+        $user2 = \Phake::mock(User::class);
         \Phake::when($user2)->getId()->thenReturn(2);
         \Phake::when($user2)->getGender()->thenReturn(User::GENDER_FEMALE);
-        $user3 = \Phake::mock(User::clazz());
+        $user3 = \Phake::mock(User::class);
         \Phake::when($user3)->getId()->thenReturn(3);
         \Phake::when($user3)->getGender()->thenReturn(User::GENDER_MALE);
 
@@ -96,7 +96,7 @@ class UserServiceTest extends \PHPUnit\Framework\TestCase
         $rootUserHandler = \Phake::mock('Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface');
         $service = new UserService($em, $rootUserHandler);
 
-        $user = \Phake::mock(User::clazz());
+        $user = \Phake::mock(User::class);
         \Phake::when($rootUserHandler)->getUser()->thenReturn($user);
         \Phake::when($rootUserHandler)->isRootUser($user)->thenReturn(true);
 

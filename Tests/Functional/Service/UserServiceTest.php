@@ -27,9 +27,9 @@ class UserServiceTest extends FunctionalTestCase
     {
         self::$st = new SchemaTool(self::$em);
         self::$st->createSchema(array(
-            self::$em->getClassMetadata(User::clazz()),
-            self::$em->getClassMetadata(Group::clazz()),
-            self::$em->getClassMetadata(Permission::clazz()),
+            self::$em->getClassMetadata(User::class),
+            self::$em->getClassMetadata(Group::class),
+            self::$em->getClassMetadata(Permission::class),
         ));
     }
 
@@ -39,9 +39,9 @@ class UserServiceTest extends FunctionalTestCase
     public static function doTearDownAfterClass()
     {
         self::$st->dropSchema(array(
-            self::$em->getClassMetadata(User::clazz()),
-            self::$em->getClassMetadata(Group::clazz()),
-            self::$em->getClassMetadata(Permission::clazz()),
+            self::$em->getClassMetadata(User::class),
+            self::$em->getClassMetadata(Group::class),
+            self::$em->getClassMetadata(Permission::class),
         ));
     }
 

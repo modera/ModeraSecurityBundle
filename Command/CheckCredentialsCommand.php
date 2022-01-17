@@ -54,7 +54,7 @@ class CheckCredentialsCommand extends Command
         $criteria = array();
         $criteria[$input->getArgument('property')] = $username;
 
-        $user =  $this->em->getRepository(User::clazz())->findOneBy($criteria);
+        $user =  $this->em->getRepository(User::class)->findOneBy($criteria);
 
         if (!$user) {
             $output->writeln(sprintf('<error>User "%s" not found!</error>', $username));

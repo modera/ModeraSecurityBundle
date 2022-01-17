@@ -35,7 +35,7 @@ class GroupRepositoryTest extends FunctionalTestCase
 
     public function testFindByRefName()
     {
-        $emptyGroupList = static::$em->getRepository(Group::clazz())->findByRefName('test');
+        $emptyGroupList = static::$em->getRepository(Group::class)->findByRefName('test');
         $this->assertCount(0, $emptyGroupList);
 
         $group = new Group();
@@ -45,11 +45,11 @@ class GroupRepositoryTest extends FunctionalTestCase
         static::$em->persist($group);
         static::$em->flush();
 
-        $oneGroupList = static::$em->getRepository(Group::clazz())->findByRefName('test');
+        $oneGroupList = static::$em->getRepository(Group::class)->findByRefName('test');
         $this->assertCount(1, $oneGroupList);
         $this->assertEquals($group, $oneGroupList[0]);
 
-        $anotherEmptyList = static::$em->getRepository(Group::clazz())->findByRefName('testNew');
+        $anotherEmptyList = static::$em->getRepository(Group::class)->findByRefName('testNew');
         $this->assertCount(0, $anotherEmptyList);
 
         return $group;
@@ -65,15 +65,15 @@ class GroupRepositoryTest extends FunctionalTestCase
      */
     public function testFindByRefName_RefNameCases(Group $group)
     {
-        $oneGroupList = static::$em->getRepository(Group::clazz())->findByRefName('Test');
+        $oneGroupList = static::$em->getRepository(Group::class)->findByRefName('Test');
         $this->assertCount(1, $oneGroupList);
         $this->assertEquals($group, $oneGroupList[0]);
 
-        $anotherOneGroupList = static::$em->getRepository(Group::clazz())->findByRefName('tesT');
+        $anotherOneGroupList = static::$em->getRepository(Group::class)->findByRefName('tesT');
         $this->assertCount(1, $anotherOneGroupList);
         $this->assertEquals($group, $anotherOneGroupList[0]);
 
-        $lastOneGroupList = static::$em->getRepository(Group::clazz())->findByRefName('TEST');
+        $lastOneGroupList = static::$em->getRepository(Group::class)->findByRefName('TEST');
         $this->assertCount(1, $lastOneGroupList);
         $this->assertEquals($group, $lastOneGroupList[0]);
     }
@@ -93,7 +93,7 @@ class GroupRepositoryTest extends FunctionalTestCase
      */
     private static function getTableClasses()
     {
-        return array(Group::clazz());
+        return array(Group::class);
     }
 
     /**

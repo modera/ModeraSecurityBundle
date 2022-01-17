@@ -21,9 +21,6 @@ interface PasswordConfigInterface
     );
 
     /**
-     * @deprecated Will be removed in 3.0, it is added as a BC layer to avoid breaking default
-     * password changing flow
-     *
      * @return boolean
      */
     public function isEnabled();

@@ -96,7 +96,7 @@ class AuthenticatorTest extends \PHPUnit\Framework\TestCase
 
     public function testUserToArray()
     {
-        $user = \Phake::mock(User::clazz());
+        $user = \Phake::mock(User::class);
         \Phake::when($user)->getId()->thenReturn(777);
         \Phake::when($user)->getFullName()->thenReturn('John Doe');
         \Phake::when($user)->getEmail()->thenReturn('john.doe@example.org');

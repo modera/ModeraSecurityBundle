@@ -94,7 +94,7 @@ class UserService
      */
     public function findUserBy($property, $value)
     {
-        return $this->em->getRepository(User::clazz())->findOneBy(array($property => $value));
+        return $this->em->getRepository(User::class)->findOneBy(array($property => $value));
     }
 
     /**
@@ -107,7 +107,7 @@ class UserService
      */
     public function findUsersBy($property, $value)
     {
-        return $this->em->getRepository(User::clazz())->findBy(array($property => $value));
+        return $this->em->getRepository(User::class)->findBy(array($property => $value));
     }
 
     /**
@@ -175,7 +175,7 @@ class UserService
 
         $qb = $this->em->createQueryBuilder();
         $qb->select('p, u, g')
-            ->from(Permission::clazz(), 'p')
+            ->from(Permission::class, 'p')
             ->leftJoin('p.users', 'u')
             ->leftJoin('p.groups', 'g')
             ->where($qb->expr()->eq('p.roleName', ':roleName'))
@@ -198,7 +198,7 @@ class UserService
             if (count($groupIds)) {
                 $qb = $this->em->createQueryBuilder();
                 $qb->select('g, u')
-                    ->from(Group::clazz(), 'g')
+                    ->from(Group::class, 'g')
                     ->leftJoin('g.users', 'u')
                     ->where($qb->expr()->in('g.id', $groupIds))
                 ;

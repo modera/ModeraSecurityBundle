@@ -40,7 +40,7 @@ class RootUserHandlerInjectionListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPostLoadWithEntity()
     {
-        $user = \Phake::mock(User::clazz());
+        $user = \Phake::mock(User::class);
 
         $event = $this->createEvent($user);
 

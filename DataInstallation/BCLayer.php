@@ -54,9 +54,9 @@ class BCLayer
         // rather than to the new one, so it is more bulletproof simply to renew old ones and attempt
         // to delete new ones
 
-        $em = $this->doctrineRegistry->getManagerForClass(PermissionCategory::clazz());
-        $categoryRepository = $em->getRepository(PermissionCategory::clazz());
-        $permissionRepository = $em->getRepository(Permission::clazz());
+        $em = $this->doctrineRegistry->getManagerForClass(PermissionCategory::class);
+        $categoryRepository = $em->getRepository(PermissionCategory::class);
+        $permissionRepository = $em->getRepository(Permission::class);
 
         if (!$em instanceof EntityManagerInterface) {
             throw new \RuntimeException('Instance of EntityManager is expected.');
@@ -102,7 +102,7 @@ class BCLayer
 
         if (count($categoryIdsToRemove)) {
             try {
-                $query = $em->createQuery(sprintf('DELETE FROM %s e WHERE e.id IN (?0)', PermissionCategory::clazz()));
+                $query = $em->createQuery(sprintf('DELETE FROM %s e WHERE e.id IN (?0)', PermissionCategory::class));
                 $query->execute([$categoryIdsToRemove]);
             } catch (\Exception $e) {
                 // It might happen that we can't delete those categories because there are some other established

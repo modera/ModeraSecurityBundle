@@ -73,7 +73,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
-                        ->scalarNode('enabled') // in 3.0 this flag is going to be removed and feature will be enabled by default
+                        ->scalarNode('enabled')
                             ->defaultFalse()
                         ->end()
                         ->scalarNode('min_length')
