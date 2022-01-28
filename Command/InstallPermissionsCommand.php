@@ -41,7 +41,7 @@ class InstallPermissionsCommand extends Command
         $stats = $this->dataInstaller->installPermissions();
 
         $output->writeln(' >> Installed: '.$stats['installed']);
-        $output->writeln(' >> Removed: '.$stats['removed']);
+        //$output->writeln(' >> Removed: '.$stats['removed']);
 
         return 0;
     }

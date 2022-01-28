@@ -121,7 +121,7 @@ class PermissionAndCategoriesInstaller
 
         return array(
             'installed' => $permissionCategoriesInstalled,
-            'removed' => 0,
+            //'removed' => 0,
         );
     }
 
@@ -185,7 +185,7 @@ class PermissionAndCategoriesInstaller
 
         return array(
             'installed' => $permissionInstalled,
-            'removed' => 0,
+            //'removed' => 0,
         );
     }
 

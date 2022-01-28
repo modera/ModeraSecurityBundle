@@ -48,7 +48,7 @@ class InstallPermissionCategoriesCommand extends Command
         $stats = $this->dataInstaller->installCategories();
 
         $output->writeln(' >> Installed: '.$stats['installed']);
-        $output->writeln(' >> Removed: '.$stats['removed']);
+        //$output->writeln(' >> Removed: '.$stats['removed']);
 
         return 0;
     }
