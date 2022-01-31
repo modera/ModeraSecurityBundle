@@ -53,7 +53,7 @@ class UserService
     public function remove(User $user)
     {
         if ($this->rootUserHandler->isRootUser($user)) {
-            throw new \RuntimeException(T::trans('Super admin user never can be deleted.'));
+            throw new \RuntimeException(T::trans('ROOT user cannot be removed.'));
         }
 
         $this->em->remove($user);
@@ -68,7 +68,7 @@ class UserService
     public function disable(User $user)
     {
         if ($this->rootUserHandler->isRootUser($user)) {
-            throw new \RuntimeException(T::trans('Super admin user never can be disabled.'));
+            throw new \RuntimeException(T::trans('ROOT user cannot be disabled.'));
         }
 
         $user->setActive(false);
