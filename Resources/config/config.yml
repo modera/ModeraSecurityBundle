@@ -32,5 +32,3 @@ security:
                 property: username
         modera_provider:
             id: '%modera_security.user_provider_service%'
-
-    always_authenticate_before_granting: true

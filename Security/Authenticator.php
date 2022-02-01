@@ -104,7 +104,7 @@ class Authenticator implements AuthenticationFailureHandlerInterface, Authentica
     public static function getAuthenticationResponse(TokenInterface $token)
     {
         $response = array('success' => false);
-        if ($token->isAuthenticated() && $token->getUser() instanceof User) {
+        if ($token && $token->getUser() instanceof User) {
             /* @var User $user */
             $user = $token->getUser();
             $response = array(
