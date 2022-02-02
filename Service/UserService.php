@@ -134,19 +134,13 @@ class UserService
      *
      * @return bool
      */
-    public function isGranted(User $user, $roleName)
+    public function isGranted(User $user, string $roleName): bool
     {
-        if (null === $this->roleHierarchy) {
-            return in_array($roleName, $user->getRoles(), true);
+        $roles = $user->getRoles();
+        if (null !== $this->roleHierarchy) {
+            $roles = $this->roleHierarchy->getReachableRoleNames($roles);
         }
-
-        foreach ($this->roleHierarchy->getReachableRoles($user->getRoles()) as $role) {
-            if ($roleName === $role) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array($roleName, $roles, true);
     }
 
     /**
