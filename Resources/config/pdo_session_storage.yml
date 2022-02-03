@@ -4,10 +4,10 @@ parameters:
     modera_security.session_handler.dns_or_url: '%env(DATABASE_URL)%'
     modera_security.session_handler.options:
         db_table: modera_security_session
-        db_id_col: session_id
-        db_data_col: session_value
-        db_time_col: session_time
-        db_lifetime_col: session_lifetime
+        db_id_col: sess_id
+        db_data_col: sess_data
+        db_time_col: sess_time
+        db_lifetime_col: sess_lifetime
         db_username: '%modera_security.session_handler.db_username%'
         db_password: '%modera_security.session_handler.db_password%'
 

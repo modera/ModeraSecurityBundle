@@ -6,7 +6,11 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="modera_security_session")
+ * @ORM\Table(
+ *     name="modera_security_session",
+ *     options={"collate":"utf8mb4_bin", "charset":"utf8mb4"},
+ *     indexes={@ORM\Index(name="sess_lifetime_idx", columns={"sess_lifetime"})}
+ * )
  *
  * @author    Sergei Vizel <sergei.vizel@modera.org>
  * @copyright 2015 Modera Foundation
@@ -14,29 +18,23 @@ use Doctrine\ORM\Mapping as ORM;
 class Session
 {
     /**
-     * This property mapped column type used to be "binary" with length=128, but in Symfony 2.7 Doctrine DBAL v2.4 is used
-     * and this version doesn't have BinaryType available yet. To solve this we updated mapping to use type "string"
-     * instead, it should be more that enough to store SID, here's the proof:
-     * - http://php.net/manual/en/session.configuration.php#ini.session.hash-function
-     * - http://php.net/manual/en/session.configuration.php#ini.session.hash-bits-per-character.
-     *
      * @ORM\Id
-     * @ORM\Column(type="string", nullable=false)
+     * @ORM\Column(name="sess_id", type="binary", length=128, nullable=false)
      */
-    protected $session_id;
+    protected ?string $id = null;
 
     /**
-     * @ORM\Column(type="blob", length=65532, nullable=false)
+     * @ORM\Column(name="sess_data", type="blob", length=65532, nullable=false)
      */
-    protected $session_value;
+    protected ?string $data = null;
 
     /**
-     * @ORM\Column(type="integer", nullable=false, options={"unsigned"=true})
+     * @ORM\Column(name="sess_time", type="integer", nullable=false, options={"unsigned"=true})
      */
-    protected $session_time;
+    protected ?int $time = null;
 
     /**
-     * @ORM\Column(type="integer", nullable=false)
+     * @ORM\Column(name="sess_lifetime", type="integer", nullable=false, options={"unsigned"=true})
      */
-    protected $session_lifetime;
+    protected ?int $lifetime = null;
 }
