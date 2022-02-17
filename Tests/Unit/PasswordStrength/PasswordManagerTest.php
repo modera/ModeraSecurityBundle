@@ -260,6 +260,7 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
         $encoderDummy->mapping = array(
             'foo' => 'encoded-foo',
             'bar' => 'encoded-bar',
+            'baz' => 'encoded-baz',
         );
         $validatorMock = \Phake::mock(ValidatorInterface::class);
         \Phake::when($validatorMock)
@@ -275,7 +276,8 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
         $user->setMeta(array(
             'modera_security' => array(
                 'used_passwords' => array(
-                    $this->createTimeWithDaysAgo(130) => 'encoded-bar',
+                    $this->createTimeWithDaysAgo(125) => 'encoded-baz',
+                    $this->createTimeWithDaysAgo(100) => 'encoded-bar',
                     $this->createTimeWithDaysAgo(25) => 'encoded-foo',
                 ),
             ),
@@ -291,10 +293,10 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
             'Given password cannot be used because it has been already used in last 99 days.',
             $thrownException->getMessage()
         );
-        $this->assertEquals(2, count($user->getMeta()['modera_security']['used_passwords']));
+        $this->assertEquals(3, count($user->getMeta()['modera_security']['used_passwords']));
 
         $pm->encodeAndSetPassword($user, 'bar');
-        $this->assertEquals(3, count($user->getMeta()['modera_security']['used_passwords']));
+        $this->assertEquals(2, count($user->getMeta()['modera_security']['used_passwords']));
     }
 
     /**

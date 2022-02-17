@@ -4,17 +4,17 @@ namespace Modera\SecurityBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Modera\SecurityBundle\Model\UserInterface;
-use Modera\SecurityBundle\Validator\Constraints\Email;
-use Modera\SecurityBundle\Validator\Constraints\Username;
-use Modera\SecurityBundle\PasswordStrength\PasswordManager;
-use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
-use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
-use Sli\ExtJsIntegrationBundle\DataMapping\PreferencesAwareUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface as CoreUserInterface;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Sli\ExtJsIntegrationBundle\DataMapping\PreferencesAwareUserInterface;
+use Modera\SecurityBundle\Model\UserInterface as ModeraUserInterface;
+use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
+use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
+use Modera\SecurityBundle\PasswordStrength\PasswordManager;
+use Modera\SecurityBundle\Validator\Constraints\Username;
+use Modera\SecurityBundle\Validator\Constraints\Email;
 
 /**
  * @ORM\Table(name="modera_security_user")
@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author    Sergei Vizel <sergei.vizel@modera.org>
  * @copyright 2014 Modera Foundation
  */
-class User implements UserInterface, CoreUserInterface, \Serializable, EquatableInterface, PreferencesAwareUserInterface
+class User implements \Serializable, UserInterface, EquatableInterface, ModeraUserInterface, PreferencesAwareUserInterface
 {
     /**
      * @ORM\Column(type="integer")
@@ -179,14 +179,6 @@ class User implements UserInterface, CoreUserInterface, \Serializable, Equatable
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function isEqualTo(\Symfony\Component\Security\Core\User\UserInterface $user)
-    {
-        return $this->username === $user->getUsername();
-    }
-
-    /**
      * @return Permission[]
      */
     public function getRawRoles()
@@ -235,9 +227,43 @@ class User implements UserInterface, CoreUserInterface, \Serializable, Equatable
     {
     }
 
+    /**
+     * @deprecated Use User::isActive() method
+     *
+     * @return bool
+     */
     public function isEnabled()
     {
+        @trigger_error(sprintf(
+            'The "%s()" method is deprecated. Use User::isActive() method.',
+            __METHOD__
+        ), \E_USER_DEPRECATED);
+
         return $this->isActive;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEqualTo(UserInterface $user)
+    {
+        if ($this->username !== $user->getUsername()) {
+            return false;
+        }
+
+        if ($this->password !== $user->getPassword()) {
+            return false;
+        }
+
+        if ($this->salt !== $user->getSalt()) {
+            return false;
+        }
+
+        if ($this->isActive !== $user->isActive()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -305,6 +331,7 @@ class User implements UserInterface, CoreUserInterface, \Serializable, Equatable
 
     /**
      * @deprecated Use User::isActive() method
+     *
      * @return bool
      */
     public function getIsActive()

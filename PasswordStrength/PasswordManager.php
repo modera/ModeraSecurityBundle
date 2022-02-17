@@ -81,7 +81,7 @@ class PasswordManager
         $encodedPassword = $this->passwordEncoder->encodePassword($user, $plainPassword);
 
         $now = new \DateTime('now');
-        foreach ($meta['modera_security']['used_passwords'] as $oldPasswordChangeTimestamp=>$oldEncodedPassword) {
+        foreach ($meta['modera_security']['used_passwords'] as $oldPasswordChangeTimestamp => $oldEncodedPassword) {
             if ($encodedPassword == $oldEncodedPassword) {
                 $oldPasswordChangeTime = new \DateTime();
                 $oldPasswordChangeTime->setTimestamp($oldPasswordChangeTimestamp);
@@ -143,19 +143,35 @@ class PasswordManager
             throw $e;
         }
 
+        $encodedPassword = $this->passwordEncoder->encodePassword($user, $plainPassword);
+        $user->setPassword($encodedPassword);
+
         $meta = $user->getMeta();
-        if (!isset($meta['modera_security']['used_passwords'])) {
+
+        if (!isset($meta['modera_security']['used_passwords']) || $this->isPasswordRotationTurnedOff()) {
             if (!isset($meta['modera_security'])) {
                 $meta['modera_security'] = array();
             }
             $meta['modera_security']['used_passwords'] = array();
         }
 
-        $encodedPassword = $this->passwordEncoder->encodePassword($user, $plainPassword);
-        $user->setPassword($encodedPassword);
+        // remove outdated passwords
+        if (!$this->isPasswordRotationTurnedOff()) {
+            $now = new \DateTime('now');
+            foreach ($meta['modera_security']['used_passwords'] as $oldPasswordChangeTimestamp => $oldEncodedPassword) {
+                $oldPasswordChangeTime = new \DateTime();
+                $oldPasswordChangeTime->setTimestamp($oldPasswordChangeTimestamp);
+
+                $daysPassed = $now->diff($oldPasswordChangeTime)->days;
+                if ($daysPassed > $this->passwordConfig->getRotationPeriodInDays()) {
+                    unset($meta['modera_security']['used_passwords'][$oldPasswordChangeTimestamp]);
+                }
+            }
+        }
 
         $meta['modera_security']['used_passwords'][time()] = $encodedPassword;
         unset($meta['modera_security']['force_password_rotation']);
+
         $user->setMeta($meta);
     }
 

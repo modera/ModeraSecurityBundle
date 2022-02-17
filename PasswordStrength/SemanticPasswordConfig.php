@@ -34,7 +34,7 @@ class SemanticPasswordConfig implements PasswordConfigInterface
      */
     public function isNumberRequired()
     {
-        return $this->semanticConfig['number_required'];
+        return $this->isEnabled() ? $this->semanticConfig['number_required'] : false;
     }
 
     /**
@@ -42,7 +42,7 @@ class SemanticPasswordConfig implements PasswordConfigInterface
      */
     public function isLetterRequired()
     {
-        return false !== $this->semanticConfig['letter_required'];
+        return $this->isEnabled() ? false !== $this->semanticConfig['letter_required'] : false;
     }
 
     /**
@@ -58,7 +58,7 @@ class SemanticPasswordConfig implements PasswordConfigInterface
      */
     public function getRotationPeriodInDays()
     {
-        return $this->semanticConfig['rotation_period'];
+        return $this->isEnabled() ? $this->semanticConfig['rotation_period'] : false;
     }
 
     /**
