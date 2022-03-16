@@ -450,7 +450,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
      */
     public function setFirstName($firstName)
     {
-        $this->firstName = preg_replace('/[^[:alnum:][:space:]-]/u', '', $firstName);
+        $this->firstName = preg_replace('/[^[:alnum:][:space:]-]/u', '', trim($firstName));
     }
 
     /**
@@ -466,7 +466,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
      */
     public function setLastName($lastName)
     {
-        $this->lastName = preg_replace('/[^[:alnum:][:space:]-]/u', '', $lastName);
+        $this->lastName = preg_replace('/[^[:alnum:][:space:]-]/u', '', trim($lastName));
     }
 
     /**
@@ -482,7 +482,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
      */
     public function setMiddleName($middleName)
     {
-        $this->middleName = preg_replace('/[^[:alnum:][:space:]-]/u', '', $middleName);
+        $this->middleName = preg_replace('/[^[:alnum:][:space:]-]/u', '', trim($middleName));
     }
 
     /**
