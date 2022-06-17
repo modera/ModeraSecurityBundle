@@ -58,6 +58,9 @@
             <argument type="service" id="service_container" />
         </service>
 
+        <service id="Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface"
+                 alias="modera_security.root_user_handler.semantic_config_root_user_handler" />
+
         <service id="modera_security.service.user_service"
                  class="Modera\SecurityBundle\Service\UserService"
                  public="true">
