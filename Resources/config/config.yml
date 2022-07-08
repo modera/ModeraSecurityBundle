@@ -28,7 +28,7 @@ security:
     providers:
         entity_provider:
             entity:
-                class: ModeraSecurityBundle:User
+                class: Modera\SecurityBundle\Entity\User
                 property: username
         modera_provider:
             id: '%modera_security.user_provider_service%'
