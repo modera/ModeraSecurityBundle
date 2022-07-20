@@ -21,7 +21,7 @@ interface PasswordConfigInterface
     );
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isEnabled();
 
@@ -31,12 +31,12 @@ interface PasswordConfigInterface
     public function getMinLength();
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isNumberRequired();
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isLetterRequired();
 
