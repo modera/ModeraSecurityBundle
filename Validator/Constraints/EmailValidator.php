@@ -15,7 +15,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class EmailValidator extends ConstraintValidator
 {
-    public const PATTERN = Constraints\EmailValidator::PATTERN_HTML5;
+    public const PATTERN = '/^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/';
 
     /**
      * {@inheritdoc}
