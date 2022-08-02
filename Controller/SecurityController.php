@@ -14,18 +14,22 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
  */
 class SecurityController extends Controller
 {
+    private AuthenticationUtils $helper;
+
+    public function __construct(AuthenticationUtils $helper)
+    {
+        $this->helper = $helper;
+    }
+
     /**
      * @Route("/login", name="_security_login")
      * @Template()
      */
     public function loginAction()
     {
-        /* @var AuthenticationUtils $helper */
-        $helper = $this->get('security.authentication_utils');
-
         return array(
-            'last_username' => $helper->getLastUsername(),
-            'error' => $helper->getLastAuthenticationError(),
+            'last_username' => $this->helper->getLastUsername(),
+            'error' => $this->helper->getLastAuthenticationError(),
         );
     }
 
