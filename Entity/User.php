@@ -19,6 +19,7 @@ use Modera\SecurityBundle\Validator\Constraints\Email;
 /**
  * @ORM\Table(name="modera_security_user")
  * @ORM\Entity
+ * @UniqueEntity("personalId")
  * @UniqueEntity("username")
  * @UniqueEntity("email")
  *
@@ -64,6 +65,11 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
      * @ORM\Column(type="string", length=32)
      */
     private $salt;
+
+    /**
+     * @ORM\Column(name="personal_id", type="string", nullable=true, unique=true)
+     */
+    private $personalId;
 
     /**
      * @ORM\Column(name="first_name", type="string", nullable=true)
@@ -359,7 +365,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getEmail()
     {
@@ -438,7 +444,23 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
+     */
+    public function getPersonalId()
+    {
+        return $this->personalId;
+    }
+
+    /**
+     * @param string $personalId
+     */
+    public function setPersonalId($personalId)
+    {
+        $this->personalId = preg_replace('/[^[:alnum:][:space:]-]/u', '', trim($personalId)) ?: null;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFirstName()
     {
@@ -454,7 +476,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getLastName()
     {
@@ -470,7 +492,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getMiddleName()
     {
@@ -486,9 +508,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
     }
 
     /**
-     * @param bool $short
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getFullName($pattern = 'first last')
     {
@@ -515,7 +535,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
     }
 
     /**
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getGender()
     {
@@ -536,7 +556,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getState()
     {
@@ -556,7 +576,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
     }
 
     /**
-     * @return \DateTime|null
+     * {@inheritdoc}
      */
     public function getLastLogin()
     {

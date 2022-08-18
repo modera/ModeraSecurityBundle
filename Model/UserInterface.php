@@ -22,32 +22,38 @@ interface UserInterface
     public function getEmail();
 
     /**
-     * @return string
+     * @return string|null
+     */
+    public function getPersonalId();
+
+    /**
+     * @return string|null
      */
     public function getFirstName();
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLastName();
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getMiddleName();
 
     /**
+     * @param string $pattern
      * @return string
      */
-    public function getFullName();
+    public function getFullName($pattern = 'first last');
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getGender();
 
     /**
-     * @return string
+     * @return int
      */
     public function getState();
 
