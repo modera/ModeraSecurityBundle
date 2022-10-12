@@ -5,11 +5,9 @@ namespace Modera\SecurityBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Sli\ExtJsIntegrationBundle\DataMapping\PreferencesAwareUserInterface;
-use Modera\SecurityBundle\Model\UserInterface as ModeraUserInterface;
 use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
 use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
 use Modera\SecurityBundle\PasswordStrength\PasswordManager;
@@ -26,7 +24,7 @@ use Modera\SecurityBundle\Validator\Constraints\Email;
  * @author    Sergei Vizel <sergei.vizel@modera.org>
  * @copyright 2014 Modera Foundation
  */
-class User implements \Serializable, UserInterface, EquatableInterface, ModeraUserInterface, PreferencesAwareUserInterface
+class User implements \Serializable, UserInterface, PreferencesAwareUserInterface
 {
     /**
      * @ORM\Column(type="integer")
@@ -251,7 +249,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
     /**
      * {@inheritdoc}
      */
-    public function isEqualTo(UserInterface $user)
+    public function isEqualTo(SymfonyUserInterface $user)
     {
         if ($this->username !== $user->getUsername()) {
             return false;
@@ -608,7 +606,7 @@ class User implements \Serializable, UserInterface, EquatableInterface, ModeraUs
     }
 
     /**
-     * @return \Modera\SecurityBundle\Entity\Permission[]
+     * @return Permission[]
      */
     public function getPermissions()
     {
