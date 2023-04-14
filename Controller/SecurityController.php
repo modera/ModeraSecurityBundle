@@ -5,7 +5,6 @@ namespace Modera\SecurityBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
@@ -23,14 +22,13 @@ class SecurityController extends Controller
 
     /**
      * @Route("/login", name="_security_login")
-     * @Template()
      */
     public function loginAction()
     {
-        return array(
+        return $this->render('@ModeraSecurity/security/login.html.twig', array(
             'last_username' => $this->helper->getLastUsername(),
             'error' => $this->helper->getLastAuthenticationError(),
-        );
+        ));
     }
 
     /**
