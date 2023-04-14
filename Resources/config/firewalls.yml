@@ -12,8 +12,8 @@ parameters:
             security: false
 
         secured_area:
+            lazy: true
             pattern: ^/
-            anonymous: ~
             guard: '%modera_security.firewalls.secured_area.guard%'
             context: modera_auth
             provider: modera_provider
