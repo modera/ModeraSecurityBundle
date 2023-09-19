@@ -3,12 +3,13 @@
 namespace Modera\SecurityBundle\Service;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
-use Modera\SecurityBundle\Entity\Permission;
 use Modera\FoundationBundle\Translation\T;
 use Modera\SecurityBundle\Entity\Group;
+use Modera\SecurityBundle\Entity\Permission;
 use Modera\SecurityBundle\Entity\User;
+use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
  * TODO move logic Doctrine's repository ?
@@ -18,20 +19,21 @@ use Modera\SecurityBundle\Entity\User;
  */
 class UserService
 {
-    private $em;
-    private $rootUserHandler;
-    private $roleHierarchy;
+    private EntityManager $em;
+    private RootUserHandlerInterface $rootUserHandler;
+    private ?RoleHierarchyInterface $roleHierarchy = null;
+    private ?TokenStorageInterface $tokenStorage = null;
 
-    /**
-     * @param EntityManager $em
-     * @param RootUserHandlerInterface $rootUserHandler
-     * @param RoleHierarchyInterface $roleHierarchy
-     */
-    public function __construct(EntityManager $em, RootUserHandlerInterface $rootUserHandler, RoleHierarchyInterface $roleHierarchy = null)
-    {
+    public function __construct(
+        EntityManager $em,
+        RootUserHandlerInterface $rootUserHandler,
+        ?RoleHierarchyInterface $roleHierarchy = null,
+        ?TokenStorageInterface $tokenStorage = null
+    ) {
         $this->em = $em;
         $this->rootUserHandler = $rootUserHandler;
         $this->roleHierarchy = $roleHierarchy;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -108,6 +110,29 @@ class UserService
     public function findUsersBy($property, $value)
     {
         return $this->em->getRepository(User::class)->findBy(array($property => $value));
+    }
+
+    /**
+     * @return ?User
+     */
+    public function getAuthenticatedUser()
+    {
+        if (null === $this->tokenStorage) {
+            return null;
+        }
+
+        $token = $this->tokenStorage->getToken();
+        if (null === $token) {
+            return null;
+        }
+
+        // @deprecated since 5.4, $user will always be a UserInterface instance
+        if (!\is_object($user = $token->getUser())) {
+            // e.g. anonymous authentication
+            return null;
+        }
+
+        return $user;
     }
 
     /**

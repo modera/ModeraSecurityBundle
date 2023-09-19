@@ -69,6 +69,7 @@
             <!-- defined in \Modera\SecurityBundle\DependencyInjection\ModeraSecurityExtension  -->
             <argument type="service" id="modera_security.root_user_handling.handler" />
             <argument type="service" id="security.role_hierarchy" />
+            <argument type="service" id="security.token_storage" />
         </service>
 
         <service id="Modera\SecurityBundle\Service\UserService"
