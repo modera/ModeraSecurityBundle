@@ -378,6 +378,11 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
         $this->email = trim($email) ?: null;
     }
 
+    public function getUserIdentifier()
+    {
+        return $this->getUsername();
+    }
+
     /**
      * {@inheritdoc}
      */
