@@ -2,60 +2,67 @@
 
 namespace Modera\SecurityBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Groups are used to group users.
  *
  * @ORM\Entity(repositoryClass="Modera\SecurityBundle\Entity\GroupRepository")
+ *
  * @ORM\Table(name="modera_security_usersgroup", uniqueConstraints={@ORM\UniqueConstraint(name="refName_idx", columns={"refName"})})
  *
- * @author Sergei Lissovski <sergei.lissovski@gmail.com>
+ * @author Sergei Lissovski <sergei.lissovski@modera.org>
  */
 class Group
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
+     * @var Collection<int, UserInterface>
+     *
      * @ORM\ManyToMany(targetEntity="User", mappedBy="groups", cascade={"persist"})
      */
-    private $users;
+    private Collection $users;
 
     /**
      * @Assert\NotBlank
      *
      * @ORM\Column(type="string")
      */
-    private $name;
+    private ?string $name = null;
 
     /**
      * Reference name that maybe used in code to refer exact group.
-     * Group with ref.name usually will be created through fixtures.
+     * Group with ref.name will be created through fixtures.
      *
-     * Please note, there is not mandatory Regex assert.
+     * Please note, there is no mandatory Regex assert.
      * But in modera/backend-security-bindle controller this value will
      * be normalized by self::normalizeRefNameString
      *
      * So if plan to use UI editing of your group, try to stick to this Regex assert.
      *
      * @Assert\Regex("/[A-Z_]{0,}/")
+     *
      * @ORM\Column(type="string", nullable=true)
      */
-    private $refName;
+    private ?string $refName = null;
 
     /**
-     * @var Permission[]
+     * @var Collection<int, Permission>
      *
      * @ORM\ManyToMany(targetEntity="Permission", mappedBy="groups", cascade={"persist"})
      */
-    private $permissions;
+    private Collection $permissions;
 
     public function __construct()
     {
@@ -65,23 +72,18 @@ class Group
 
     /**
      * @deprecated Use native ::class property
-     *
-     * @return string
      */
-    public static function clazz()
+    public static function clazz(): string
     {
-        @trigger_error(sprintf(
+        @\trigger_error(\sprintf(
             'The "%s()" method is deprecated. Use native ::class property.',
             __METHOD__
         ), \E_USER_DEPRECATED);
 
-        return get_called_class();
+        return \get_called_class();
     }
 
-    /**
-     * @param User $user
-     */
-    public function addUser(User $user)
+    public function addUser(UserInterface $user): void
     {
         $this->users->add($user);
         if (!$user->getGroups()->contains($this)) {
@@ -89,10 +91,7 @@ class Group
         }
     }
 
-    /**
-     * @param Permission $role
-     */
-    public function addPermission(Permission $role)
+    public function addPermission(Permission $role): void
     {
         $role->addGroup($this);
         if (!$this->permissions->contains($role)) {
@@ -100,87 +99,77 @@ class Group
         }
     }
 
-    /**
-     * @param Permission $role
-     *
-     * @return bool
-     */
-    public function hasPermission(Permission $role)
+    public function hasPermission(Permission $role): bool
     {
         return $this->permissions->contains($role);
     }
 
-    /**
-     * @param User $user
-     *
-     * @return bool
-     */
-    public function hasUser(User $user)
+    public function hasUser(UserInterface $user): bool
     {
         return $this->users->contains($user);
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    public function getName()
+    public function getName(): string
     {
-        return $this->name;
+        return $this->name ?? '';
     }
 
-    public function setUsers($users)
+    /**
+     * @param Collection<int, UserInterface> $users
+     */
+    public function setUsers(Collection $users): void
     {
         $this->users = $users;
     }
 
     /**
-     * @return User[]
+     * @return Collection<int, UserInterface>
      */
-    public function getUsers()
+    public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function setPermissions($roles)
+    /**
+     * @param Collection<int, Permission> $roles
+     */
+    public function setPermissions(Collection $roles): void
     {
         $this->permissions = $roles;
     }
 
     /**
-     * @return Permission[]
+     * @return Collection<int, Permission>
      */
-    public function getPermissions()
+    public function getPermissions(): Collection
     {
         return $this->permissions;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getRefName()
+    public function getRefName(): ?string
     {
         return $this->refName;
     }
 
-    /**
-     * @param mixed $refName
-     */
-    public function setRefName($refName)
+    public function setRefName(?string $refName): void
     {
         $this->refName = $refName;
     }
 
-    public static function normalizeRefNameString($proposedRefName)
+    public static function normalizeRefNameString(string $proposedRefName): ?string
     {
-        $modifiedRefName = strtoupper($proposedRefName);
+        $modifiedRefName = \strtoupper($proposedRefName);
 
-        return preg_replace('/[^A-Z_]+/', '', $modifiedRefName);
+        return \preg_replace('/[^A-Z_]+/', '', $modifiedRefName);
     }
 }

@@ -8,45 +8,27 @@ namespace Modera\SecurityBundle\PasswordStrength;
  */
 interface PasswordConfigInterface
 {
-    const LETTER_REQUIRED_TYPE_CAPITAL = 'capital';
-    const LETTER_REQUIRED_TYPE_NON_CAPITAL = 'non_capital';
-    const LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL = 'capital_or_non_capital';
-    const LETTER_REQUIRED_TYPE_CAPITAL_AND_NON_CAPITAL = 'capital_and_non_capital';
+    public const LETTER_REQUIRED_TYPE_CAPITAL = 'capital';
+    public const LETTER_REQUIRED_TYPE_NON_CAPITAL = 'non_capital';
+    public const LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL = 'capital_or_non_capital';
+    public const LETTER_REQUIRED_TYPE_CAPITAL_AND_NON_CAPITAL = 'capital_and_non_capital';
 
-    const LETTER_REQUIRED_TYPES = array(
+    public const LETTER_REQUIRED_TYPES = [
         self::LETTER_REQUIRED_TYPE_CAPITAL,
         self::LETTER_REQUIRED_TYPE_NON_CAPITAL,
         self::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL,
         self::LETTER_REQUIRED_TYPE_CAPITAL_AND_NON_CAPITAL,
-    );
+    ];
 
-    /**
-     * @return bool
-     */
-    public function isEnabled();
+    public function isEnabled(): bool;
 
-    /**
-     * @return integer
-     */
-    public function getMinLength();
+    public function getMinLength(): int;
 
-    /**
-     * @return bool
-     */
-    public function isNumberRequired();
+    public function isNumberRequired(): bool;
 
-    /**
-     * @return bool
-     */
-    public function isLetterRequired();
+    public function isLetterRequired(): bool;
 
-    /**
-     * @return string
-     */
-    public function getLetterRequiredType();
+    public function getLetterRequiredType(): string;
 
-    /**
-     * @return integer
-     */
-    public function getRotationPeriodInDays();
+    public function getRotationPeriodInDays(): ?int;
 }

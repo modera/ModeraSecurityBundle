@@ -2,8 +2,8 @@
 
 namespace Modera\SecurityBundle;
 
+use Modera\ExpanderBundle\Ext\ExtensionPoint;
 use Modera\SecurityBundle\DependencyInjection\MailServiceAliasCompilerPass;
-use Sli\ExpanderBundle\Ext\ExtensionPoint;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -13,12 +13,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class ModeraSecurityBundle extends Bundle
 {
-    const ROLE_ROOT_USER = 'ROLE_ROOT_USER';
+    public const ROLE_ROOT_USER = 'ROLE_ROOT_USER';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $permissionsProviders = new ExtensionPoint('modera_security.permissions');
         $permissionsProviders->setDescription(

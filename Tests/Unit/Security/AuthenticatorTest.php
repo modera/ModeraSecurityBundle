@@ -100,6 +100,7 @@ class AuthenticatorTest extends \PHPUnit\Framework\TestCase
         \Phake::when($user)->getId()->thenReturn(777);
         \Phake::when($user)->getFullName()->thenReturn('John Doe');
         \Phake::when($user)->getEmail()->thenReturn('john.doe@example.org');
+        \Phake::when($user)->getUserIdentifier()->thenReturn('john.doe');
         \Phake::when($user)->getUsername()->thenReturn('john.doe');
         \Phake::when($user)->getMeta()->thenReturn(array());
 

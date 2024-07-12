@@ -2,11 +2,11 @@
 
 namespace Modera\SecurityBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * This is the class that loads and manages your bundle configuration.
@@ -15,12 +15,9 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
  */
 class ModeraSecurityExtension extends Extension implements PrependExtensionInterface
 {
-    const CONFIG_KEY = 'modera_security.config';
+    public const CONFIG_KEY = 'modera_security.config';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -33,25 +30,31 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
 
         $this->injectConfigIntoContainer($config, $container);
 
+        /** @var array{'root_user_handler': string} $config */
+        $config = $config;
+
         $container
             ->setAlias('modera_security.root_user_handling.handler', $config['root_user_handler'])
             ->setPublic(true)
         ;
 
-        if (class_exists('Symfony\Component\Console\Application')) {
+        if (\class_exists('Symfony\Component\Console\Application')) {
             try {
                 $loader->load('console.xml');
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
     }
 
     /**
-     * @param array $config
-     * @param ContainerBuilder $container
+     * @param array<string, mixed> $config
      */
-    private function injectConfigIntoContainer(array $config, ContainerBuilder $container)
+    private function injectConfigIntoContainer(array $config, ContainerBuilder $container): void
     {
         $container->setParameter(self::CONFIG_KEY, $config);
+
+        /** @var array{'sorting_position': array<string, mixed>} $config */
+        $config = $config;
 
         $container->setParameter(
             'modera_security.sorting_position',
@@ -59,22 +62,22 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         $configs = $container->getExtensionConfig($this->getAlias());
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        /** @var array{'firewalls': array<string, mixed>, 'switch_user': array{string, string}, 'access_control': array<mixed>} $config */
         $config = $this->prependSwitchUserConfig($config);
 
         if ($container->hasParameter('modera_security.default_firewalls')) {
-            $config['firewalls'] = array_merge(
+            /** @var array<string, mixed> $defaultFirewalls */
+            $defaultFirewalls = $container->getParameter('modera_security.default_firewalls');
+            $config['firewalls'] = \array_merge(
                 $config['firewalls'],
-                $container->getParameter('modera_security.default_firewalls')
+                $defaultFirewalls
             );
         }
 
@@ -84,18 +87,19 @@ class ModeraSecurityExtension extends Extension implements PrependExtensionInter
     }
 
     /**
-     * @param array $config
-     * @return array
+     * @param array<string, mixed> $config
+     *
+     * @return array<string, mixed>
      */
-    private function prependSwitchUserConfig(array $config)
+    private function prependSwitchUserConfig(array $config): array
     {
-        if ($config['switch_user']) {
-            $switchUserDefaultCfg = array(
+        if (isset($config['switch_user']) && $config['switch_user']) {
+            $switchUserDefaultCfg = [
                 'role' => 'ROLE_ALLOWED_TO_SWITCH',
                 'parameter' => '_switch_user',
-            );
+            ];
 
-            if (!is_array($config['switch_user'])) {
+            if (!\is_array($config['switch_user'])) {
                 $config['switch_user'] = $switchUserDefaultCfg;
             }
 

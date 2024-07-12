@@ -2,7 +2,7 @@
 
 namespace Modera\SecurityBundle\Contributions;
 
-use Sli\ExpanderBundle\Ext\ContributorInterface;
+use Modera\ExpanderBundle\Ext\ContributorInterface;
 
 /**
  * @author    Sergei Vizel <sergei.vizel@modera.org>
@@ -10,16 +10,13 @@ use Sli\ExpanderBundle\Ext\ContributorInterface;
  */
 class RoutingResourcesProvider implements ContributorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getItems()
+    public function getItems(): array
     {
-        return array(
-            array(
+        return [
+            [
                 'resource' => '@ModeraSecurityBundle/Controller/SecurityController.php',
                 'type' => 'annotation',
-            ),
-        );
+            ],
+        ];
     }
 }

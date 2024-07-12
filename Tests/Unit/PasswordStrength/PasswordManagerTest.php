@@ -8,26 +8,28 @@ use Modera\SecurityBundle\PasswordStrength\Mail\MailServiceInterface;
 use Modera\SecurityBundle\PasswordStrength\PasswordConfigInterface;
 use Modera\SecurityBundle\PasswordStrength\PasswordManager;
 use Modera\SecurityBundle\PasswordStrength\StrongPassword;
-use Modera\SecurityBundle\PasswordStrength\StrongPasswordValidator;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class UserPasswordEncoderDummy implements UserPasswordEncoderInterface
+class UserPasswordEncoderDummy implements UserPasswordHasherInterface
 {
     public $mapping = array();
 
-    public function encodePassword(UserInterface $user, $plainPassword)
+    public function hashPassword(PasswordAuthenticatedUserInterface $user, string $plainPassword): string
     {
         return $this->mapping[$plainPassword];
     }
 
-    public function isPasswordValid(UserInterface $user, $raw)
+    public function isPasswordValid(PasswordAuthenticatedUserInterface $user, string $plainPassword): bool
     {
+        return true;
     }
 
-    public function needsRehash(UserInterface $user): bool
+    public function needsRehash(PasswordAuthenticatedUserInterface $user): bool
     {
         return false;
     }
@@ -62,7 +64,10 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
         ;
 
         $pm = new PasswordManager(
-            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+            $passwordConfigMock,
+            $encoderDummy,
+            $validatorMock,
+            \Phake::mock(MailServiceInterface::class)
         );
 
         $user = new User();
@@ -109,7 +114,10 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
         ;
 
         $pm = new PasswordManager(
-            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+            $passwordConfigMock,
+            $encoderDummy,
+            $validatorMock,
+            \Phake::mock(MailServiceInterface::class)
         );
 
         $this->assertTrue($pm->isItTimeToRotatePassword(new User()));
@@ -154,16 +162,21 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
         $encoderDummy = new UserPasswordEncoderDummy();
         $validatorMock = \Phake::mock(ValidatorInterface::class);
 
+        $constraintViolationList = \Phake::mock(ConstraintViolationListInterface::class);
+
         \Phake::when($validatorMock)
             ->validate('foo123', $this->isInstanceOf(StrongPassword::class))
-            ->thenReturn('validation-result')
+            ->thenReturn($constraintViolationList)
         ;
 
         $pm = new PasswordManager(
-            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+            $passwordConfigMock,
+            $encoderDummy,
+            $validatorMock,
+            \Phake::mock(MailServiceInterface::class)
         );
 
-        $this->assertEquals('validation-result', $pm->validatePassword('foo123'));
+        $this->assertEquals($constraintViolationList, $pm->validatePassword('foo123'));
     }
 
     public function testEncodeAndSetPassword_happyPath()
@@ -171,7 +184,7 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
         $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
         \Phake::when($passwordConfigMock)
             ->getRotationPeriodInDays()
-            ->thenReturn(false)
+            ->thenReturn(null)
         ;
 
         $encoderDummy = new UserPasswordEncoderDummy();
@@ -182,14 +195,19 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
             'yoyo' => 'encoded-yoyo',
         );
 
+        $constraintViolationList = \Phake::mock(ConstraintViolationListInterface::class);
+
         $validatorMock = \Phake::mock(ValidatorInterface::class);
         \Phake::when($validatorMock)
             ->validate(\Phake::anyParameters())
-            ->thenReturn([])
+            ->thenReturn($constraintViolationList)
         ;
 
         $pm = new PasswordManager(
-            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+            $passwordConfigMock,
+            $encoderDummy,
+            $validatorMock,
+            \Phake::mock(MailServiceInterface::class)
         );
 
         $user = new User();
@@ -209,7 +227,7 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
         $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
         \Phake::when($passwordConfigMock)
             ->getRotationPeriodInDays()
-            ->thenReturn(false)
+            ->thenReturn(null)
         ;
 
         $encoderDummy = new UserPasswordEncoderDummy();
@@ -220,14 +238,19 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
             'yoyo' => 'encoded-yoyo',
         );
 
+        $constraintViolationList = \Phake::mock(ConstraintViolationListInterface::class);
+
         $validatorMock = \Phake::mock(ValidatorInterface::class);
         \Phake::when($validatorMock)
             ->validate(\Phake::anyParameters())
-            ->thenReturn([])
+            ->thenReturn($constraintViolationList)
         ;
 
         $pm = new PasswordManager(
-            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+            $passwordConfigMock,
+            $encoderDummy,
+            $validatorMock,
+            \Phake::mock(MailServiceInterface::class)
         );
 
         $user = new User();
@@ -262,14 +285,20 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
             'bar' => 'encoded-bar',
             'baz' => 'encoded-baz',
         );
+
+        $constraintViolationList = \Phake::mock(ConstraintViolationListInterface::class);
+
         $validatorMock = \Phake::mock(ValidatorInterface::class);
         \Phake::when($validatorMock)
             ->validate(\Phake::anyParameters())
-            ->thenReturn([])
+            ->thenReturn($constraintViolationList)
         ;
 
         $pm = new PasswordManager(
-            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+            $passwordConfigMock,
+            $encoderDummy,
+            $validatorMock,
+            \Phake::mock(MailServiceInterface::class)
         );
 
         $user = new User();
@@ -300,7 +329,7 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException Modera\SecurityBundle\PasswordStrength\BadPasswordException
+     * @expectedException \Modera\SecurityBundle\PasswordStrength\BadPasswordException
      * @expectedExceptionMessage error-msg1
      */
     public function testEncodeAndSetPassword_validationFail()
@@ -308,7 +337,7 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
         $passwordConfigMock = \Phake::mock(PasswordConfigInterface::class);
         \Phake::when($passwordConfigMock)
             ->getRotationPeriodInDays()
-            ->thenReturn(false)
+            ->thenReturn(null)
         ;
 
         $encoderDummy = new UserPasswordEncoderDummy();
@@ -322,14 +351,18 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
             ->thenReturn('error-msg1')
         ;
 
+        $constraintViolationList = new ConstraintViolationList([$violation]);
         $validatorMock = \Phake::mock(ValidatorInterface::class);
         \Phake::when($validatorMock)
             ->validate('foo', $this->isInstanceOf(StrongPassword::class))
-            ->thenReturn([$violation])
+            ->thenReturn($constraintViolationList)
         ;
 
         $pm = new PasswordManager(
-            $passwordConfigMock, $encoderDummy, $validatorMock, \Phake::mock(MailServiceInterface::class)
+            $passwordConfigMock,
+            $encoderDummy,
+            $validatorMock,
+            \Phake::mock(MailServiceInterface::class)
         );
 
         $user = new User();
@@ -387,15 +420,17 @@ class PasswordManagerTest extends \PHPUnit\Framework\TestCase
     {
         $mailServiceMock = \Phake::mock(MailServiceInterface::class);
 
+        $constraintViolationList = \Phake::mock(ConstraintViolationListInterface::class);
+
         $validatorMock = \Phake::mock(ValidatorInterface::class);
         \Phake::when($validatorMock)
             ->validate(\Phake::anyParameters())
-            ->thenReturn([])
+            ->thenReturn($constraintViolationList)
         ;
 
         $pm = new PasswordManager(
             \Phake::mock(PasswordConfigInterface::class),
-            \Phake::mock(UserPasswordEncoderInterface::class),
+            \Phake::mock(UserPasswordEncoderDummy::class),
             $validatorMock,
             $mailServiceMock
         );

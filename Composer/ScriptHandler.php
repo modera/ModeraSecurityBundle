@@ -11,24 +11,26 @@ use Modera\ModuleBundle\Composer\AbstractScriptHandler;
  */
 class ScriptHandler extends AbstractScriptHandler
 {
-    /**
-     * @param Event $event
-     */
-    public static function installPermissions(Event $event)
+    public static function installPermissions(Event $event): void
     {
         $options = static::getOptions($event);
+
+        /** @var string $binDir */
         $binDir = $options['symfony-bin-dir'];
 
         echo '>>> ModeraSecurityBundle: Install permissions'.PHP_EOL;
 
-        if (!is_dir($binDir)) {
-            echo 'The symfony-bin-dir ('.$binDir.') specified in composer.json was not found in '.getcwd().', can not install permissions.'.PHP_EOL;
+        if (!\is_dir($binDir)) {
+            echo 'The symfony-bin-dir ('.$binDir.') specified in composer.json was not found in '.\getcwd().', can not install permissions.'.PHP_EOL;
 
             return;
         }
 
-        static::executeCommand($event, $binDir, 'modera:security:install-permission-categories', $options['process-timeout']);
-        static::executeCommand($event, $binDir, 'modera:security:install-permissions', $options['process-timeout']);
+        /** @var int $processTimeout */
+        $processTimeout = $options['process-timeout'];
+
+        static::executeCommand($event, $binDir, 'modera:security:install-permission-categories', $processTimeout);
+        static::executeCommand($event, $binDir, 'modera:security:install-permissions', $processTimeout);
 
         echo '>>> ModeraSecurityBundle: done'.PHP_EOL;
     }

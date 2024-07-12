@@ -20,25 +20,17 @@ class RootUserHandlerInjectionListener
     /**
      * We have to inject container instead of instance of RootUserHandler service
      * because of when the latter is injected it results in circular dependencies.
-     *
-     * @var ContainerInterface
      */
-    private $container;
+    private ContainerInterface $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
-    /**
-     * @param LifecycleEventArgs $event
-     */
-    public function postLoad(LifecycleEventArgs $event)
+    public function postLoad(LifecycleEventArgs $event): void
     {
-        /* @var RootUserHandlerInterface $rootUserHandler */
+        /** @var RootUserHandlerInterface $rootUserHandler */
         $rootUserHandler = $this->container->get('modera_security.root_user_handling.handler');
 
         $entity = $event->getObject();

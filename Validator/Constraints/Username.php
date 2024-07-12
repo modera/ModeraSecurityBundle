@@ -14,12 +14,9 @@ use Symfony\Component\Validator\Constraint;
  */
 class Username extends Constraint
 {
-    public $service = 'modera_security.validator.username';
+    public string $service = 'modera_security.validator.username';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return $this->service;
     }

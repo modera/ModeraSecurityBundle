@@ -2,24 +2,28 @@
 
 namespace Modera\SecurityBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(name="modera_security_permission")
  *
- * @author Sergei Lissovski <sergei.lissovski@gmail.com>
+ * @author Sergei Lissovski <sergei.lissovski@modera.org>
  */
 class Permission
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * Name of symfony security role, something like "ROLE_USER".
@@ -28,64 +32,64 @@ class Permission
      *
      * @ORM\Column(type="string")
      */
-    private $roleName;
+    private ?string $roleName = null;
 
     /**
      * A name of this role that can be easily understood by administrator, for instance - "Access admin section".
      *
      * @ORM\Column(type="string", nullable=true)
      */
-    private $name;
+    private ?string $name = null;
 
     /**
      * @ORM\Column(type="string", nullable=true)
      */
-    private $description;
+    private ?string $description = null;
 
     /**
-     * @var int
      * @ORM\Column(type="integer")
      */
-    private $position = 0;
+    private int $position = 0;
 
     /**
+     * @var Collection<int, Permission>
+     *
      * @ORM\ManyToMany(targetEntity="Permission", cascade={"persist"})
+     *
      * @ORM\JoinTable(
      *     name="modera_security_rolehierarchy",
      *     joinColumns={@ORM\JoinColumn(name="permission_id", referencedColumnName="id")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="child_id", referencedColumnName="id")}
      * )
-     *
-     * @var Permission[]
      */
-    private $roles;
+    private Collection $roles;
 
     /**
-     * @var User[]
+     * @var Collection<int, UserInterface>
      *
      * @ORM\ManyToMany(targetEntity="User", inversedBy="permissions", cascade={"persist"})
+     *
      * @ORM\JoinTable(
      *     name="modera_security_permissionusers"
      * )
      */
-    private $users;
+    private Collection $users;
 
     /**
-     * @var Group[]
+     * @var Collection<int, Group>
      *
      * @ORM\ManyToMany(targetEntity="Group", inversedBy="permissions", cascade={"persist"})
+     *
      * @ORM\JoinTable(
      *     name="modera_security_permissiongroups"
      * )
      */
-    private $groups;
+    private Collection $groups;
 
     /**
-     * @var PermissionCategory
-     *
-     * @Orm\ManyToOne(targetEntity="PermissionCategory", inversedBy="permissions", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="PermissionCategory", inversedBy="permissions", cascade={"persist"})
      */
-    private $category;
+    private ?PermissionCategory $category = null;
 
     public function __construct()
     {
@@ -96,148 +100,152 @@ class Permission
 
     /**
      * @deprecated Use native ::class property
-     *
-     * @return string
      */
-    public static function clazz()
+    public static function clazz(): string
     {
-        @trigger_error(sprintf(
+        @\trigger_error(\sprintf(
             'The "%s()" method is deprecated. Use native ::class property.',
             __METHOD__
         ), \E_USER_DEPRECATED);
 
-        return get_called_class();
+        return \get_called_class();
     }
 
-    public function addUser(User $user)
+    public function addUser(UserInterface $user): void
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
         }
     }
 
-    public function addGroup(Group $group)
+    public function addGroup(Group $group): void
     {
         if (!$this->groups->contains($group)) {
             $this->groups[] = $group;
         }
     }
 
-    public function addRole(self $role)
+    public function addRole(self $role): void
     {
         $this->roles[] = $role;
     }
 
-    public function hasGroup(Group $group)
+    public function hasGroup(Group $group): bool
     {
         return $this->groups->contains($group);
     }
 
-    public function getRole()
+    public function getRole(): string
     {
         return $this->getRoleName();
     }
 
     // boilerplate:
 
-    /**
-     * @param int $position
-     */
-    public function setPosition($position)
+    public function setPosition(int $position): void
     {
         $this->position = $position;
     }
 
-    /**
-     * @return int
-     */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
 
-    public function setDescription($description)
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
     }
 
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setGroups($groups)
+    /**
+     * @param Collection<int, Group> $groups
+     */
+    public function setGroups(Collection $groups): void
     {
         $this->groups = $groups;
     }
 
-    public function getGroups()
+    /**
+     * @return Collection<int, Group>
+     */
+    public function getGroups(): Collection
     {
         return $this->groups;
     }
 
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setRoleName($roleName)
+    public function setRoleName(string $roleName): void
     {
         $this->roleName = $roleName;
     }
 
-    public function getRoleName()
+    public function getRoleName(): string
     {
-        return $this->roleName;
+        return $this->roleName ?? '';
     }
 
-    public function setRoles($roles)
+    /**
+     * @param Collection<int, Permission> $roles
+     */
+    public function setRoles(Collection $roles): void
     {
         $this->roles = $roles;
     }
 
-    public function getRoles()
+    /**
+     * @return Collection<int, Permission>
+     */
+    public function getRoles(): Collection
     {
         return $this->roles;
     }
 
-    public function setUsers($users)
+    /**
+     * @param Collection<int, UserInterface> $users
+     */
+    public function setUsers(Collection $users): void
     {
         $this->users = $users;
     }
 
-    public function getUsers()
+    /**
+     * @return Collection<int, UserInterface>
+     */
+    public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param PermissionCategory $category
-     */
-    public function setCategory($category)
+    public function setCategory(?PermissionCategory $category): void
     {
         $this->category = $category;
     }
 
-    /**
-     * @return PermissionCategory
-     */
-    public function getCategory()
+    public function getCategory(): ?PermissionCategory
     {
         return $this->category;
     }

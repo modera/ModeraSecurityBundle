@@ -2,10 +2,10 @@
 
 namespace Modera\SecurityBundle\Security;
 
-use Symfony\Component\Security\Core\User\UserInterface as CoreUserInterface;
+use Modera\SecurityBundle\Entity\UserInterface;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Modera\SecurityBundle\Model\UserInterface;
+use Symfony\Component\Security\Core\User\UserInterface as CoreUserInterface;
 
 /**
  * @author    Sergei Vizel <sergei.vizel@modera.org>
@@ -13,9 +13,6 @@ use Modera\SecurityBundle\Model\UserInterface;
  */
 class UserChecker implements UserCheckerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function checkPreAuth(CoreUserInterface $user): void
     {
         if (!$user instanceof UserInterface) {
@@ -29,9 +26,6 @@ class UserChecker implements UserCheckerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkPostAuth(CoreUserInterface $user): void
     {
         if (!$user instanceof UserInterface) {

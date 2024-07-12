@@ -21,8 +21,7 @@
         "symfony/security-bundle": "^5.4|^6.0",
         "symfony/framework-bundle": "^5.4|^6.0",
         "modera/foundation-bundle": "^5.0",
-        "modera/translations-bundle": "^5.0",
-        "sergeil/extjsintegration-bundle": "^3.0"
+        "modera/translations-bundle": "^5.0"
     },
     "require-dev": {
         "phake/phake": "^4.0",

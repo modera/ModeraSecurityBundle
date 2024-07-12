@@ -13,17 +13,19 @@ class GroupRepository extends EntityRepository
     /**
      * Finds group by refName.
      *
-     * Search is NOT case sensitive because of unique constrain.
+     * Search is NOT case-sensitive because of unique constrain.
      *
-     * @param $refName
-     *
-     * @return array
+     * @return Group[]
      */
-    public function findByRefName($refName)
+    public function findByRefName(string $refName): array
     {
-        return $this->getEntityManager()
+        /** @var Group[] $result */
+        $result = $this->getEntityManager()
             ->createQuery('SELECT g FROM ModeraSecurityBundle:Group g WHERE LOWER(g.refName) = LOWER(:refName)')
-            ->setParameter('refName', $refName)
-            ->getResult();
+                ->setParameter('refName', $refName)
+            ->getResult()
+        ;
+
+        return $result;
     }
 }

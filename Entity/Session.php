@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
  * @ORM\Table(
  *     name="modera_security_session",
  *     options={"collate":"utf8mb4_bin", "charset":"utf8mb4"},
@@ -19,6 +20,7 @@ class Session
 {
     /**
      * @ORM\Id
+     *
      * @ORM\Column(name="sess_id", type="binary", length=128, nullable=false)
      */
     protected ?string $id = null;

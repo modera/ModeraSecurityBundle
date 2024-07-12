@@ -17,17 +17,14 @@ class EmailValidator extends ConstraintValidator
 {
     public const PATTERN = '/^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         $errorMsg = 'This value is not a valid email address.';
-        if (class_exists('Modera\FoundationBundle\Translation\T')) {
+        if (\class_exists('Modera\FoundationBundle\Translation\T')) {
             $errorMsg = T::trans($errorMsg);
         }
 
-        $regex = new Constraints\Regex(array('pattern' => self::PATTERN));
+        $regex = new Constraints\Regex(['pattern' => self::PATTERN]);
         $regex->message = $errorMsg;
 
         $this->subValidate(
@@ -38,11 +35,9 @@ class EmailValidator extends ConstraintValidator
     }
 
     /**
-     * @param ConstraintValidator $validator
-     * @param mixed $value
-     * @param Constraint $constraint
+     * @param mixed $value Mixed value
      */
-    private function subValidate(ConstraintValidator $validator, $value, Constraint $constraint)
+    private function subValidate(ConstraintValidator $validator, $value, Constraint $constraint): void
     {
         $this->context->setConstraint($constraint);
         $validator->initialize($this->context);

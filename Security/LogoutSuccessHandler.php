@@ -2,9 +2,9 @@
 
 namespace Modera\SecurityBundle\Security;
 
-use Symfony\Component\Security\Http\Logout\DefaultLogoutSuccessHandler;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**
  * @internal
@@ -12,17 +12,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  * @author    Sergei Vizel <sergei.vizel@modera.org>
  * @copyright 2014 Modera Foundation
  */
-class LogoutSuccessHandler extends DefaultLogoutSuccessHandler
+class LogoutSuccessHandler implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function onLogoutSuccess(Request $request)
+    public static function getSubscribedEvents(): array
     {
-        if ($request->isXmlHttpRequest()) {
-            return new JsonResponse(array('success' => true));
-        } else {
-            return parent::onLogoutSuccess($request);
+        return [LogoutEvent::class => 'onLogout'];
+    }
+
+    public function onLogout(LogoutEvent $event): void
+    {
+        if ($event->getRequest()->isXmlHttpRequest()) {
+            $event->setResponse(new JsonResponse(['success' => true]));
         }
     }
 }

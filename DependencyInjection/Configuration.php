@@ -2,9 +2,9 @@
 
 namespace Modera\SecurityBundle\DependencyInjection;
 
+use Modera\SecurityBundle\PasswordStrength\PasswordConfigInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Modera\SecurityBundle\PasswordStrength\PasswordConfigInterface;
 
 /**
  * This is the class that validates and merges configuration from your app/config files.
@@ -13,10 +13,7 @@ use Modera\SecurityBundle\PasswordStrength\PasswordConfigInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('modera_security');
         $rootNode = $treeBuilder->getRootNode();
@@ -34,11 +31,11 @@ class Configuration implements ConfigurationInterface
                         // 'modera_security.root_user_handler.semantic_config_root_user_handler' service is used
                         // as 'root_user_handler'
                         ->variableNode('query')
-                            ->defaultValue(array('id' => 1))
+                            ->defaultValue(['id' => 1])
                             ->cannotBeEmpty()
                         ->end()
                         ->variableNode('roles') // * - means all privileges
-                            // it can also be array with roles names
+                            // it can also be an array with roles names
                             ->defaultValue('*')
                             ->cannotBeEmpty()
                         ->end()
@@ -48,13 +45,13 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(false)
                 ->end()
                 ->arrayNode('firewalls')
-                    ->defaultValue(array())
+                    ->defaultValue([])
                     ->prototype('array')
                         ->prototype('variable')->end()
                     ->end()
                 ->end()
                 ->arrayNode('access_control')
-                    ->defaultValue(array())
+                    ->defaultValue([])
                     ->prototype('array')
                         ->prototype('variable')->end()
                     ->end()
@@ -86,10 +83,10 @@ class Configuration implements ConfigurationInterface
                             ->beforeNormalization()
                                 ->always(function ($v) {
                                     $default = PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL;
-                                    if (is_bool($v) && $v) {
+                                    if (\is_bool($v) && $v) {
                                         return $default;
-                                    } else if (is_string($v)) {
-                                        if (!in_array($v, PasswordConfigInterface::LETTER_REQUIRED_TYPES)) {
+                                    } elseif (\is_string($v)) {
+                                        if (!\in_array($v, PasswordConfigInterface::LETTER_REQUIRED_TYPES)) {
                                             return $default;
                                         }
 
@@ -111,34 +108,36 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('categories')
-                            ->defaultValue(array())
+                            ->defaultValue([])
                             ->beforeNormalization()
                                 ->ifArray()
                                 ->then(function ($v) {
-                                    if (array_keys($v) !== range(0, count($v) - 1)) {
+                                    if (\array_keys($v) !== \range(0, \count($v) - 1)) {
                                         return $v;
                                     }
-                                    $arr = array_flip(array_reverse($v));
-                                    array_walk($arr, function (&$position) {
-                                        $position++;
+                                    $arr = \array_flip(\array_reverse($v));
+                                    \array_walk($arr, function (&$position) {
+                                        ++$position;
                                     });
+
                                     return $arr;
                                 })
                             ->end()
                             ->prototype('scalar')->end()
                         ->end()
-                        ->arrayNode('perrmissions')
-                            ->defaultValue(array())
+                        ->arrayNode('permissions')
+                            ->defaultValue([])
                             ->beforeNormalization()
                                 ->ifArray()
                                 ->then(function ($v) {
-                                    if (array_keys($v) !== range(0, count($v) - 1)) {
+                                    if (\array_keys($v) !== \range(0, \count($v) - 1)) {
                                         return $v;
                                     }
-                                    $arr = array_flip(array_reverse($v));
-                                    array_walk($arr, function (&$position) {
-                                        $position++;
+                                    $arr = \array_flip(\array_reverse($v));
+                                    \array_walk($arr, function (&$position) {
+                                        ++$position;
                                     });
+
                                     return $arr;
                                 })
                             ->end()

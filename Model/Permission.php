@@ -10,39 +10,25 @@ class Permission implements PermissionInterface
 {
     /**
      * @see PermissionInterface::getRole()
-     *
-     * @var string
      */
-    private $role;
+    private string $role;
 
     /**
      * @see PermissionInterface::getName()
-     *
-     * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @see PermissionInterface::getCategory()
-     *
-     * @var string
      */
-    private $category;
+    private ?string $category;
 
     /**
      * @see PermissionInterface::getDescription()
-     *
-     * @var string
      */
-    private $description;
+    private ?string $description;
 
-    /**
-     * @param string $name
-     * @param string $role
-     * @param string $category
-     * @param string $description
-     */
-    public function __construct($name, $role, $category = null, $description = null)
+    public function __construct(string $name, string $role, ?string $category = null, ?string $description = null)
     {
         $this->category = $category;
         $this->description = $description;
@@ -50,34 +36,22 @@ class Permission implements PermissionInterface
         $this->role = $role;
     }
 
-    /**
-     * @return string
-     */
-    public function getRole()
+    public function getRole(): string
     {
         return $this->role;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * @return string
-     */
-    public function getCategory()
+    public function getCategory(): ?string
     {
         return $this->category;
     }

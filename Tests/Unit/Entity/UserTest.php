@@ -2,6 +2,7 @@
 
 namespace Modera\SecurityBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Modera\SecurityBundle\Entity\Group;
 use Modera\SecurityBundle\Entity\Permission;
 use Modera\SecurityBundle\Entity\User;
@@ -48,11 +49,11 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $group = \Phake::mock(Group::class);
         \Phake::when($group)
             ->getPermissions()
-            ->thenReturn([$groupPermission])
+            ->thenReturn(new ArrayCollection([$groupPermission]))
         ;
 
         $user->addPermission($userPermission);
-        $user->setGroups([$group]);
+        $user->setGroups(new ArrayCollection([$group]));
 
         $userRoles = $user->getRawRoles();
 

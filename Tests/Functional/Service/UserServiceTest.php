@@ -3,6 +3,7 @@
 namespace Modera\SecurityBundle\Tests\Functional\Service;
 
 use Doctrine\ORM\Tools\SchemaTool;
+use Modera\SecurityBundle\Entity\PermissionCategory as PermissionCategoryEntity;
 use Modera\SecurityBundle\Entity\User;
 use Modera\SecurityBundle\Entity\Group;
 use Modera\SecurityBundle\Entity\Permission;
@@ -23,25 +24,27 @@ class UserServiceTest extends FunctionalTestCase
     /**
      * {@inheritdoc}
      */
-    public static function doSetUpBeforeClass()
+    public static function doSetUpBeforeClass(): void
     {
         self::$st = new SchemaTool(self::$em);
         self::$st->createSchema(array(
             self::$em->getClassMetadata(User::class),
             self::$em->getClassMetadata(Group::class),
             self::$em->getClassMetadata(Permission::class),
+            self::$em->getClassMetadata(PermissionCategoryEntity::class),
         ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function doTearDownAfterClass()
+    public static function doTearDownAfterClass(): void
     {
         self::$st->dropSchema(array(
             self::$em->getClassMetadata(User::class),
             self::$em->getClassMetadata(Group::class),
             self::$em->getClassMetadata(Permission::class),
+            self::$em->getClassMetadata(PermissionCategoryEntity::class),
         ));
     }
 

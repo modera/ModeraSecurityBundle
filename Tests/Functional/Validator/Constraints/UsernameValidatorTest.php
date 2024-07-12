@@ -56,9 +56,9 @@ class UsernameValidatorTest extends FunctionalTestCase
     private function createContext()
     {
         return new ExecutionContext(
-            self::$container->get('validator'),
+            self::getContainer()->get('validator'),
             '',
-            self::$container->get('translator')
+            self::getContainer()->get('translator')
         );
     }
 }

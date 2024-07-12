@@ -20,23 +20,14 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class StrongPasswordValidator extends ConstraintValidator
 {
-    /**
-     * @var PasswordConfigInterface
-     */
-    private $config;
+    private PasswordConfigInterface $config;
 
-    /**
-     * @param PasswordConfigInterface $config
-     */
     public function __construct(PasswordConfigInterface $config)
     {
         $this->config = $config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$this->config->isEnabled()) {
             return;
@@ -46,17 +37,17 @@ class StrongPasswordValidator extends ConstraintValidator
             $this->subValidate(
                 new LengthValidator(),
                 $value,
-                new Length(array('min' => $this->config->getMinLength()))
+                new Length(['min' => $this->config->getMinLength()])
             );
         }
 
         if ($this->config->isNumberRequired()) {
             $errorMsg = 'Password must contain at least one number character.';
-            if (class_exists('Modera\FoundationBundle\Translation\T')) {
+            if (\class_exists('Modera\FoundationBundle\Translation\T')) {
                 $errorMsg = T::trans($errorMsg);
             }
 
-            $regexConstraint = new Regex(array('pattern' => '/[0-9]/'));
+            $regexConstraint = new Regex(['pattern' => '/[0-9]/']);
             $regexConstraint->message = $errorMsg;
 
             $this->subValidate(
@@ -67,38 +58,40 @@ class StrongPasswordValidator extends ConstraintValidator
         }
 
         if ($this->config->isLetterRequired()) {
-            switch ($this->config->getLetterRequiredType()) {
+            switch ($type = $this->config->getLetterRequiredType()) {
                 case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL:
                     $pattern = '/[A-Za-z]/';
                     $errorMsg = 'Password must contain at least one letter.';
-                    if (class_exists('Modera\FoundationBundle\Translation\T')) {
+                    if (\class_exists('Modera\FoundationBundle\Translation\T')) {
                         $errorMsg = T::trans($errorMsg);
                     }
                     break;
                 case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_AND_NON_CAPITAL:
                     $pattern = '/(?=.*[A-Z])(?=.*[a-z])/';
                     $errorMsg = 'Password must contain at least one capital and one non-capital letter.';
-                    if (class_exists('Modera\FoundationBundle\Translation\T')) {
+                    if (\class_exists('Modera\FoundationBundle\Translation\T')) {
                         $errorMsg = T::trans($errorMsg);
                     }
                     break;
                 case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL:
                     $pattern = '/[A-Z]/';
                     $errorMsg = 'Password must contain at least one capital letter.';
-                    if (class_exists('Modera\FoundationBundle\Translation\T')) {
+                    if (\class_exists('Modera\FoundationBundle\Translation\T')) {
                         $errorMsg = T::trans($errorMsg);
                     }
                     break;
                 case PasswordConfigInterface::LETTER_REQUIRED_TYPE_NON_CAPITAL:
                     $pattern = '/[a-z]/';
                     $errorMsg = 'Password must contain at least one non-capital letter.';
-                    if (class_exists('Modera\FoundationBundle\Translation\T')) {
+                    if (\class_exists('Modera\FoundationBundle\Translation\T')) {
                         $errorMsg = T::trans($errorMsg);
                     }
                     break;
+                default:
+                    throw new \RuntimeException(\sprintf('Unsupported type: %s', $type));
             }
 
-            $regexConstraint = new Regex(array('pattern' => $pattern));
+            $regexConstraint = new Regex(['pattern' => $pattern]);
             $regexConstraint->message = $errorMsg;
 
             $this->subValidate(
@@ -110,11 +103,9 @@ class StrongPasswordValidator extends ConstraintValidator
     }
 
     /**
-     * @param ConstraintValidator $validator
-     * @param mixed $value
-     * @param Constraint $constraint
+     * @param mixed $value Mixed value
      */
-    private function subValidate(ConstraintValidator $validator, $value, Constraint $constraint)
+    private function subValidate(ConstraintValidator $validator, $value, Constraint $constraint): void
     {
         $this->context->setConstraint($constraint);
         $validator->initialize($this->context);

@@ -2,12 +2,14 @@
 
 namespace Modera\SecurityBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @Orm\Entity
- * @Orm\Table(name="modera_security_permissioncategory")
+ * @ORM\Entity
+ *
+ * @ORM\Table(name="modera_security_permissioncategory")
  *
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2014 Modera Foundation
@@ -16,37 +18,36 @@ class PermissionCategory
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(type="string")
      */
-    private $name;
+    private ?string $name;
 
     /**
      * @ORM\Column(type="string")
      */
-    private $technicalName;
+    private ?string $technicalName;
 
     /**
-     * @var int
      * @ORM\Column(type="integer")
      */
-    private $position = 0;
+    private int $position = 0;
 
     /**
-     * @Orm\OneToMany(targetEntity="Permission", mappedBy="category", cascade={"persist"})
+     * @var Collection<int, Permission>
+     *
+     * @ORM\OneToMany(targetEntity="Permission", mappedBy="category", cascade={"persist"})
      */
-    private $permissions;
+    private Collection $permissions;
 
-    /**
-     * @param string $name
-     * @param string $technicalName
-     */
-    public function __construct($name = null, $technicalName = null)
+    public function __construct(?string $name = null, ?string $technicalName = null)
     {
         $this->name = $name;
         $this->technicalName = $technicalName;
@@ -56,95 +57,69 @@ class PermissionCategory
 
     /**
      * @deprecated Use native ::class property
-     *
-     * @return string
      */
-    public static function clazz()
+    public static function clazz(): string
     {
-        @trigger_error(sprintf(
+        @\trigger_error(\sprintf(
             'The "%s()" method is deprecated. Use native ::class property.',
             __METHOD__
         ), \E_USER_DEPRECATED);
 
-        return get_called_class();
+        return \get_called_class();
     }
 
-    /**
-     * @param int $position
-     */
-    public function setPosition($position)
+    public function setPosition(int $position): void
     {
         $this->position = $position;
     }
 
-    /**
-     * @return int
-     */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
 
-    /**
-     * @param mixed $technicalName
-     */
-    public function setTechnicalName($technicalName)
+    public function setTechnicalName(string $technicalName): void
     {
         $this->technicalName = $technicalName;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getTechnicalName()
+    public function getTechnicalName(): string
     {
-        return $this->technicalName;
+        return $this->technicalName ?? '';
     }
 
     /**
-     * @param mixed $permissions
+     * @param Collection<int, Permission> $permissions
      */
-    public function setPermissions($permissions)
+    public function setPermissions(Collection $permissions): void
     {
         $this->permissions = $permissions;
     }
 
     /**
-     * @return mixed
+     * @return Collection<int, Permission>
      */
-    public function getPermissions()
+    public function getPermissions(): Collection
     {
         return $this->permissions;
     }
 
-    /**
-     * @param mixed $name
-     */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getName()
+    public function getName(): string
     {
-        return $this->name;
+        return $this->name ?? '';
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

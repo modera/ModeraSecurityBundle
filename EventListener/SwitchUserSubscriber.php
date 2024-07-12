@@ -2,15 +2,15 @@
 
 namespace Modera\SecurityBundle\EventListener;
 
+use Modera\SecurityBundle\ModeraSecurityBundle;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
-use Modera\SecurityBundle\ModeraSecurityBundle;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
  * @author    Sergei Vizel <sergei.vizel@modera.org>
@@ -18,29 +18,21 @@ use Modera\SecurityBundle\ModeraSecurityBundle;
  */
 class SwitchUserSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
-    private $redirectUri;
+    private ?string $redirectUri = null;
+
+    private ?string $usernameParameter = null;
 
     /**
-     * @var string
+     * @param array<string, mixed> $bundleConfig
      */
-    private $usernameParameter;
-
-    /**
-     * @param array $bundleConfig
-     */
-    public function __construct(array $bundleConfig = array()) {
-        if (isset($bundleConfig['switch_user']) && $bundleConfig['switch_user']) {
+    public function __construct(array $bundleConfig = [])
+    {
+        if (\is_array($bundleConfig['switch_user'] ?? null) && \is_string($bundleConfig['switch_user']['parameter'] ?? null)) {
             $this->usernameParameter = $bundleConfig['switch_user']['parameter'];
         }
     }
 
-    /**
-     * @param ResponseEvent $event
-     */
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if ($this->redirectUri) {
             $event->setResponse(new RedirectResponse($this->redirectUri));
@@ -48,13 +40,10 @@ class SwitchUserSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param SwitchUserEvent $event
-     */
-    public function onSwitchUser(SwitchUserEvent $event)
+    public function onSwitchUser(SwitchUserEvent $event): void
     {
         if ($this->usernameParameter) {
-            $request    = $event->getRequest();
+            $request = $event->getRequest();
             $targetUser = $event->getTargetUser();
 
             $username = $request->get($this->usernameParameter) ?: $request->headers->get($this->usernameParameter);
@@ -63,20 +52,17 @@ class SwitchUserSubscriber implements EventSubscriberInterface
                 $exit = false;
                 $token = $event->getToken();
                 if ($token instanceof SwitchUserToken) {
-                    $exit = $token->getOriginalToken()->getUser()->getUsername() === $targetUser->getUsername();
+                    $exit = $token->getOriginalToken()->getUser() && $token->getOriginalToken()->getUser()->getUserIdentifier() === $targetUser->getUserIdentifier();
                 }
 
-                if ($exit || in_array(ModeraSecurityBundle::ROLE_ROOT_USER, $targetUser->getRoles())) {
-                    $this->redirectUri = str_replace($targetUser->getUsername(), SwitchUserListener::EXIT_VALUE, $request->getUri());
+                if ($exit || \in_array(ModeraSecurityBundle::ROLE_ROOT_USER, $targetUser->getRoles())) {
+                    $this->redirectUri = \str_replace($targetUser->getUserIdentifier(), SwitchUserListener::EXIT_VALUE, $request->getUri());
                 }
             }
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::RESPONSE => 'onKernelResponse',

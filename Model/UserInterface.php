@@ -7,60 +7,36 @@ use Symfony\Component\Security\Core\Exception\DisabledException;
 /**
  * @author    Sergei Vizel <sergei.vizel@modera.org>
  * @copyright 2014 Modera Foundation
+ *
+ * @method ?string getUsername()
  */
 interface UserInterface
 {
-    const GENDER_MALE = 'm';
-    const GENDER_FEMALE = 'f';
+    public const GENDER_MALE = 'm';
+    public const GENDER_FEMALE = 'f';
 
-    const STATE_NEW = 0;
-    const STATE_ACTIVE = 1;
+    public const STATE_NEW = 0;
+    public const STATE_ACTIVE = 1;
 
-    /**
-     * @return string
-     */
-    public function getEmail();
+    public function getEmail(): ?string;
 
-    /**
-     * @return string|null
-     */
-    public function getPersonalId();
+    // public function getUsername(): ?string;
 
-    /**
-     * @return string|null
-     */
-    public function getFirstName();
+    public function getPersonalId(): ?string;
 
-    /**
-     * @return string|null
-     */
-    public function getLastName();
+    public function getFirstName(): ?string;
 
-    /**
-     * @return string|null
-     */
-    public function getMiddleName();
+    public function getLastName(): ?string;
 
-    /**
-     * @param string $pattern
-     * @return string
-     */
-    public function getFullName($pattern = 'first last');
+    public function getMiddleName(): ?string;
 
-    /**
-     * @return string|null
-     */
-    public function getGender();
+    public function getFullName(string $pattern = 'first last'): ?string;
 
-    /**
-     * @return int
-     */
-    public function getState();
+    public function getGender(): ?string;
 
-    /**
-     * @return \DateTime|null
-     */
-    public function getLastLogin();
+    public function getState(): int;
+
+    public function getLastLogin(): ?\DateTimeInterface;
 
     /**
      * Checks whether the user is enabled.
@@ -68,9 +44,9 @@ interface UserInterface
      * Internally, if this method returns false, the authentication system
      * will throw a DisabledException and prevent login.
      *
-     * @return bool true if the user is enabled, false otherwise
+     * true if the user is enabled, false otherwise
      *
      * @see DisabledException
      */
-    public function isEnabled();
+    public function isEnabled(): bool;
 }

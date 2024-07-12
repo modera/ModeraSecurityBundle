@@ -6,6 +6,9 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Modera\FoundationBundle\Testing\FunctionalTestCase;
 use Modera\SecurityBundle\Entity\Group;
+use Modera\SecurityBundle\Entity\Permission;
+use Modera\SecurityBundle\Entity\PermissionCategory as PermissionCategoryEntity;
+use Modera\SecurityBundle\Entity\User;
 
 /**
  * @author    Alex Plaksin <alex.plaksin@modera.net>
@@ -21,14 +24,14 @@ class GroupRepositoryTest extends FunctionalTestCase
     /**
      * {@inheritdoc}
      */
-    public static function doSetUpBeforeClass()
+    public static function doSetUpBeforeClass(): void
     {
         static::$st = new SchemaTool(static::$em);
         static::$st->dropSchema(static::getTableClassesMetadata());
         static::$st->createSchema(static::getTableClassesMetadata());
     }
 
-    public static function doTearDownAfterClass()
+    public static function doTearDownAfterClass(): void
     {
         static::$st->dropSchema(static::getTableClassesMetadata());
     }
@@ -81,7 +84,7 @@ class GroupRepositoryTest extends FunctionalTestCase
     /**
      * {@inheritdoc}
      */
-    protected static function getIsolationLevel()
+    protected static function getIsolationLevel(): string
     {
         return static::IM_CLASS;
     }
@@ -93,7 +96,12 @@ class GroupRepositoryTest extends FunctionalTestCase
      */
     private static function getTableClasses()
     {
-        return array(Group::class);
+        return [
+            User::class,
+            Group::class,
+            Permission::class,
+            PermissionCategoryEntity::class,
+        ];
     }
 
     /**

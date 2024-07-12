@@ -2,13 +2,14 @@
 
 namespace Modera\SecurityBundle\RootUserHandling;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\EntityManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Modera\SecurityBundle\DependencyInjection\ModeraSecurityExtension;
-use Modera\SecurityBundle\ModeraSecurityBundle;
 use Modera\SecurityBundle\Entity\Permission;
 use Modera\SecurityBundle\Entity\User;
+use Modera\SecurityBundle\Entity\UserInterface;
+use Modera\SecurityBundle\ModeraSecurityBundle;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This implementation will use semantic bundle configuration to retrieve information about root user.
@@ -21,75 +22,72 @@ use Modera\SecurityBundle\Entity\User;
 class SemanticConfigRootUserHandler implements RootUserHandlerInterface
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private $config;
+    private array $config;
 
-    /**
-     * @var EntityManager $em
-     */
-    private $em;
+    private EntityManagerInterface $em;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
+        /** @var array{
+         *     'root_user': array<string, mixed>,
+         *     'switch_user'?: array{'role': string}
+         * } $config
+         */
         $config = $container->getParameter(ModeraSecurityExtension::CONFIG_KEY);
 
         $this->config = $config['root_user'];
 
         $this->config['switch_user_role'] = null;
-        if (isset($config['switch_user']) && $config['switch_user']) {
+        if (\is_array($config['switch_user'] ?? null)) {
             $this->config['switch_user_role'] = $config['switch_user']['role'];
         }
 
-        $this->em = $container->get('doctrine.orm.entity_manager');
+        /** @var EntityManagerInterface $em */
+        $em = $container->get('doctrine.orm.entity_manager');
+        $this->em = $em;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isRootUser(User $user)
+    public function isRootUser(UserInterface $user): bool
     {
-        /* @var User $rootUser */
-        $rootUser = $this->getUser();
+        return $this->getUser()->isEqualTo($user);
+    }
+
+    public function getUser(): UserInterface
+    {
+        /** @var array<string, mixed> $query */
+        $query = $this->config['query'];
+
+        /** @var ?UserInterface $rootUser */
+        $rootUser = $this->em->getRepository(User::class)->findOneBy($query);
 
         if (!$rootUser) {
-            throw new RootUserNotFoundException('Unable to find root user using query: '.json_encode($this->config['query']));
+            throw new RootUserNotFoundException('Unable to find root user using query: '.\json_encode($query));
         }
 
-        return $rootUser->isEqualTo($user);
+        return $rootUser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getUser()
-    {
-        return $this->em->getRepository(User::class)->findOneBy($this->config['query']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRoles()
+    public function getRoles(): array
     {
         $roles = $this->config['roles'];
 
-        if (is_string($roles) && '*' == $roles) {
-            $query = sprintf('SELECT e.roleName FROM %s e', Permission::class);
+        if (\is_string($roles) && '*' === $roles) {
+            $query = \sprintf('SELECT e.roleName FROM %s e', Permission::class);
             $query = $this->em->createQuery($query);
+            /** @var array{'roleName': string}[] $result */
+            $result = $query->getResult(Query::HYDRATE_SCALAR);
 
-            $roleNames = array();
-            foreach ($query->getResult(Query::HYDRATE_SCALAR) as $roleName) {
+            $roleNames = [];
+            foreach ($result as $roleName) {
                 $roleNames[] = $roleName['roleName'];
             }
 
             $roles = $roleNames;
         }
 
-        if (!is_array($roles)) {
+        if (!\is_array($roles)) {
             throw new \RuntimeException('Neither "*" nor array is used to define root user roles!');
         }
 

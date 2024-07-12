@@ -2,21 +2,24 @@
 
 namespace Modera\SecurityBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Sli\ExtJsIntegrationBundle\DataMapping\PreferencesAwareUserInterface;
-use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Modera\SecurityBundle\PasswordStrength\BadPasswordException;
 use Modera\SecurityBundle\PasswordStrength\PasswordManager;
-use Modera\SecurityBundle\Validator\Constraints\Username;
+use Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface;
 use Modera\SecurityBundle\Validator\Constraints\Email;
+use Modera\SecurityBundle\Validator\Constraints\Username;
+use Modera\ServerCrudBundle\DataMapping\PreferencesAwareUserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="modera_security_user")
+ *
  * @ORM\Entity
+ *
  * @UniqueEntity("personalId")
  * @UniqueEntity("username")
  * @UniqueEntity("email")
@@ -28,94 +31,100 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
 {
     /**
      * @ORM\Column(type="integer")
+     *
      * @ORM\Id
+     *
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
      */
-    private $isActive;
+    private bool $isActive;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
      *
      * @Email
+     *
      * @Assert\NotBlank
      */
-    private $email;
+    private ?string $email = null;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
      *
      * @Username
+     *
      * @Assert\NotBlank
      */
-    private $username;
+    private ?string $username = null;
 
     /**
      * @ORM\Column(type="string", length=64)
      */
-    private $password;
+    private ?string $password = null;
 
     /**
      * @ORM\Column(type="string", length=32)
      */
-    private $salt;
+    private string $salt;
 
     /**
      * @ORM\Column(name="personal_id", type="string", nullable=true, unique=true)
      */
-    private $personalId;
+    private ?string $personalId = null;
 
     /**
      * @ORM\Column(name="first_name", type="string", nullable=true)
      */
-    private $firstName;
+    private ?string $firstName = null;
 
     /**
      * @ORM\Column(name="last_name", type="string", nullable=true)
      */
-    private $lastName;
+    private ?string $lastName = null;
 
     /**
      * @ORM\Column(name="middle_name", type="string", nullable=true)
      */
-    private $middleName;
+    private ?string $middleName = null;
 
     /**
      * @ORM\Column(type="string", length=1, nullable=true)
      */
-    private $gender;
+    private ?string $gender = null;
 
     /**
      * @ORM\Column(type="integer", nullable=false)
      */
-    protected $state = self::STATE_NEW;
+    protected int $state = self::STATE_NEW;
 
     /**
-     * @var \DateTime
      * @ORM\Column(name="last_login", type="datetime", nullable=true)
      */
-    private $lastLogin;
+    private ?\DateTimeInterface $lastLogin = null;
 
     /**
+     * @var Collection<int, Group>
+     *
      * @ORM\ManyToMany(targetEntity="Group", inversedBy="users", cascade={"persist"})
+     *
      * @ORM\JoinTable(
      *   name="modera_security_users_groups",
      *   joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
      *   inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id")}
      * )
      */
-    private $groups;
+    private Collection $groups;
 
     /**
-     * @var Permission[]
+     * @var Collection<int, Permission>
      *
      * @ORM\ManyToMany(targetEntity="Permission", mappedBy="users", cascade={"persist"})
      */
-    private $permissions;
+    private Collection $permissions;
 
     /**
      * You can use this field to keep meta-information associated with given user. To minimize chance of occurring
@@ -123,19 +132,18 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
      * example, if you have a bundle AcmeFooBundle which wants to save some values to this field then store all values
      * under "acme_foo" key.
      *
+     * @var array<string, mixed>
+     *
      * @ORM\Column(type="json")
      */
-    private $meta = array();
+    private array $meta = [];
 
-    /**
-     * @var RootUserHandlerInterface
-     */
-    private $rootUserHandler;
+    private ?RootUserHandlerInterface $rootUserHandler = null;
 
     public function __construct()
     {
         $this->isActive = true;
-        $this->salt = md5(uniqid(null, true));
+        $this->salt = \md5(\uniqid('', true));
 
         $this->groups = new ArrayCollection();
         $this->permissions = new ArrayCollection();
@@ -147,20 +155,13 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
      * @see #getRoles() method
      *
      * @private
-     *
-     * @param RootUserHandlerInterface $rootUserHandler
      */
-    public function init(RootUserHandlerInterface $rootUserHandler)
+    public function init(?RootUserHandlerInterface $rootUserHandler): void
     {
         $this->rootUserHandler = $rootUserHandler;
     }
 
-    /**
-     * @param Group $group
-     *
-     * @return bool
-     */
-    public function addToGroup(Group $group)
+    public function addToGroup(Group $group): bool
     {
         if (!$group->hasUser($this)) {
             $group->addUser($this);
@@ -171,10 +172,7 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
         return false;
     }
 
-    /**
-     * @param Permission $role
-     */
-    public function addPermission(Permission $role)
+    public function addPermission(Permission $role): void
     {
         $role->addUser($this);
         if (!$this->permissions->contains($role)) {
@@ -185,9 +183,9 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
     /**
      * @return Permission[]
      */
-    public function getRawRoles()
+    public function getRawRoles(): array
     {
-        $roles = array();
+        $roles = [];
         foreach ($this->getGroups() as $group) {
             foreach ($group->getPermissions() as $role) {
                 $roles[] = $role;
@@ -204,11 +202,9 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
      * This method also takes into account possibility that a user might be "root".
      *
      * @see #init() method
-     * @see \Modera\SecurityBundle\RootUserHandling\RootUserHandlerInterface
-     *
-     * {@inheritdoc}
+     * @see RootUserHandlerInterface
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         if ($this->rootUserHandler) {
             if ($this->rootUserHandler->isRootUser($this)) {
@@ -216,7 +212,7 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
             }
         }
 
-        $roles = array('ROLE_USER');
+        $roles = ['ROLE_USER'];
         foreach ($this->getRawRoles() as $role) {
             $roles[] = $role->getRoleName();
         }
@@ -224,21 +220,16 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
         return $roles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 
     /**
      * @deprecated Use User::isActive() method
-     *
-     * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
-        @trigger_error(sprintf(
+        @\trigger_error(sprintf(
             'The "%s()" method is deprecated. Use User::isActive() method.',
             __METHOD__
         ), \E_USER_DEPRECATED);
@@ -246,11 +237,12 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
         return $this->isActive;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isEqualTo(SymfonyUserInterface $user)
+    public function isEqualTo(SymfonyUserInterface $user): bool
     {
+        if (!($user instanceof static)) {
+            return false;
+        }
+
         if ($this->username !== $user->getUsername()) {
             return false;
         }
@@ -273,74 +265,63 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
     /**
      * @see \Serializable::serialize()
      */
-    public function serialize()
+    public function serialize(): ?string
     {
-        return serialize(array(
+        return \serialize([
             'id' => $this->id,
             'username' => $this->username,
             'password' => $this->password,
             'salt' => $this->salt,
             'isActive' => $this->isActive,
-        ));
+        ]);
     }
 
     /**
-     * {@inheritdoc}
+     * @see \Serializable::unserialize()
      */
-    public function unserialize($serialized)
+    public function unserialize($data): void
     {
-        foreach (unserialize($serialized) as $key => $value) {
+        /** @var array<string, mixed> $arr */
+        $arr = \unserialize($data);
+        foreach ($arr as $key => $value) {
             $this->{$key} = $value;
         }
     }
 
     /**
      * @deprecated Use native ::class property
-     *
-     * @return string
      */
-    public static function clazz()
+    public static function clazz(): string
     {
-        @trigger_error(sprintf(
+        @\trigger_error(\sprintf(
             'The "%s()" method is deprecated. Use native ::class property.',
             __METHOD__
         ), \E_USER_DEPRECATED);
 
-        return get_called_class();
+        return \get_called_class();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return bool
-     */
-    public function isActive()
+    public function isActive(): bool
     {
         return $this->isActive;
     }
 
-    /**
-     * @param bool $isActive
-     */
-    public function setActive($isActive)
+    public function setActive(bool $isActive): void
     {
         $this->isActive = $isActive;
     }
 
     /**
      * @deprecated Use User::isActive() method
-     *
-     * @return bool
      */
-    public function getIsActive()
+    public function getIsActive(): bool
     {
-        @trigger_error(sprintf(
+        @\trigger_error(sprintf(
             'The "%s()" method is deprecated. Use User::isActive() method.',
             __METHOD__
         ), \E_USER_DEPRECATED);
@@ -350,11 +331,10 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
 
     /**
      * @deprecated Use User::setActive() method
-     * @param bool $isActive
      */
-    public function setIsActive($isActive)
+    public function setIsActive(bool $isActive): void
     {
-        @trigger_error(sprintf(
+        @\trigger_error(sprintf(
             'The "%s()" method is deprecated. Use User::setActive() method.',
             __METHOD__
         ), \E_USER_DEPRECATED);
@@ -362,214 +342,147 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
         $this->setActive($isActive);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    /**
-     * @param string $email
-     */
-    public function setEmail($email)
+    public function setEmail(string $email): void
     {
-        $this->email = trim($email) ?: null;
+        $this->email = \trim($email) ?: null;
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
-        return $this->getUsername();
+        return $this->getUsername() ?? '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getUsername()
+    public function getUsername(): ?string
     {
         return $this->username;
     }
 
-    /**
-     * @param string $username
-     */
-    public function setUsername($username)
+    public function setUsername(string $username): void
     {
-        $this->username = trim($username) ?: null;
+        $this->username = \trim($username) ?: null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
     /**
-     * @since 2.56.0
-     *
      * @throws BadPasswordException
-     *
-     * @param PasswordManager $passwordManager
-     * @param string $plainPassword
      */
-    public function validateAndSetPassword(PasswordManager $passwordManager, $plainPassword)
+    public function validateAndSetPassword(PasswordManager $passwordManager, string $plainPassword): void
     {
         $passwordManager->encodeAndSetPassword($this, $plainPassword);
     }
 
     /**
      * Most of the time you want to use #validateAndSetPassword() method instead.
-     *
-     * @param string $encodedPassword
      */
-    public function setPassword($encodedPassword)
+    public function setPassword(string $encodedPassword): void
     {
         $this->password = $encodedPassword;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return $this->salt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setSalt($salt)
+    public function setSalt(string $salt): void
     {
         $this->salt = $salt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPersonalId()
+    public function getPersonalId(): ?string
     {
         return $this->personalId;
     }
 
-    /**
-     * @param string $personalId
-     */
-    public function setPersonalId($personalId)
+    public function setPersonalId(?string $personalId): void
     {
-        $this->personalId = preg_replace('/[^[:alnum:][:space:]-]/u', '', trim($personalId)) ?: null;
+        $this->personalId = \preg_replace('/[^[:alnum:][:space:]-]/u', '', \trim($personalId ?? '')) ?: null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFirstName()
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
 
-    /**
-     * @param string $firstName
-     */
-    public function setFirstName($firstName)
+    public function setFirstName(?string $firstName): void
     {
-        $this->firstName = preg_replace('/[^[:alnum:][:space:]-]/u', '', trim($firstName)) ?: null;
+        $this->firstName = \preg_replace('/[^[:alnum:][:space:]-]/u', '', \trim($firstName ?? '')) ?: null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLastName()
+    public function getLastName(): ?string
     {
         return $this->lastName;
     }
 
-    /**
-     * @param string $lastName
-     */
-    public function setLastName($lastName)
+    public function setLastName(?string $lastName): void
     {
-        $this->lastName = preg_replace('/[^[:alnum:][:space:]-]/u', '', trim($lastName)) ?: null;
+        $this->lastName = \preg_replace('/[^[:alnum:][:space:]-]/u', '', \trim($lastName ?? '')) ?: null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMiddleName()
+    public function getMiddleName(): ?string
     {
         return $this->middleName;
     }
 
-    /**
-     * @param string $middleName
-     */
-    public function setMiddleName($middleName)
+    public function setMiddleName(?string $middleName): void
     {
-        $this->middleName = preg_replace('/[^[:alnum:][:space:]-]/u', '', trim($middleName)) ?: null;
+        $this->middleName = \preg_replace('/[^[:alnum:][:space:]-]/u', '', \trim($middleName ?? '')) ?: null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFullName($pattern = 'first last')
+    public function getFullName(string $pattern = 'first last'): ?string
     {
-        $data = array(
+        $data = [
             'first' => $this->getFirstName(),
             'last' => $this->getLastName(),
             'middle' => $this->getMiddleName(),
-        );
+        ];
 
-        $keys = array();
-        $values = array();
+        $keys = [];
+        $values = [];
         foreach ($data as $key => $value) {
             $keys[] = '/\b'.$key.'\b/';
             $values[] = $value;
         }
 
-        $name = trim(preg_replace($keys, $values, $pattern));
+        $name = \trim(\preg_replace($keys, $values, $pattern) ?? '');
 
         if (!$name) {
-            return $this->getUsername();
+            return $this->getUsername(); // TODO: return NULL
         }
 
         return $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getGender()
+    public function getGender(): ?string
     {
         return $this->gender;
     }
 
-    /**
-     * @param string $gender
-     */
-    public function setGender($gender)
+    public function setGender(?string $gender): void
     {
-        $gender = strtolower($gender);
-        if (!in_array($gender, array(self::GENDER_MALE, self::GENDER_FEMALE))) {
+        $gender = \strtolower($gender ?? '');
+        if (!\in_array($gender, [self::GENDER_MALE, self::GENDER_FEMALE])) {
             $gender = null;
         }
 
         $this->gender = $gender;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getState()
+    public function getState(): int
     {
         return $this->state;
     }
 
-    /**
-     * @param int $state
-     */
-    public function setState($state)
+    public function setState(int $state): void
     {
         if (self::STATE_ACTIVE !== $state) {
             $state = self::STATE_NEW;
@@ -578,75 +491,66 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
         $this->state = $state;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLastLogin()
+    public function getLastLogin(): ?\DateTimeInterface
     {
         return $this->lastLogin;
     }
 
-    /**
-     * @param \DateTime $lastLogin
-     */
-    public function setLastLogin($lastLogin)
+    public function setLastLogin(\DateTimeInterface $lastLogin): void
     {
         $this->lastLogin = $lastLogin;
     }
 
     /**
-     * @param Group[] $groups
+     * @param Collection<int, Group> $groups
      */
-    public function setGroups($groups)
+    public function setGroups(Collection $groups): void
     {
         $this->groups = $groups;
     }
 
     /**
-     * @return Group[]
+     * @return Collection<int, Group>
      */
-    public function getGroups()
+    public function getGroups(): Collection
     {
         return $this->groups;
     }
 
     /**
-     * @return Permission[]
+     * @return Collection<int, Permission>
      */
-    public function getPermissions()
+    public function getPermissions(): Collection
     {
         return $this->permissions;
     }
 
-    /**
-     * @return array
-     */
-    public function getMeta()
+    public function getMeta(): array
     {
         return $this->meta;
     }
 
     /**
-     * @param array $meta
+     * @param array<string, mixed> $meta
      */
-    public function setMeta(array $meta)
+    public function setMeta(array $meta): void
     {
         $this->meta = $meta;
     }
 
-    public function clearMeta()
+    public function clearMeta(): void
     {
-        $this->meta = array();
+        $this->meta = [];
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string, string>
      */
-    public function getPreferences()
+    public function getPreferences(): array
     {
-        return array(
+        return [
             PreferencesAwareUserInterface::SETTINGS_DATE_FORMAT => 'Y-m-d',
             PreferencesAwareUserInterface::SETTINGS_DATETIME_FORMAT => 'Y-m-d H:i:s',
-        );
+        ];
     }
 }

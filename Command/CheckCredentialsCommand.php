@@ -3,13 +3,13 @@
 namespace Modera\SecurityBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Modera\SecurityBundle\Entity\User;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Modera\SecurityBundle\Entity\User;
 
 /**
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
@@ -29,10 +29,7 @@ class CheckCredentialsCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('modera:security:check-credentials')
@@ -43,26 +40,33 @@ class CheckCredentialsCommand extends Command
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var string $username */
         $username = $input->getOption('username');
+
+        /** @var string $password */
         $password = $input->getOption('password');
 
-        $criteria = array();
-        $criteria[$input->getArgument('property')] = $username;
+        /** @var string $property */
+        $property = $input->getArgument('property');
 
-        $user =  $this->em->getRepository(User::class)->findOneBy($criteria);
+        /** @var array<string, mixed> $criteria */
+        $criteria = [
+            $property => $username,
+        ];
+
+        $user = $this->em->getRepository(User::class)->findOneBy($criteria);
 
         if (!$user) {
             $output->writeln(sprintf('<error>User "%s" not found!</error>', $username));
+
             return 1;
         }
 
         if (!$this->encoder->isPasswordValid($user, $password)) {
             $output->writeln('<error>Password not valid!</error>');
+
             return 2;
         }
 

@@ -3,7 +3,7 @@
 namespace Modera\SecurityBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as Controller;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -23,18 +23,18 @@ class SecurityController extends Controller
     /**
      * @Route("/login", name="_security_login")
      */
-    public function loginAction()
+    public function loginAction(): Response
     {
-        return $this->render('@ModeraSecurity/security/login.html.twig', array(
+        return $this->render('@ModeraSecurity/security/login.html.twig', [
             'last_username' => $this->helper->getLastUsername(),
             'error' => $this->helper->getLastAuthenticationError(),
-        ));
+        ]);
     }
 
     /**
      * @Route("/login_check", name="_security_check")
      */
-    public function securityCheckAction()
+    public function securityCheckAction(): void
     {
         // The security layer will intercept this request
     }
@@ -42,7 +42,7 @@ class SecurityController extends Controller
     /**
      * @Route("/logout", name="_security_logout")
      */
-    public function logoutAction()
+    public function logoutAction(): void
     {
         // The security layer will intercept this request
     }

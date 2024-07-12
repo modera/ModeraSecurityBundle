@@ -17,9 +17,9 @@ class BCLayerTest extends AbstractTestCase
      */
     private $bcLayer;
 
-    public function doSetUp()
+    public function doSetUp(): void
     {
-        $this->bcLayer = self::$container->get('modera_security.data_installation.bc_layer');
+        $this->bcLayer = self::getContainer()->get('modera_security.data_installation.bc_layer');
     }
 
     public function testSyncPermissionCategoryTechnicalNamesInDatabase_onlyOldCategoryExists()

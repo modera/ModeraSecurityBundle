@@ -8,20 +8,23 @@ namespace Modera\SecurityBundle\PasswordStrength;
  */
 class BadPasswordException extends \RuntimeException
 {
-    private $errors = array();
+    /**
+     * @var string[]
+     */
+    private array $errors = [];
 
     /**
-     * @param array $errors
+     * @param string[] $errors
      */
-    public function setErrors(array $errors = array())
+    public function setErrors(array $errors = []): void
     {
         $this->errors = $errors;
     }
 
     /**
-     * @param array $errors
+     * @return string[]
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }

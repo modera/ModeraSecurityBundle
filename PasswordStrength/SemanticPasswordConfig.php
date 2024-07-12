@@ -9,63 +9,58 @@ namespace Modera\SecurityBundle\PasswordStrength;
 class SemanticPasswordConfig implements PasswordConfigInterface
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private $semanticConfig = array();
+    private array $semanticConfig = [];
 
     /**
-     * @param array $bundleSemanticConfig
+     * @param array<string, mixed> $bundleSemanticConfig
      */
     public function __construct(array $bundleSemanticConfig)
     {
-        $this->semanticConfig = $bundleSemanticConfig['password_strength'];
+        /** @var array<string, mixed> $semanticConfig */
+        $semanticConfig = $bundleSemanticConfig['password_strength'];
+        $this->semanticConfig = $semanticConfig;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMinLength()
+    public function getMinLength(): int
     {
-        return $this->semanticConfig['min_length'];
+        /** @var int $minLength */
+        $minLength = $this->semanticConfig['min_length'];
+
+        return $minLength;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isNumberRequired()
+    public function isNumberRequired(): bool
     {
-        return $this->isEnabled() ? $this->semanticConfig['number_required'] : false;
+        return $this->isEnabled() && false !== $this->semanticConfig['number_required'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isLetterRequired()
+    public function isLetterRequired(): bool
     {
-        return $this->isEnabled() ? false !== $this->semanticConfig['letter_required'] : false;
+        return $this->isEnabled() && false !== $this->semanticConfig['letter_required'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getLetterRequiredType()
+    public function getLetterRequiredType(): string
     {
-        return $this->semanticConfig['letter_required'];
+        if (\is_string($this->semanticConfig['letter_required'])) {
+            return $this->semanticConfig['letter_required'];
+        }
+
+        return PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRotationPeriodInDays()
+    public function getRotationPeriodInDays(): ?int
     {
-        return $this->isEnabled() ? $this->semanticConfig['rotation_period'] : false;
+        if ($this->isEnabled() && \is_int($this->semanticConfig['rotation_period'])) {
+            return $this->semanticConfig['rotation_period'];
+        }
+
+        return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
-        return $this->semanticConfig['enabled'];
+        return true === $this->semanticConfig['enabled'];
     }
 }

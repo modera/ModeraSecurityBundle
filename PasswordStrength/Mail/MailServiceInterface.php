@@ -2,7 +2,7 @@
 
 namespace Modera\SecurityBundle\PasswordStrength\Mail;
 
-use Modera\SecurityBundle\Entity\User;
+use Modera\SecurityBundle\Entity\UserInterface;
 
 /**
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
@@ -10,9 +10,5 @@ use Modera\SecurityBundle\Entity\User;
  */
 interface MailServiceInterface
 {
-    /**
-     * @param User $user
-     * @param string $plainPassword
-     */
-    public function sendPassword(User $user, $plainPassword);
+    public function sendPassword(UserInterface $user, string $plainPassword): void;
 }

@@ -27,7 +27,6 @@ parameters:
                 success_handler: modera_security.security.authenticator
             logout:
                 path: _security_logout
-                success_handler: modera_security.security.logout_success_handler
             remember_me:
                 secret: '%modera_security.firewalls.remember_me.secret%'
                 lifetime: 31536000 # 365 days in seconds

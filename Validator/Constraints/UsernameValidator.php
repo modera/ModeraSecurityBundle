@@ -16,17 +16,14 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class UsernameValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         $errorMsg = 'This value can only contain characters that are allowed in e-mail addresses.';
         if (class_exists('Modera\FoundationBundle\Translation\T')) {
             $errorMsg = T::trans($errorMsg);
         }
 
-        $regex = new Regex(array('pattern' => '/^[a-zA-Z0-9\._!#$%&’*+\/=?^`{|}~@-]+$/'));
+        $regex = new Regex(['pattern' => '/^[a-zA-Z0-9\._!#$%&’*+\/=?^`{|}~@-]+$/']);
         $regex->message = $errorMsg;
 
         $this->subValidate(
@@ -37,11 +34,9 @@ class UsernameValidator extends ConstraintValidator
     }
 
     /**
-     * @param ConstraintValidator $validator
-     * @param mixed $value
-     * @param Constraint $constraint
+     * @param mixed $value Mixed value
      */
-    private function subValidate(ConstraintValidator $validator, $value, Constraint $constraint)
+    private function subValidate(ConstraintValidator $validator, $value, Constraint $constraint): void
     {
         $this->context->setConstraint($constraint);
         $validator->initialize($this->context);

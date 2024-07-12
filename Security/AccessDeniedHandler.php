@@ -2,8 +2,9 @@
 
 namespace Modera\SecurityBundle\Security;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 
@@ -13,18 +14,17 @@ use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
  */
 class AccessDeniedHandler implements AccessDeniedHandlerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(Request $request, AccessDeniedException $accessDeniedException)
+    public function handle(Request $request, AccessDeniedException $accessDeniedException): ?Response
     {
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(
-                array(
+                [
                     'success' => false,
                     'message' => $accessDeniedException->getMessage(),
-                )
+                ]
             );
         }
+
+        return null;
     }
 }

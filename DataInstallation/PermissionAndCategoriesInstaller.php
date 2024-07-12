@@ -2,13 +2,13 @@
 
 namespace Modera\SecurityBundle\DataInstallation;
 
-use Doctrine\ORM\EntityManager;
-use Sli\ExpanderBundle\Ext\ContributorInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Modera\ExpanderBundle\Ext\ContributorInterface;
 use Modera\FoundationBundle\Utils\DeprecationNoticeEmitter;
+use Modera\SecurityBundle\Entity\Permission;
+use Modera\SecurityBundle\Entity\PermissionCategory;
 use Modera\SecurityBundle\Model\PermissionCategoryInterface;
 use Modera\SecurityBundle\Model\PermissionInterface;
-use Modera\SecurityBundle\Entity\PermissionCategory;
-use Modera\SecurityBundle\Entity\Permission;
 
 /**
  * Service responsible for installing permissions and permission categories so later they can be used to manage
@@ -19,80 +19,61 @@ use Modera\SecurityBundle\Entity\Permission;
  */
 class PermissionAndCategoriesInstaller
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    private EntityManagerInterface $em;
+
+    private ContributorInterface $permissionCategoriesProvider;
+
+    private ContributorInterface $permissionsProvider;
+
+    private ?BCLayer $bcLayer;
+
+    private ?DeprecationNoticeEmitter $deprecationNoticeEmitter;
 
     /**
-     * @var ContributorInterface
+     * @var array{'categories': array<string, int>, 'permissions': array<string, int>}
      */
-    private $permissionCategoriesProvider;
+    private array $sortingPosition;
 
     /**
-     * @var ContributorInterface
-     */
-    private $permissionsProvider;
-
-    /**
-     * @var BCLayer
-     */
-    private $bcLayer;
-
-    /**
-     * @var DeprecationNoticeEmitter
-     */
-    private $deprecationNoticeEmitter;
-
-    /**
-     * @var array
-     */
-    private $sortingPosition;
-
-    /**
-     * @internal Since 2.54.0
+     * @internal
      *
-     * @param EntityManager            $em
-     * @param ContributorInterface     $permissionCategoriesProvider
-     * @param ContributorInterface     $permissionsProvider
-     * @param BCLayer                  $bcLayer
-     * @param DeprecationNoticeEmitter $deprecationNoticeEmitter
+     * @param array{'categories'?: array<string, int>, 'permissions'?: array<string, int>} $sortingPosition
      */
     public function __construct(
-        EntityManager $em,
+        EntityManagerInterface $em,
         ContributorInterface $permissionCategoriesProvider,
         ContributorInterface $permissionsProvider,
-        BCLayer $bcLayer = null,
-        DeprecationNoticeEmitter $deprecationNoticeEmitter = null,
-        array $sortingPosition = array()
+        ?BCLayer $bcLayer = null,
+        ?DeprecationNoticeEmitter $deprecationNoticeEmitter = null,
+        array $sortingPosition = []
     ) {
         $this->em = $em;
         $this->permissionCategoriesProvider = $permissionCategoriesProvider;
         $this->permissionsProvider = $permissionsProvider;
         $this->bcLayer = $bcLayer;
         $this->deprecationNoticeEmitter = $deprecationNoticeEmitter;
-        $this->sortingPosition = array_merge(array(
-            'categories' => array(),
-            'perrmissions' => array(),
-        ), $sortingPosition);
+        $this->sortingPosition = \array_merge([
+            'categories' => [],
+            'permissions' => [],
+        ], $sortingPosition);
     }
 
     /**
-     * @return array
+     * @return array{'installed': int}
      */
-    public function installCategories()
+    public function installCategories(): array
     {
         $permissionCategoriesInstalled = 0;
         $sortingPosition = $this->sortingPosition['categories'];
 
-        /* @var PermissionCategoryInterface[] $permissionCategories */
+        /** @var PermissionCategoryInterface[] $permissionCategories */
         $permissionCategories = $this->permissionCategoriesProvider->getItems();
-        if (count($permissionCategories) > 0) {
+        if (\count($permissionCategories) > 0) {
             foreach ($permissionCategories as $permissionCategory) {
-                /* @var PermissionCategory $entityPermissionCategory */
-                $entityPermissionCategory = $this->em->getRepository(PermissionCategory::class)->findOneBy(array(
+                /** @var ?PermissionCategory $entityPermissionCategory */
+                $entityPermissionCategory = $this->em->getRepository(PermissionCategory::class)->findOneBy([
                     'technicalName' => $permissionCategory->getTechnicalName(),
-                ));
+                ]);
 
                 if (!$entityPermissionCategory) {
                     $entityPermissionCategory = new PermissionCategory();
@@ -119,26 +100,26 @@ class PermissionAndCategoriesInstaller
             $this->bcLayer->syncPermissionCategoryTechnicalNamesInDatabase();
         }
 
-        return array(
+        return [
             'installed' => $permissionCategoriesInstalled,
-            //'removed' => 0,
-        );
+            // 'removed' => 0,
+        ];
     }
 
     /**
-     * @return array
+     * @return array{'installed': int}
      */
-    public function installPermissions()
+    public function installPermissions(): array
     {
         $permissionInstalled = 0;
-        $sortingPosition = $this->sortingPosition['perrmissions'];
+        $sortingPosition = $this->sortingPosition['permissions'];
 
-        /* @var PermissionInterface[] $permissions */
+        /** @var PermissionInterface[] $permissions */
         $permissions = $this->permissionsProvider->getItems();
         foreach ($permissions as $permission) {
-            $entityPermission = $this->em->getRepository(Permission::class)->findOneBy(array(
+            $entityPermission = $this->em->getRepository(Permission::class)->findOneBy([
                 'roleName' => $permission->getRole(),
-            ));
+            ]);
 
             if (!$entityPermission) {
                 $entityPermission = new Permission();
@@ -159,23 +140,24 @@ class PermissionAndCategoriesInstaller
             $entityPermission->setPosition($position);
 
             $categoryTechnicalName = $permission->getCategory();
-            if ($this->bcLayer) {
+            if ($this->bcLayer && $categoryTechnicalName) {
                 // MPFE-964, see \Modera\BackendSecurityBundle\Contributions\PermissionCategoriesProvider
                 $newCategoryName = $this->bcLayer->resolveNewPermissionCategoryTechnicalName($categoryTechnicalName);
-                if (false !== $newCategoryName) {
-                    $this->emitDeprecationNotice(sprintf(
+                if (null !== $newCategoryName) {
+                    $this->emitDeprecationNotice(\sprintf(
                         'Permission category "%s" is deprecated, you must use "%s" category instead when contributing new permissions.',
-                        $categoryTechnicalName, $newCategoryName
+                        $categoryTechnicalName,
+                        $newCategoryName
                     ));
 
                     $categoryTechnicalName = $newCategoryName;
                 }
             }
 
-            /* @var PermissionCategory $category */
-            $category = $this->em->getRepository(PermissionCategory::class)->findOneBy(array(
+            /** @var ?PermissionCategory $category */
+            $category = $this->em->getRepository(PermissionCategory::class)->findOneBy([
                 'technicalName' => $categoryTechnicalName,
-            ));
+            ]);
             if ($category) {
                 $entityPermission->setCategory($category);
             }
@@ -183,13 +165,13 @@ class PermissionAndCategoriesInstaller
 
         $this->em->flush();
 
-        return array(
+        return [
             'installed' => $permissionInstalled,
-            //'removed' => 0,
-        );
+            // 'removed' => 0,
+        ];
     }
 
-    private function emitDeprecationNotice($notice)
+    private function emitDeprecationNotice(string $notice): void
     {
         if ($this->deprecationNoticeEmitter) {
             $this->deprecationNoticeEmitter->emit($notice);

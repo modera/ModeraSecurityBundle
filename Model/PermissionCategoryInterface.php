@@ -13,15 +13,11 @@ interface PermissionCategoryInterface
     /**
      * A unique ID that can later be used by {@class PermissionInterface} to refer a category, for example:
      * "customer_support".
-     *
-     * @return string
      */
-    public function getTechnicalName();
+    public function getTechnicalName(): string;
 
     /**
-     * A human readable name of a category, for example - "Customer support".
-     *
-     * @return string
+     * A human-readable name of a category, for example - "Customer support".
      */
-    public function getName();
+    public function getName(): string;
 }

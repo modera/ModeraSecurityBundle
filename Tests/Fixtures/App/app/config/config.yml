@@ -3,9 +3,11 @@ imports:
     - { resource: "@ModeraSecurityBundle/Resources/config/security.yml" }
 
 framework:
+    test: true
     secret:          Hell yeah!
     csrf_protection: true
     session:         ~
+    annotations:     ~
     validation:      { enable_annotations: true }
     translator:      { fallback: '%locale%' }
     router:

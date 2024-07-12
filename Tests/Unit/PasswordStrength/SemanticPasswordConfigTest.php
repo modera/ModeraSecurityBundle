@@ -19,32 +19,32 @@ class SemanticPasswordConfigTest extends \PHPUnit\Framework\TestCase
     {
         $this->config = new SemanticPasswordConfig(array(
             'password_strength' => array(
-                'enabled' => 'foo1',
-                'number_required' => 'foo2',
-                'letter_required' => 'foo3',
-                'rotation_period' => 'foo4',
+                'enabled' => true,
+                'number_required' => true,
+                'letter_required' => 'test',
+                'rotation_period' => 123,
             ),
         ));
     }
 
     public function testIsEnabled()
     {
-        $this->assertEquals('foo1', $this->config->isEnabled());
+        $this->assertTrue($this->config->isEnabled());
     }
 
     public function testNumberRequired()
     {
-        $this->assertEquals('foo2', $this->config->isNumberRequired());
+        $this->assertTrue($this->config->isNumberRequired());
     }
 
     public function testLetterRequired()
     {
         $this->assertTrue($this->config->isLetterRequired());
-        $this->assertEquals('foo3', $this->config->getLetterRequiredType());
+        $this->assertEquals('test', $this->config->getLetterRequiredType());
     }
 
     public function testRotationPeriod()
     {
-        $this->assertEquals('foo4', $this->config->getRotationPeriodInDays());
+        $this->assertEquals(123, $this->config->getRotationPeriodInDays());
     }
 }

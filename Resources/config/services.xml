@@ -104,7 +104,7 @@
                  public="true">
 
             <argument type="service" id="modera_security.password_strength.password_config" />
-            <argument type="service" id="security.password_encoder" />
+            <argument type="service" id="security.password_hasher" />
             <argument type="service" id="validator" />
             <argument type="service" id="modera_security.password_strength.mail.mail_service" />
         </service>

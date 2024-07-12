@@ -24,7 +24,7 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit\Framework\TestCase
             ),
         );
 
-        $em = \Phake::mock('Doctrine\ORM\EntityManager');
+        $em = \Phake::mock('Doctrine\ORM\EntityManagerInterface');
 
         \Phake::when($container)->getParameter(ModeraSecurityExtension::CONFIG_KEY)->thenReturn($bundleConfig);
         \Phake::when($container)->get('doctrine.orm.entity_manager')->thenReturn($em);
@@ -32,20 +32,23 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit\Framework\TestCase
         $handler = new SemanticConfigRootUserHandler($container);
 
         $anonymousUser = \Phake::mock(User::class);
+        $rootUser = \Phake::mock(User::class);
 
         $dbUser = \Phake::mock(User::class);
-        \Phake::when($dbUser)->isEqualTo($anonymousUser)->thenReturn('dat is true');
+        \Phake::when($dbUser)->isEqualTo($anonymousUser)->thenReturn(false);
+        \Phake::when($dbUser)->isEqualTo($rootUser)->thenReturn(true);
 
         $userRepository = \Phake::mock('Doctrine\Persistence\ObjectRepository');
         \Phake::when($userRepository)->findOneBy($bundleConfig['root_user']['query'])->thenReturn($dbUser);
         \Phake::when($em)->getRepository(User::class)->thenReturn($userRepository);
 
-        $this->assertEquals('dat is true', $handler->isRootUser($anonymousUser));
+        $this->assertFalse($handler->isRootUser($anonymousUser));
+        $this->assertTrue($handler->isRootUser($rootUser));
     }
 
     public function testGetRolesWithAsterisk()
     {
-        $em = \Phake::mock('Doctrine\ORM\EntityManager');
+        $em = \Phake::mock('Doctrine\ORM\EntityManagerInterface');
         $container = \Phake::mock('Symfony\Component\DependencyInjection\ContainerInterface');
         $bundleConfig = array(
             'root_user' => array(
@@ -71,6 +74,7 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRolesAsArray()
     {
+        $em = \Phake::mock('Doctrine\ORM\EntityManagerInterface');
         $container = \Phake::mock('Symfony\Component\DependencyInjection\ContainerInterface');
         $bundleConfig = array(
             'root_user' => array(
@@ -79,6 +83,7 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit\Framework\TestCase
         );
 
         \Phake::when($container)->getParameter(ModeraSecurityExtension::CONFIG_KEY)->thenReturn($bundleConfig);
+        \Phake::when($container)->get('doctrine.orm.entity_manager')->thenReturn($em);
 
         $handler = new SemanticConfigRootUserHandler($container);
 
@@ -87,10 +92,11 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testGetRolesNeitherStringNorArrayDefined()
     {
+        $em = \Phake::mock('Doctrine\ORM\EntityManagerInterface');
         $container = \Phake::mock('Symfony\Component\DependencyInjection\ContainerInterface');
         $bundleConfig = array(
             'root_user' => array(
@@ -99,6 +105,7 @@ class SemanticConfigRootUserHandlerTest extends \PHPUnit\Framework\TestCase
         );
 
         \Phake::when($container)->getParameter(ModeraSecurityExtension::CONFIG_KEY)->thenReturn($bundleConfig);
+        \Phake::when($container)->get('doctrine.orm.entity_manager')->thenReturn($em);
 
         $handler = new SemanticConfigRootUserHandler($container);
 

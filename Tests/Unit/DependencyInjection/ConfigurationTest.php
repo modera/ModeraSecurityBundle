@@ -64,7 +64,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $expected = false;
         if (is_bool($value) && $value) {
             $expected = PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL;
-        } else if (is_string($value)) {
+        } elseif (is_string($value)) {
             $expected = $value;
             if (!in_array($value, PasswordConfigInterface::LETTER_REQUIRED_TYPES)) {
                 $expected = PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL;

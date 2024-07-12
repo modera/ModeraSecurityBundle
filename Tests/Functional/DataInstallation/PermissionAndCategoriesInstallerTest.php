@@ -8,7 +8,7 @@ use Modera\SecurityBundle\DataInstallation\BCLayer;
 use Modera\SecurityBundle\DataInstallation\PermissionAndCategoriesInstaller;
 use Modera\SecurityBundle\Model\Permission;
 use Modera\SecurityBundle\Model\PermissionCategory;
-use Sli\ExpanderBundle\Ext\ContributorInterface;
+use Modera\ExpanderBundle\Ext\ContributorInterface;
 use Modera\SecurityBundle\Entity\PermissionCategory as PermissionCategoryEntity;
 use Modera\SecurityBundle\Entity\Permission as PermissionEntity;
 
@@ -29,7 +29,7 @@ class PermissionAndCategoriesInstallerTest extends AbstractTestCase
     /**
      * {@inheritdoc}
      */
-    public function doSetUp()
+    public function doSetUp(): void
     {
         $this->permissionCategoriesProvider = $this->createMock(ContributorInterface::CLAZZ);
         $this->permissionsProvider = $this->createMock(ContributorInterface::CLAZZ);
@@ -38,7 +38,7 @@ class PermissionAndCategoriesInstallerTest extends AbstractTestCase
             self::$em,
             $this->permissionCategoriesProvider,
             $this->permissionsProvider,
-            self::$container->get('modera_security.data_installation.bc_layer')
+            self::getContainer()->get('modera_security.data_installation.bc_layer')
         );
     }
 

@@ -39,6 +39,6 @@ class BCLayerTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveNewPermissionCategoryTechnicalName_noMatch()
     {
-        $this->assertFalse($this->bcLayer->resolveNewPermissionCategoryTechnicalName('foobar'));
+        $this->assertNull($this->bcLayer->resolveNewPermissionCategoryTechnicalName('foobar'));
     }
 }

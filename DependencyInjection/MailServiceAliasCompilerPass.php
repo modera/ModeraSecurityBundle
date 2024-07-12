@@ -11,14 +11,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class MailServiceAliasCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
+        /** @var array{'password_strength': array{'mail': array{'service': string}}} $config */
         $config = $container->getParameter(ModeraSecurityExtension::CONFIG_KEY);
 
-        $aliasConfig = array();
+        $aliasConfig = [];
         $aliasConfig['modera_security.password_strength.mail.mail_service'] = $config['password_strength']['mail']['service'];
 
         $container->addAliases($aliasConfig);

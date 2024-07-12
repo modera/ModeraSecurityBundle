@@ -14,12 +14,9 @@ use Symfony\Component\Validator\Constraint;
  */
 class Email extends Constraint
 {
-    public $service = 'modera_security.validator.email';
+    public string $service = 'modera_security.validator.email';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return $this->service;
     }

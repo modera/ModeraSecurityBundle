@@ -2,18 +2,19 @@
 
 namespace Modera\SecurityBundle\Security;
 
+use Modera\SecurityBundle\Entity\UserInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
-use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
+use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 use Symfony\Component\Security\Http\HttpUtils;
-use Modera\SecurityBundle\Entity\User;
 
 /**
  * @internal
@@ -23,58 +24,40 @@ use Modera\SecurityBundle\Entity\User;
  */
 class Authenticator implements AuthenticationFailureHandlerInterface, AuthenticationSuccessHandlerInterface
 {
-    /**
-     * @var DefaultAuthenticationSuccessHandler
-     */
-    private $successHandler;
+    private DefaultAuthenticationSuccessHandler $successHandler;
 
-    /**
-     * @var DefaultAuthenticationFailureHandler
-     */
-    private $failureHandler;
+    private DefaultAuthenticationFailureHandler $failureHandler;
 
-    /**
-     * @param HttpUtils $httpUtils
-     * @param HttpKernelInterface $httpKernel
-     * @param LoggerInterface|null $logger
-     */
     public function __construct(
         HttpUtils $httpUtils,
         HttpKernelInterface $httpKernel,
-        LoggerInterface $logger = null
-    )
-    {
+        ?LoggerInterface $logger = null
+    ) {
         $this->successHandler = new DefaultAuthenticationSuccessHandler($httpUtils);
-        $this->failureHandler = new DefaultAuthenticationFailureHandler($httpKernel, $httpUtils, array(), $logger);
+        $this->failureHandler = new DefaultAuthenticationFailureHandler($httpKernel, $httpUtils, [], $logger);
     }
 
     /**
-     * @param array $options An array of options
+     * @param array<string, mixed> $options
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->successHandler->setOptions($options);
         $this->failureHandler->setOptions($options);
     }
 
-    /**
-     * @param string $providerKey
-     */
-    public function setProviderKey($providerKey)
+    public function setFirewallName(string $firewallName): void
     {
-        $this->successHandler->setProviderKey($providerKey);
+        $this->successHandler->setFirewallName($firewallName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         if ($request->isXmlHttpRequest()) {
-            $result = array(
+            $result = [
                 'success' => false,
                 'message' => $exception->getMessage(),
-            );
+            ];
 
             return new JsonResponse($result);
         }
@@ -82,10 +65,7 @@ class Authenticator implements AuthenticationFailureHandlerInterface, Authentica
         return $this->failureHandler->onAuthenticationFailure($request, $exception);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
     {
         if ($request->isXmlHttpRequest()) {
             $result = static::getAuthenticationResponse($token);
@@ -97,38 +77,48 @@ class Authenticator implements AuthenticationFailureHandlerInterface, Authentica
     }
 
     /**
-     * @param TokenInterface $token
-     *
-     * @return array
+     * @return array{
+     *     'success': bool,
+     *     'profile'?: array{
+     *         'id': ?int,
+     *         'name': ?string,
+     *         'email': ?string,
+     *         'username': ?string,
+     *         'meta': array<string, mixed>,
+     *     },
+     * }
      */
-    public static function getAuthenticationResponse(TokenInterface $token)
+    public static function getAuthenticationResponse(?TokenInterface $token): array
     {
-        $response = array('success' => false);
-        if ($token && $token->getUser() instanceof User) {
-            /* @var User $user */
+        $response = ['success' => false];
+        if ($token && $token->getUser() instanceof UserInterface) {
             $user = $token->getUser();
-            $response = array(
+            $response = [
                 'success' => true,
                 'profile' => self::userToArray($user),
-            );
+            ];
         }
 
         return $response;
     }
 
     /**
-     * @param User $user
-     *
-     * @return array
+     * @return array{
+     *     'id': ?int,
+     *     'name': ?string,
+     *     'email': ?string,
+     *     'username': ?string,
+     *     'meta': array<string, mixed>,
+     * }
      */
-    public static function userToArray(User $user)
+    public static function userToArray(UserInterface $user): array
     {
-        return array(
+        return [
             'id' => $user->getId(),
             'name' => $user->getFullName(),
             'email' => $user->getEmail(),
             'username' => $user->getUsername(),
             'meta' => $user->getMeta(),
-        );
+        ];
     }
 }

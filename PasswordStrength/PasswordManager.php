@@ -4,55 +4,35 @@ namespace Modera\SecurityBundle\PasswordStrength;
 
 use Modera\SecurityBundle\Entity\User;
 use Modera\SecurityBundle\PasswordStrength\Mail\MailServiceInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Modera\SecurityBundle\PasswordStrength\PasswordConfigInterface;
 
 /**
- * @since 2.56.0
- *
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
  * @copyright 2017 Modera Foundation
  */
 class PasswordManager
 {
-    /**
-     * @var PasswordConfigInterface
-     */
-    private $passwordConfig;
+    private PasswordConfigInterface $passwordConfig;
 
-    /**
-     * @var UserPasswordEncoderInterface
-     */
-    private $passwordEncoder;
+    private UserPasswordHasherInterface $passwordHasher;
 
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
+    private ValidatorInterface $validator;
 
-    /**
-     * @var MailServiceInterface
-     */
-    private $mailService;
+    private MailServiceInterface $mailService;
 
     /**
      * @internal Use container service instead
-     *
-     * @param PasswordConfigInterface $passwordConfig
-     * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param ValidatorInterface $validator
      */
     public function __construct(
         PasswordConfigInterface $passwordConfig,
-        UserPasswordEncoderInterface $passwordEncoder,
+        UserPasswordHasherInterface $passwordHasher,
         ValidatorInterface $validator,
         MailServiceInterface $mailService
-    )
-    {
+    ) {
         $this->passwordConfig = $passwordConfig;
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
         $this->validator = $validator;
         $this->mailService = $mailService;
     }
@@ -61,28 +41,23 @@ class PasswordManager
      * Checks if it is allowed to use $plainPassword according to password rotation config. For example,
      * if rotation period is 30 days and password "foobar123" has been set within this period then
      * the method will return FALSE.
-     *
-     * @param User $user
-     * @param string $plainPassword
-     *
-     * @return bool
      */
-    public function hasPasswordAlreadyBeenUsedWithinLastRotationPeriod(User $user, $plainPassword)
+    public function hasPasswordAlreadyBeenUsedWithinLastRotationPeriod(User $user, string $plainPassword): bool
     {
         if ($this->isPasswordRotationTurnedOff()) {
             return false;
         }
 
         $meta = $user->getMeta();
-        if (!isset($meta['modera_security']['used_passwords'])) {
+        if (!\is_array($meta['modera_security'] ?? null) || !\is_array($meta['modera_security']['used_passwords'] ?? null)) {
             return false; // if here we return TRUE then it won't be possible to create new users
         }
 
-        $encodedPassword = $this->passwordEncoder->encodePassword($user, $plainPassword);
+        $encodedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
 
         $now = new \DateTime('now');
         foreach ($meta['modera_security']['used_passwords'] as $oldPasswordChangeTimestamp => $oldEncodedPassword) {
-            if ($encodedPassword == $oldEncodedPassword) {
+            if ($encodedPassword === $oldEncodedPassword) {
                 $oldPasswordChangeTime = new \DateTime();
                 $oldPasswordChangeTime->setTimestamp($oldPasswordChangeTimestamp);
 
@@ -96,63 +71,55 @@ class PasswordManager
         return false;
     }
 
-    /**
-     * @param string $plainPassword
-     *
-     * @return ConstraintViolation[]
-     */
-    public function validatePassword($plainPassword)
+    public function validatePassword(string $plainPassword): ConstraintViolationListInterface
     {
         return $this->validator->validate($plainPassword, new StrongPassword());
     }
 
     /**
-     * Validates $plainPassword, verifies its against possibly configuration rotation if everything's fine then
+     * Validates $plainPassword, verifies it's against possibly configuration rotation if everything's fine then
      * it encodes it and updates $user, if some problems were detected then exception will be thrown.
      *
      * NB! Changes are not automatically persisted into database, so you need to flush UoW manually.
      *
      * @throws BadPasswordException
-     *
-     * @param User $user
-     * @param string $plainPassword
      */
-    public function encodeAndSetPassword(User $user, $plainPassword)
+    public function encodeAndSetPassword(User $user, string $plainPassword): void
     {
         if (!$this->isPasswordRotationTurnedOff()) {
             if ($this->hasPasswordAlreadyBeenUsedWithinLastRotationPeriod($user, $plainPassword)) {
-                $error = sprintf(
+                $error = \sprintf(
                     'Given password cannot be used because it has been already used in last %d days.',
                     $this->passwordConfig->getRotationPeriodInDays()
                 );
                 $e = new BadPasswordException($error);
-                $e->setErrors(array($error));
+                $e->setErrors([$error]);
                 throw $e;
             }
         }
 
         $violations = $this->validatePassword($plainPassword);
-        if (count($violations) > 0) {
+        if (\count($violations) > 0) {
             $errors = [];
             foreach ($violations as $violation) {
                 $errors[] = $violation->getMessage();
             }
 
-            $e = new BadPasswordException(implode(' ', $errors));
+            $e = new BadPasswordException(\implode(' ', $errors));
             $e->setErrors($errors);
             throw $e;
         }
 
-        $encodedPassword = $this->passwordEncoder->encodePassword($user, $plainPassword);
+        $encodedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
         $user->setPassword($encodedPassword);
 
         $meta = $user->getMeta();
+        if (!\is_array($meta['modera_security'] ?? null)) {
+            $meta['modera_security'] = [];
+        }
 
-        if (!isset($meta['modera_security']['used_passwords']) || $this->isPasswordRotationTurnedOff()) {
-            if (!isset($meta['modera_security'])) {
-                $meta['modera_security'] = array();
-            }
-            $meta['modera_security']['used_passwords'] = array();
+        if (!\is_array($meta['modera_security']['used_passwords'] ?? null) || $this->isPasswordRotationTurnedOff()) {
+            $meta['modera_security']['used_passwords'] = [];
         }
 
         // remove outdated passwords
@@ -169,7 +136,7 @@ class PasswordManager
             }
         }
 
-        $meta['modera_security']['used_passwords'][time()] = $encodedPassword;
+        $meta['modera_security']['used_passwords'][\time()] = $encodedPassword;
         unset($meta['modera_security']['force_password_rotation']);
 
         $user->setMeta($meta);
@@ -177,71 +144,71 @@ class PasswordManager
 
     /**
      * Returns TRUE if it is time to change user's password already.
-     *
-     * @param User $user
-     *
-     * @return bool
      */
-    public function isItTimeToRotatePassword(User $user)
+    public function isItTimeToRotatePassword(User $user): bool
     {
         if ($this->isPasswordRotationTurnedOff()) {
             return false;
         }
 
         $meta = $user->getMeta();
-        if (isset($meta['modera_security']['force_password_rotation']) &&
-            true === $meta['modera_security']['force_password_rotation']) {
+        if (!\is_array($meta['modera_security'] ?? null)) {
+            $meta['modera_security'] = [];
+        }
 
+        if (isset($meta['modera_security']['force_password_rotation'])
+            && true === $meta['modera_security']['force_password_rotation']) {
             return true;
         }
+
         if (!isset($meta['modera_security']['used_passwords'])) {
             return true;
         }
 
         $usedPasswords = $meta['modera_security']['used_passwords'];
-        if (count($usedPasswords) == 0) {
+        if (!\is_array($usedPasswords)) {
+            $usedPasswords = [];
+        }
+
+        if (0 === \count($usedPasswords)) {
             return true;
         }
 
-        end($usedPasswords);
+        \end($usedPasswords);
         $lastTimePasswordChangeDateTime = new \DateTime('now');
         $lastTimePasswordChangeDateTime->setTimestamp(key($usedPasswords));
 
         $now = new \DateTime('now');
+
         return $now->diff($lastTimePasswordChangeDateTime)->days > $this->passwordConfig->getRotationPeriodInDays();
     }
 
-    /**
-     * @param User|null $user
-     *
-     * @return string
-     */
-    public function generatePassword(User $user = null)
+    public function generatePassword(?User $user = null): string
     {
         while (true) {
             $plainPassword = '';
             $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
             for ($i = 0; $i < $this->passwordConfig->getMinLength(); ++$i) {
-                $plainPassword .= $characters[rand(0, strlen($characters) - 1)];
+                $plainPassword .= $characters[\rand(0, \strlen($characters) - 1)];
             }
 
-            if ($this->passwordConfig->isNumberRequired() && !preg_match('/[0-9]/', $plainPassword)) {
+            if ($this->passwordConfig->isNumberRequired() && !\preg_match('/[0-9]/', $plainPassword)) {
                 continue;
             }
             if ($this->passwordConfig->isLetterRequired()) {
                 $continue = false;
                 switch ($this->passwordConfig->getLetterRequiredType()) {
                     case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_OR_NON_CAPITAL:
-                        $continue = !preg_match('/[A-Za-z]/', $plainPassword);
+                        $continue = !\preg_match('/[A-Za-z]/', $plainPassword);
                         break;
                     case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL_AND_NON_CAPITAL:
-                        $continue = !preg_match('/(?=.*[A-Z])(?=.*[a-z])/', $plainPassword);
+                        $continue = !\preg_match('/(?=.*[A-Z])(?=.*[a-z])/', $plainPassword);
                         break;
                     case PasswordConfigInterface::LETTER_REQUIRED_TYPE_CAPITAL:
-                        $continue = !preg_match('/[A-Z]/', $plainPassword);
+                        $continue = !\preg_match('/[A-Z]/', $plainPassword);
                         break;
                     case PasswordConfigInterface::LETTER_REQUIRED_TYPE_NON_CAPITAL:
-                        $continue = !preg_match('/[a-z]/', $plainPassword);
+                        $continue = !\preg_match('/[a-z]/', $plainPassword);
                         break;
                 }
 
@@ -261,23 +228,23 @@ class PasswordManager
     /**
      * When a password is sent over email then the first time user logins using it he/she will
      * be force to change it.
-     *
-     * @param User $user
-     * @param string $plainPassword
      */
-    public function encodeAndSetPasswordAndThenEmailIt(User $user, $plainPassword)
+    public function encodeAndSetPasswordAndThenEmailIt(User $user, string $plainPassword): void
     {
         $this->encodeAndSetPassword($user, $plainPassword);
 
         $meta = $user->getMeta();
+        if (!\is_array($meta['modera_security'] ?? null)) {
+            $meta['modera_security'] = [];
+        }
         $meta['modera_security']['force_password_rotation'] = true;
         $user->setMeta($meta);
 
         $this->mailService->sendPassword($user, $plainPassword);
     }
 
-    private function isPasswordRotationTurnedOff()
+    private function isPasswordRotationTurnedOff(): bool
     {
-        return $this->passwordConfig->getRotationPeriodInDays() === false;
+        return null === $this->passwordConfig->getRotationPeriodInDays();
     }
 }

@@ -10,9 +10,8 @@ services:
 
     modera_security.security.logout_success_handler:
         class: Modera\SecurityBundle\Security\LogoutSuccessHandler
-        arguments:
-            - "@security.http_utils"
-            - /
+        tags:
+            - kernel.event_subscriber
 
 security:
     encoders:
