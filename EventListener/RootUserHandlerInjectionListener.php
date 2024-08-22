@@ -28,15 +28,10 @@ class RootUserHandlerInjectionListener
         $this->container = $container;
     }
 
-    public function postLoad(LifecycleEventArgs $event): void
+    public function postLoad(User $entity, LifecycleEventArgs $event): void
     {
         /** @var RootUserHandlerInterface $rootUserHandler */
         $rootUserHandler = $this->container->get('modera_security.root_user_handling.handler');
-
-        $entity = $event->getObject();
-
-        if ($entity instanceof User) {
-            $entity->init($rootUserHandler);
-        }
+        $entity->init($rootUserHandler);
     }
 }

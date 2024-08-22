@@ -45,32 +45,8 @@ class RootUserHandlerInjectionListenerTest extends \PHPUnit\Framework\TestCase
         $event = $this->createEvent($user);
 
         $listener = new RootUserHandlerInjectionListener($this->container);
-        $listener->postLoad($event);
+        $listener->postLoad($user, $event);
 
         \Phake::verify($user)->init($this->rootUserHandler);
-    }
-
-    /**
-     * @doesNotPerformAssertions
-     */
-    public function testPostLoadNoEntityProvided()
-    {
-        $event = $this->createEvent();
-
-        $listener = new RootUserHandlerInjectionListener($this->container);
-        $listener->postLoad($event);
-    }
-
-    /**
-     * @doesNotPerformAssertions
-     */
-    public function testPostLoadWithWrongType()
-    {
-        $userWannaBe = new \stdClass();
-
-        $event = $this->createEvent($userWannaBe);
-
-        $listener = new RootUserHandlerInjectionListener($this->container);
-        $listener->postLoad($event);
     }
 }

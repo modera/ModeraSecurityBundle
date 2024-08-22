@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 
 <container xmlns="http://symfony.com/schema/dic/services"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
         <parameter key="modera_security.validator.email_validator.class">Modera\SecurityBundle\Validator\Constraints\EmailValidator</parameter>
@@ -80,7 +80,11 @@
 
             <argument type="service" id="service_container" />
 
-            <tag name="doctrine.event_listener" event="postLoad" />
+            <tag name="doctrine.orm.entity_listener"
+                 event="postLoad"
+                 entity="Modera\SecurityBundle\Entity\User"
+                 lazy="true"/>
+
         </service>
 
         <service id="modera_security.password_strength.password_config"
@@ -89,10 +93,10 @@
 
             <argument>%modera_security.config%</argument>
         </service>
-        
+
         <service id="modera_security.password_strength.strong_password_validator"
                  class="Modera\SecurityBundle\PasswordStrength\StrongPasswordValidator">
-            
+
             <argument type="service" id="modera_security.password_strength.password_config" />
 
             <tag name="validator.constraint_validator" />
