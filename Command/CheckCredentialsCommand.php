@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * @author    Sergei Lissovski <sergei.lissovski@modera.org>
@@ -19,12 +19,12 @@ class CheckCredentialsCommand extends Command
 {
     private EntityManagerInterface $em;
 
-    private UserPasswordEncoderInterface $encoder;
+    private UserPasswordHasherInterface $hasher;
 
-    public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $encoder)
+    public function __construct(EntityManagerInterface $em, UserPasswordHasherInterface $hasher)
     {
         $this->em = $em;
-        $this->encoder = $encoder;
+        $this->hasher = $hasher;
 
         parent::__construct();
     }
@@ -34,37 +34,37 @@ class CheckCredentialsCommand extends Command
         $this
             ->setName('modera:security:check-credentials')
             ->setDescription('Check user credentials.')
-            ->addOption('username', null, InputOption::VALUE_REQUIRED)
-            ->addOption('password', null, InputOption::VALUE_REQUIRED)
             ->addArgument('property', InputArgument::OPTIONAL, '', 'username')
+            ->addOption('identifier', null, InputOption::VALUE_REQUIRED)
+            ->addOption('password', null, InputOption::VALUE_REQUIRED)
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string $username */
-        $username = $input->getOption('username');
+        /** @var string $property */
+        $property = $input->getArgument('property');
+
+        /** @var string $identifier */
+        $identifier = $input->getOption('identifier');
 
         /** @var string $password */
         $password = $input->getOption('password');
 
-        /** @var string $property */
-        $property = $input->getArgument('property');
-
         /** @var array<string, mixed> $criteria */
         $criteria = [
-            $property => $username,
+            $property => $identifier,
         ];
 
         $user = $this->em->getRepository(User::class)->findOneBy($criteria);
 
         if (!$user) {
-            $output->writeln(sprintf('<error>User "%s" not found!</error>', $username));
+            $output->writeln(\sprintf('<error>User with identifier "%s" not found!</error>', $identifier));
 
             return 1;
         }
 
-        if (!$this->encoder->isPasswordValid($user, $password)) {
+        if (!$this->hasher->isPasswordValid($user, $password)) {
             $output->writeln('<error>Password not valid!</error>');
 
             return 2;

@@ -5,7 +5,7 @@ namespace Modera\SecurityBundle\Entity;
 use Doctrine\Common\Collections\Collection;
 use Modera\SecurityBundle\Model\UserInterface as ModeraUserInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface as PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 
 /**

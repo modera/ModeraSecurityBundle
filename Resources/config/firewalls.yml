@@ -1,5 +1,5 @@
 parameters:
-    modera_security.firewalls.secured_area.guard: false
+    modera_security.firewalls.secured_area.custom_authenticators: false
     modera_security.firewalls.remember_me.secret: '%kernel.secret%'
 
     modera_security.default_firewalls:
@@ -14,7 +14,7 @@ parameters:
         secured_area:
             lazy: true
             pattern: ^/
-            guard: '%modera_security.firewalls.secured_area.guard%'
+            custom_authenticators: '%modera_security.firewalls.secured_area.custom_authenticators%'
             context: modera_auth
             provider: modera_provider
             user_checker: modera_security.security.user_checker
