@@ -263,27 +263,42 @@ class User implements \Serializable, UserInterface, PreferencesAwareUserInterfac
     }
 
     /**
+     * @deprecated will be removed in next version
      * @see \Serializable::serialize()
      */
     public function serialize(): ?string
     {
-        return \serialize([
-            'id' => $this->id,
-            'username' => $this->username,
-            'password' => $this->password,
-            'salt' => $this->salt,
-            'isActive' => $this->isActive,
-        ]);
+        return \serialize($this->__serialize());
     }
 
     /**
+     * @deprecated will be removed in next version
      * @see \Serializable::unserialize()
      */
     public function unserialize($data): void
     {
         /** @var array<string, mixed> $arr */
         $arr = \unserialize($data);
-        foreach ($arr as $key => $value) {
+        $this->__unserialize($arr);
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'username' => $this->username,
+            'password' => $this->password,
+            'salt' => $this->salt,
+            'isActive' => $this->isActive,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function __unserialize(array $data): void
+    {
+        foreach ($data as $key => $value) {
             $this->{$key} = $value;
         }
     }
