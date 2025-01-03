@@ -2,6 +2,7 @@
 
 namespace Modera\SecurityBundle\EventListener;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Modera\SecurityBundle\Entity\User;
@@ -41,8 +42,20 @@ class AuthenticationSubscriber implements EventSubscriberInterface
                 $user->setState(UserInterface::STATE_ACTIVE);
             }
 
-            $this->om->persist($user);
-            $this->om->flush();
+            if ($this->om instanceof EntityManagerInterface) {
+                $this->om->createQuery(\sprintf(
+                    'UPDATE %s u SET u.lastLogin = :lastLogin, u.state = :state WHERE u.id = :id',
+                    User::class
+                ))
+                    ->setParameter('lastLogin', $user->getLastLogin())
+                    ->setParameter('state', $user->getState())
+                    ->setParameter('id', $user->getId())
+                    ->execute()
+                ;
+            } else {
+                $this->om->persist($user);
+                $this->om->flush();
+            }
         }
     }
 }
