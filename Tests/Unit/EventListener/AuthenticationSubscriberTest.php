@@ -13,7 +13,7 @@ class AuthenticationSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private function createAuthenticationSubscriber()
     {
-        $om = \Phake::mock('Doctrine\ORM\EntityManagerInterface');
+        $om = \Phake::mock('Doctrine\Persistence\ObjectManager');
         $user = \Phake::mock(User::class);
         $doctrine = \Phake::mock('Doctrine\Persistence\ManagerRegistry');
 
